@@ -24,5 +24,10 @@ namespace NewHistoricalLog
 		{
 			InitializeComponent();
 		}
-	}
+
+        private void OnFilterPopupClose(object sender, EventArgs e)
+        {
+
+        }
+    }
 }

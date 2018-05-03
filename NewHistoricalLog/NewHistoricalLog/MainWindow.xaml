@@ -3,8 +3,14 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
         xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
-        xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid" xmlns:dxnav="http://schemas.devexpress.com/winfx/2008/xaml/navigation" xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" xmlns:dxsch="http://schemas.devexpress.com/winfx/2008/xaml/scheduling" xmlns:Custom="http://schemas.devexpress.com/winfx/2008/xaml/charts/rangecontrolclient" xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol" x:Class="NewHistoricalLog.MainWindow"
-        Title="Архив сообщений" Height="350" Width="525">
+        xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid" 
+        xmlns:dxnav="http://schemas.devexpress.com/winfx/2008/xaml/navigation" 
+        xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" 
+        xmlns:dxsch="http://schemas.devexpress.com/winfx/2008/xaml/scheduling" 
+        xmlns:Custom="http://schemas.devexpress.com/winfx/2008/xaml/charts/rangecontrolclient" 
+        xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol" 
+        x:Class="NewHistoricalLog.MainWindow"
+        Title="Архив сообщений" Height="350" Width="650" MinWidth="650">
 	<Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto"/>
@@ -17,31 +23,41 @@
 				<dxb:BarButtonItem Content="Сохранить"/>
 				<dxb:BarButtonItem Content="Выход"/>
 			</dxb:BarSubItem>
-			<dxb:BarSubItem Content="Фильтр">
+			<dxb:BarSubItem Content="Фильтр" CloseUp="OnFilterPopupClose">
 				<dxb:BarButtonItem Content="Очистить фильтр"/>
+                <dxb:BarCheckItem Content="Аварийные сообщения" CloseSubMenuOnClick="False"/>
+                <dxb:BarCheckItem Content="Предупредительные сообщения" CloseSubMenuOnClick="False"/>
+                <dxb:BarCheckItem Content="Сообщения о командах" CloseSubMenuOnClick="False"/>
+                <dxb:BarCheckItem Content="Информационные сообщения" CloseSubMenuOnClick="False"/>
 
-			</dxb:BarSubItem>
+            </dxb:BarSubItem>
 			<dxb:BarSubItem Content="Сервис">
 				<dxb:BarButtonItem Content="BarButtonItem"/>
 			</dxb:BarSubItem>
 		</dxb:MainMenuControl>
+        
+            <StackPanel Orientation="Horizontal" Grid.Row="1" Width="Auto"  HorizontalAlignment="Left">
+                <TextBlock Margin="5,5,5,5"><Run Text="Начало выборки"/></TextBlock>
+                <dxe:DateEdit x:Name="startDate" HorizontalAlignment="Left" VerticalAlignment="Top" Width="130" IsTextEditable="False" Mask="G" Margin="5,5,5,5">
+                <dxe:DateEdit.StyleSettings>
+                    <dxe:DateEditPickerStyleSettings/>
+                </dxe:DateEdit.StyleSettings>
+            </dxe:DateEdit>
+                <TextBlock Margin="5,5,5,5"><Run Text="Окончание выборки"/></TextBlock>
+                <dxe:DateEdit HorizontalAlignment="Left" VerticalAlignment="Top" Width="130" IsTextEditable="False" Mask="G" Margin="5,5,5,5" x:Name="endDate">
+                <dxe:DateEdit.StyleSettings>
+                    <dxe:DateEditPickerStyleSettings/>
+                </dxe:DateEdit.StyleSettings>
+            </dxe:DateEdit>
+            </StackPanel>
 
-		<StackPanel Orientation="Horizontal" Grid.Row="1" Width="Auto" x:Name="startDate">
-			<TextBlock Margin="5,5,5,5"><Run Text="Начало выборки"/></TextBlock>
-			<dxe:DateEdit HorizontalAlignment="Left" VerticalAlignment="Top" Width="130" IsTextEditable="False" Mask="f" Margin="5,5,5,5">
-				<dxe:DateEdit.StyleSettings>
-					<dxe:DateEditCalendarStyleSettings/>
-				</dxe:DateEdit.StyleSettings>
-			</dxe:DateEdit>
-			<TextBlock Margin="5,5,5,5"><Run Text="Окончание выборки"/></TextBlock>
-			<dxe:DateEdit HorizontalAlignment="Left" VerticalAlignment="Top" Width="130" IsTextEditable="False" Mask="f" Margin="5,5,5,5" x:Name="endDate">
-				<dxe:DateEdit.StyleSettings>
-					<dxe:DateEditCalendarStyleSettings/>
-				</dxe:DateEdit.StyleSettings>
-			</dxe:DateEdit>
-		</StackPanel>
 
-		<dxg:GridControl AutoGenerateColumns="AddNew" EnableSmartColumnsGeneration="True" Grid.Row="2" x:Name="messageGrid">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Row="1">
+            <dxe:TextEdit Width="100" Margin="5,5,0,5"/>
+            <dx:SimpleButton Width="20" Margin="0,5,5,5" Glyph="{dx:DXImage Image=Zoom_32x32.png}" GlyphAlignment="Right"/>
+        </StackPanel>
+
+        <dxg:GridControl AutoGenerateColumns="AddNew" EnableSmartColumnsGeneration="True" Grid.Row="2" x:Name="messageGrid">
 			<dxg:GridControl.View>
 				<dxg:TableView AllowPerPixelScrolling="True" ShowTotalSummary="False" ShowGroupPanel="False"/>
 			</dxg:GridControl.View>
