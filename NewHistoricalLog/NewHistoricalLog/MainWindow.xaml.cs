@@ -39,6 +39,7 @@ namespace NewHistoricalLog
         {
             filterRow.Height = new GridLength(0);
 			filterBox.SelectedItem = filterBox.Items[0];
+            messageView.PageSize = Service.CountLines;
             //startDate.EditValue = DateTime.Now.AddHours(-1);
             //endDate.EditValue = DateTime.Now;
         }
@@ -184,9 +185,9 @@ namespace NewHistoricalLog
                 Service.FilterPhrase = "";
         }
 
-		private void SimpleButton_Click(object sender, RoutedEventArgs e)
+		private void SearchClick(object sender, RoutedEventArgs e)
 		{
-
+            messageView.ShowSearchPanel(true);
 		}
 	}
 }

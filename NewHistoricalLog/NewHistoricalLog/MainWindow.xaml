@@ -66,7 +66,7 @@
                 </dxe:DateEdit.StyleSettings>
             </dxe:DateEdit>
             <TextBlock Margin="5,5,5,5"><Run Text="Окончание выборки"/></TextBlock>
-            <dxe:DateEdit HorizontalAlignment="Left" VerticalAlignment="Top" Width="150"  Mask="G" Margin="5,5,5,0" x:Name="endDate" MaskUseAsDisplayFormat="True" EditValueChanged="EndDateChanged">
+            <dxe:DateEdit HorizontalAlignment="Left" VerticalAlignment="Top" Width="150"  Mask="G" Margin="5,5,5,5" x:Name="endDate" MaskUseAsDisplayFormat="True" EditValueChanged="EndDateChanged">
                 <dxe:DateEdit.StyleSettings>
                     <dxe:DateEditPickerStyleSettings/>
                 </dxe:DateEdit.StyleSettings>
@@ -78,12 +78,13 @@
             <!--<dxe:TextEdit Width="150" Margin="5,5,0,5"/>
             <dx:SimpleButton Width="20" Margin="0,5,5,5" Glyph="pack://application:,,,/NewHistoricalLog;component/Images/search.png" GlyphAlignment="Right"/>-->
             <!--<dxe:SearchControl x:Name="searcher" Width="150" Margin="5" FilterCondition="Contains"/>-->
-			<dx:SimpleButton Width="170" Click="SimpleButton_Click" Margin="5" Content="Поиск"/>
+			<dx:SimpleButton Width="170" Click="SearchClick" Margin="5" Content="Поиск"/>
 		</StackPanel>
 
         <dxg:GridControl AutoGenerateColumns="None" EnableSmartColumnsGeneration="True" Grid.Row="3" x:Name="messageGrid" ItemsSource="{Binding MessageCollection}" >
             <dxg:GridControl.View>
-                <dxg:TableView AllowPerPixelScrolling="True" ShowTotalSummary="False" SearchPanelAllowFilter="False" SearchPanelClearOnClose="True" ShowGroupPanel="False" AllowEditing="False" AllowGrouping="False" ShowFilterPanelMode="Never"/>
+                <dxg:TableView x:Name="messageView" AllowPerPixelScrolling="True" ShowTotalSummary="False" SearchPanelAllowFilter="False" SearchPanelClearOnClose="True" 
+                               ShowGroupPanel="False" AllowEditing="False" AllowGrouping="False" ShowFilterPanelMode="Never" AllowPaging="True" />
             </dxg:GridControl.View>
             <dxg:GridColumn FieldName="Date" IsSmart="True" Header="Дата" AllowGrouping="False" AllowSorting="False" AllowEditing="False">
                 <dxg:GridColumn.EditSettings>
@@ -106,7 +107,7 @@
             
         </dxg:GridControl>
 
-        <Grid Grid.Row="4" >
+        <!--<Grid Grid.Row="4" >
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                 <dx:SimpleButton Height="25" Width="30" Glyph="{dx:DXImage Image=DoublePrev_16x16.png}"/>
                 <dx:SimpleButton Height="25" Width="30" Glyph="{dx:DXImage Image=Prev_16x16.png}"/>
@@ -117,6 +118,6 @@
                 <dx:SimpleButton Height="25" Width="30" Glyph="{dx:DXImage Image=DoubleNext_16x16.png}"/>
             </StackPanel>
 
-        </Grid>
+        </Grid>-->
     </Grid>
 </dx:ThemedWindow>
