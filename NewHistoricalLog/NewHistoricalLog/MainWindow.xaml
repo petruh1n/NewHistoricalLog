@@ -48,7 +48,7 @@
                 <ColumnDefinition/>
                 <ColumnDefinition Width="270"/>
             </Grid.ColumnDefinitions>
-            <dxe:TextEdit Margin="5,5,5,5" EditValueChanging="FilterTextChanging" />
+            <dxe:TextEdit x:Name="filterText" Margin="5,5,5,5" EditValueChanging="FilterTextChanging" />
             <dxe:ComboBoxEdit x:Name="filterBox"   Margin="5,5,5,5" Width="120" Grid.Column="1" HorizontalAlignment="Left" IsTextEditable="False" EditValueChanged="FilterColumnChanged">
                 <dxe:ComboBoxEditItem Content="Сообщение"/>
                 <dxe:ComboBoxEditItem Content="Источник"/>
@@ -75,14 +75,15 @@
 
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Row="2">
-            <dxe:TextEdit Width="150" Margin="5,5,0,5"/>
-            <dx:SimpleButton Width="20" Margin="0,5,5,5" Glyph="pack://application:,,,/NewHistoricalLog;component/Images/search.png" GlyphAlignment="Right"/>
+            <!--<dxe:TextEdit Width="150" Margin="5,5,0,5"/>
+            <dx:SimpleButton Width="20" Margin="0,5,5,5" Glyph="pack://application:,,,/NewHistoricalLog;component/Images/search.png" GlyphAlignment="Right"/>-->
             <!--<dxe:SearchControl x:Name="searcher" Width="150" Margin="5" FilterCondition="Contains"/>-->
-        </StackPanel>
+			<dx:SimpleButton Width="170" Click="SimpleButton_Click" Margin="5" Content="Поиск"/>
+		</StackPanel>
 
         <dxg:GridControl AutoGenerateColumns="None" EnableSmartColumnsGeneration="True" Grid.Row="3" x:Name="messageGrid" ItemsSource="{Binding MessageCollection}" >
             <dxg:GridControl.View>
-                <dxg:TableView AllowPerPixelScrolling="True" ShowTotalSummary="False" ShowGroupPanel="False" AllowEditing="False" AllowGrouping="False" ShowFilterPanelMode="Never"/>
+                <dxg:TableView AllowPerPixelScrolling="True" ShowTotalSummary="False" SearchPanelAllowFilter="False" SearchPanelClearOnClose="True" ShowGroupPanel="False" AllowEditing="False" AllowGrouping="False" ShowFilterPanelMode="Never"/>
             </dxg:GridControl.View>
             <dxg:GridColumn FieldName="Date" IsSmart="True" Header="Дата" AllowGrouping="False" AllowSorting="False" AllowEditing="False">
                 <dxg:GridColumn.EditSettings>
@@ -93,7 +94,7 @@
                 <dxg:GridColumn.CellTemplate>
                     <DataTemplate>
                         <StackPanel Height="auto" Orientation="Horizontal">
-                            <Rectangle Fill="{Binding Path = RowData.Row.TypeColor, Mode=TwoWay}" Margin="2" />
+                            <Rectangle Fill="{Binding Path = RowData.Row.TypeColor, Mode=TwoWay}" Width="50"/>
                         </StackPanel>
                     </DataTemplate>
                 </dxg:GridColumn.CellTemplate>

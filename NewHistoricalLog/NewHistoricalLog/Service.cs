@@ -12,11 +12,11 @@ namespace NewHistoricalLog
         /// <summary>
         /// Стартовая дата выборки
         /// </summary>
-        public static DateTime StartDate { get; set; } = new DateTime();
+        public static DateTime StartDate { get; set; } = new DateTime(2017,3,7,10,0,0,0,DateTimeKind.Local);
         /// <summary>
         /// Конечная дата выборки
         /// </summary>
-        public static DateTime EndDate { get; set; } = new DateTime();
+        public static DateTime EndDate { get; set; } = new DateTime(2017, 3, 7, 20, 0, 0, 0, DateTimeKind.Local);
         /// <summary>
         /// Строка подключения к БД
         /// </summary>
