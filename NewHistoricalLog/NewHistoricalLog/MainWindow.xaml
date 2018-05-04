@@ -9,71 +9,113 @@
         xmlns:dxsch="http://schemas.devexpress.com/winfx/2008/xaml/scheduling" 
         xmlns:Custom="http://schemas.devexpress.com/winfx/2008/xaml/charts/rangecontrolclient" 
         xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol" 
+        xmlns:local="clr-namespace:NewHistoricalLog" 
         x:Class="NewHistoricalLog.MainWindow"
-        Title="Архив сообщений" Height="350" Width="650" MinWidth="650">
-	<Grid>
-		<Grid.RowDefinitions>
-			<RowDefinition Height="Auto"/>
-			<RowDefinition Height="30"/>
-			<RowDefinition Height="*"/>
-			<RowDefinition Height="Auto"/>
-		</Grid.RowDefinitions>
-		<dxb:MainMenuControl VerticalAlignment="Top" >
-			<dxb:BarSubItem Content="Файл">
-				<dxb:BarButtonItem Content="Сохранить"/>
-				<dxb:BarButtonItem Content="Выход"/>
-			</dxb:BarSubItem>
-			<dxb:BarSubItem Content="Фильтр" CloseUp="OnFilterPopupClose">
-				<dxb:BarButtonItem Content="Очистить фильтр"/>
-                <dxb:BarCheckItem Content="Аварийные сообщения" CloseSubMenuOnClick="False"/>
-                <dxb:BarCheckItem Content="Предупредительные сообщения" CloseSubMenuOnClick="False"/>
-                <dxb:BarCheckItem Content="Сообщения о командах" CloseSubMenuOnClick="False"/>
-                <dxb:BarCheckItem Content="Информационные сообщения" CloseSubMenuOnClick="False"/>
+        Title="Архив сообщений" Height="350" Width="750" MinWidth="750">
+    <dx:ThemedWindow.DataContext>
+        <local:MainWindowViewModel/>
+    </dx:ThemedWindow.DataContext>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="30" x:Name="filterRow"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition />
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <dxb:MainMenuControl VerticalAlignment="Top" >
+            <dxb:BarSubItem Content="Файл">
+                <dxb:BarButtonItem Content="Обновить" ItemClick="RefreshClick"/>
+                <dxb:BarButtonItem Content="Сохранить" ItemClick="SaveClick"/>
+                <dxb:BarButtonItem Content="Выход" ItemClick="ExitClick"/>
+            </dxb:BarSubItem>
+            <dxb:BarSubItem Content="Фильтр" CloseUp="OnFilterPopupClose">
+                <dxb:BarButtonItem Content="Очистить фильтр" ItemClick="ClearTextFilterClick"/>
+                <dxb:BarCheckItem x:Name="red" IsChecked="True" Content="Сообщения высшего приоритета" CloseSubMenuOnClick="False" Glyph="pack://application:,,,/NewHistoricalLog;component/Images/flag-red-32.png" BarItemDisplayMode="ContentAndGlyph" CheckedChanged="Priority_CheckedChanged"/>
+                <dxb:BarCheckItem x:Name="yellow" IsChecked="True" Content="Сообщения среднего приоритета" CloseSubMenuOnClick="False" Glyph="pack://application:,,,/NewHistoricalLog;component/Images/flag-yellow-32.png" BarItemDisplayMode="ContentAndGlyph" CheckedChanged="Priority_CheckedChanged"/>
+                <dxb:BarCheckItem x:Name="green" IsChecked="True" Content="Сообщения низкого приоритета" CloseSubMenuOnClick="False" Glyph="pack://application:,,,/NewHistoricalLog;component/Images/flag-green-32.png" BarItemDisplayMode="ContentAndGlyph" CheckedChanged="Priority_CheckedChanged"/>
+                <dxb:BarCheckItem x:Name="gray" IsChecked="True" Content="Сообщения нормального приоритета" CloseSubMenuOnClick="False" Glyph="pack://application:,,,/NewHistoricalLog;component/Images/flag-grey-32.png" BarItemDisplayMode="ContentAndGlyph" CheckedChanged="Priority_CheckedChanged"/>
+                <dxb:BarButtonItem Content="Текстовый фильтр" ItemClick="ShowTextFilterClick"/>
 
             </dxb:BarSubItem>
-			<dxb:BarSubItem Content="Сервис">
-				<dxb:BarButtonItem Content="BarButtonItem"/>
-			</dxb:BarSubItem>
-		</dxb:MainMenuControl>
-        
-            <StackPanel Orientation="Horizontal" Grid.Row="1" Width="Auto"  HorizontalAlignment="Left">
-                <TextBlock Margin="5,5,5,5"><Run Text="Начало выборки"/></TextBlock>
-                <dxe:DateEdit x:Name="startDate" HorizontalAlignment="Left" VerticalAlignment="Top" Width="130" IsTextEditable="False" Mask="G" Margin="5,5,5,5">
+            <dxb:BarSubItem Content="Сервис">
+                <dxb:BarButtonItem Content="Печать" ItemClick="PrintClick"/>
+            </dxb:BarSubItem>
+        </dxb:MainMenuControl>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="270"/>
+            </Grid.ColumnDefinitions>
+            <dxe:TextEdit Margin="5,5,5,5" EditValueChanging="FilterTextChanging" />
+            <dxe:ComboBoxEdit x:Name="filterBox"   Margin="5,5,5,5" Width="120" Grid.Column="1" HorizontalAlignment="Left" IsTextEditable="False" EditValueChanged="FilterColumnChanged">
+                <dxe:ComboBoxEditItem Content="Сообщение"/>
+                <dxe:ComboBoxEditItem Content="Источник"/>
+                <dxe:ComboBoxEditItem Content="Пользователь"/>
+                <dxe:ComboBoxEditItem Content="Значение"/>
+            </dxe:ComboBoxEdit>
+            <dx:SimpleButton   Margin="5,5,5,5" Width="Auto" Content="Применить фильтр" HorizontalAlignment="Right" Grid.Column="1" Click="LaunchFilterClick"/>
+        </Grid>
+
+        <StackPanel Orientation="Horizontal" Grid.Row="2" Width="Auto"  HorizontalAlignment="Left">
+            <TextBlock Margin="5,5,5,5"><Run Text="Начало выборки"/></TextBlock>
+            <dxe:DateEdit x:Name="startDate" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150"  Mask="G" Margin="5,5,5,5" MaskUseAsDisplayFormat="True" EditValueChanged="StartDateChanged">
                 <dxe:DateEdit.StyleSettings>
                     <dxe:DateEditPickerStyleSettings/>
                 </dxe:DateEdit.StyleSettings>
             </dxe:DateEdit>
-                <TextBlock Margin="5,5,5,5"><Run Text="Окончание выборки"/></TextBlock>
-                <dxe:DateEdit HorizontalAlignment="Left" VerticalAlignment="Top" Width="130" IsTextEditable="False" Mask="G" Margin="5,5,5,5" x:Name="endDate">
+            <TextBlock Margin="5,5,5,5"><Run Text="Окончание выборки"/></TextBlock>
+            <dxe:DateEdit HorizontalAlignment="Left" VerticalAlignment="Top" Width="150"  Mask="G" Margin="5,5,5,0" x:Name="endDate" MaskUseAsDisplayFormat="True" EditValueChanged="EndDateChanged">
                 <dxe:DateEdit.StyleSettings>
                     <dxe:DateEditPickerStyleSettings/>
                 </dxe:DateEdit.StyleSettings>
             </dxe:DateEdit>
-            </StackPanel>
-
-
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Row="1">
-            <dxe:TextEdit Width="100" Margin="5,5,0,5"/>
-            <dx:SimpleButton Width="20" Margin="0,5,5,5" Glyph="{dx:DXImage Image=Zoom_32x32.png}" GlyphAlignment="Right"/>
         </StackPanel>
 
-        <dxg:GridControl AutoGenerateColumns="AddNew" EnableSmartColumnsGeneration="True" Grid.Row="2" x:Name="messageGrid">
-			<dxg:GridControl.View>
-				<dxg:TableView AllowPerPixelScrolling="True" ShowTotalSummary="False" ShowGroupPanel="False"/>
-			</dxg:GridControl.View>
-		</dxg:GridControl>
 
-		<Grid Grid.Row="3" >
-			<StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-				<dx:SimpleButton Height="25" Width="30" Glyph="{dx:DXImage Image=DoublePrev_16x16.png}"/>
-				<dx:SimpleButton Height="25" Width="30" Glyph="{dx:DXImage Image=Prev_16x16.png}"/>
-				<TextBlock x:Name="curPage" Text="0" VerticalAlignment="Center" Margin="5,0,5,0"/>
-				<TextBlock Text="/" VerticalAlignment="Center" Margin="5,0,5,0"/>
-				<TextBlock x:Name="allPage" Text="0" VerticalAlignment="Center" Margin="5,0,5,0"/>
-				<dx:SimpleButton Height="25" Width="30" Glyph="{dx:DXImage Image=Next_16x16.png}"/>
-				<dx:SimpleButton Height="25" Width="30" Glyph="{dx:DXImage Image=DoubleNext_16x16.png}"/>
-			</StackPanel>
-			
-		</Grid>
-	</Grid>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Row="2">
+            <dxe:TextEdit Width="150" Margin="5,5,0,5"/>
+            <dx:SimpleButton Width="20" Margin="0,5,5,5" Glyph="pack://application:,,,/NewHistoricalLog;component/Images/search.png" GlyphAlignment="Right"/>
+            <!--<dxe:SearchControl x:Name="searcher" Width="150" Margin="5" FilterCondition="Contains"/>-->
+        </StackPanel>
+
+        <dxg:GridControl AutoGenerateColumns="None" EnableSmartColumnsGeneration="True" Grid.Row="3" x:Name="messageGrid" ItemsSource="{Binding MessageCollection}" >
+            <dxg:GridControl.View>
+                <dxg:TableView AllowPerPixelScrolling="True" ShowTotalSummary="False" ShowGroupPanel="False" AllowEditing="False" AllowGrouping="False" ShowFilterPanelMode="Never"/>
+            </dxg:GridControl.View>
+            <dxg:GridColumn FieldName="Date" IsSmart="True" Header="Дата" AllowGrouping="False" AllowSorting="False" AllowEditing="False">
+                <dxg:GridColumn.EditSettings>
+                    <dxe:DateEditSettings Mask="G" MaskUseAsDisplayFormat="True"/>
+                </dxg:GridColumn.EditSettings>
+            </dxg:GridColumn>
+            <dxg:GridColumn FieldName="TypeColor" IsSmart="True" Width="50" Header="Тип" AllowGrouping="False" AllowSorting="False" AllowEditing="False" AllowResizing="False">
+                <dxg:GridColumn.CellTemplate>
+                    <DataTemplate>
+                        <StackPanel Height="auto" Orientation="Horizontal">
+                            <Rectangle Fill="{Binding Path = RowData.Row.TypeColor, Mode=TwoWay}" Margin="2" />
+                        </StackPanel>
+                    </DataTemplate>
+                </dxg:GridColumn.CellTemplate>
+            </dxg:GridColumn>
+            <dxg:GridColumn FieldName="Text" IsSmart="True" Width="*" Header="Текст сообщения" AllowGrouping="False" AllowSorting="False" AllowEditing="False"/>
+            <dxg:GridColumn FieldName="User" IsSmart="True" Width="100" Header="Пользователь" AllowGrouping="False" AllowSorting="False" AllowEditing="False"/>
+            <dxg:GridColumn FieldName="Source" IsSmart="True" Width="100" Header="Источник" AllowGrouping="False" AllowSorting="False" AllowEditing="False"/>
+            <dxg:GridColumn FieldName="Value" IsSmart="True" Width="80" Header="Значение" AllowGrouping="False" AllowSorting="False" AllowEditing="False"/>
+            
+        </dxg:GridControl>
+
+        <Grid Grid.Row="4" >
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <dx:SimpleButton Height="25" Width="30" Glyph="{dx:DXImage Image=DoublePrev_16x16.png}"/>
+                <dx:SimpleButton Height="25" Width="30" Glyph="{dx:DXImage Image=Prev_16x16.png}"/>
+                <TextBlock x:Name="curPage" Text="0" VerticalAlignment="Center" Margin="5,0,5,0"/>
+                <TextBlock Text="/" VerticalAlignment="Center" Margin="5,0,5,0"/>
+                <TextBlock x:Name="allPage" Text="0" VerticalAlignment="Center" Margin="5,0,5,0"/>
+                <dx:SimpleButton Height="25" Width="30" Glyph="{dx:DXImage Image=Next_16x16.png}"/>
+                <dx:SimpleButton Height="25" Width="30" Glyph="{dx:DXImage Image=DoubleNext_16x16.png}"/>
+            </StackPanel>
+
+        </Grid>
+    </Grid>
 </dx:ThemedWindow>

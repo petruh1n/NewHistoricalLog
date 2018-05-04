@@ -35,6 +35,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DatabaseToolBox, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Dll\DatabaseToolBox.dll</HintPath>
+    </Reference>
     <Reference Include="DevExpress.Charts.v17.2.Core, Version=17.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
     <Reference Include="DevExpress.Images.v17.2, Version=17.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
       <Private>True</Private>
@@ -124,6 +128,23 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\flag-green-16.png" />
+    <Resource Include="Images\flag-green-32.png" />
+    <Resource Include="Images\flag-grey-16.png" />
+    <Resource Include="Images\flag-grey-32.png" />
+    <Resource Include="Images\flag-red-16.png" />
+    <Resource Include="Images\flag-red-32.png" />
+    <Resource Include="Images\flag-yellow-16.png" />
+    <Resource Include="Images\flag-yellow-32.png" />
+    <Resource Include="Images\search.png" />
+    <Resource Include="Images\SEM.png" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Dll\DatabaseToolBox.dll" />
+    <Resource Include="Dll\DatabaseToolBox.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
