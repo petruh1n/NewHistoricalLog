@@ -49,6 +49,8 @@ namespace NewHistoricalLog
         public static double Height { get; set; }
 
         public static int CountLines { get; set; } = 50;
+
+        public static int Monitor { get; set; } = 0;
         #endregion
 
 
@@ -143,7 +145,7 @@ namespace NewHistoricalLog
                     }
                 }
 
-                xdoc.Save(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SEMTrends\\Config.xml");
+                xdoc.Save(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SEMHistory\\Config.xml");
             }
             catch (Exception ex)
             {
@@ -178,7 +180,7 @@ namespace NewHistoricalLog
                 parentElement.Add(settingsGroupElement);
                 xDoc.Add(parentElement);
                 //xDoc.WriteTo(new XmlTextWriter(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SEMTrends\\Config.xml", Encoding.UTF8));
-                xDoc.Save(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SEMTrends\\Config.xml");
+                xDoc.Save(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SEMHistory\\Config.xml");
                 #endregion
             }
             catch (Exception ex)
