@@ -56,6 +56,13 @@ namespace NewHistoricalLog
 
 		private void App_Deactivated(object sender, EventArgs e)
 		{
+            foreach(Window window in app.Windows)
+            {
+                if(window!=app.MainWindow)
+                {
+                    window.Close();
+                }
+            }
 			app.MainWindow.WindowState = WindowState.Minimized;
 		}
 
@@ -65,12 +72,34 @@ namespace NewHistoricalLog
 			{
 				// Subsequent launches
 				base.OnStartupNextInstance(eventArgs);
-				
-			}
+
+                if (eventArgs.CommandLine != null)
+                {
+                    try
+                    {
+                        for (int i = 0; i < eventArgs.CommandLine.Count; i++)
+                        {
+
+                            if (eventArgs.CommandLine[i].ToUpper().Contains("MONITOR"))
+                            {
+                                Service.Monitor = Convert.ToInt32(eventArgs.CommandLine[i].Remove(0, eventArgs.CommandLine[i].IndexOf("_") + 1));
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.Error(String.Format("Ошибка при чтении ключей: {0}", ex.Message));
+                        Service.Monitor = 0;
+                    }
+                }
+
+
+            }
 			catch (Exception ex)
 			{
 				logger.Error(String.Format("Ошибка чтения ключей второго экземпляра приложения: {0}", ex.Message));
 			}
+            app.Activate();
 		}
 	}
 	public class SingleInstanceApplication : Application
@@ -96,8 +125,9 @@ namespace NewHistoricalLog
 			try
 			{
 				// Reactivate application's main window
-				this.MainWindow.Show();
+				//this.MainWindow.Show();
 				this.MainWindow.Activate();
+                this.MainWindow.WindowState = WindowState.Normal;
 			}
 			catch (Exception ex)
 			{

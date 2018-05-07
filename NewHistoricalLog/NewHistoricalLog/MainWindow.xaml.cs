@@ -5,6 +5,7 @@ using System.Text;
 using System.Windows;
 using DevExpress.Xpf.Editors;
 using DevExpress.Xpf.Grid;
+using System.Threading;
 using System.IO;
 using NLog;
 using DevExpress.Xpf.Core;
@@ -32,11 +33,6 @@ namespace NewHistoricalLog
 		public MainWindow()
 		{
 			InitializeComponent();
-            this.Loaded += OnLoad;
-		}
-
-        private void OnLoad(object sender, RoutedEventArgs e)
-        {
             #region Чтение настроек приложения
             if (File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SEMHistory\\Config.xml"))
                 Service.ReadSettings();
@@ -51,7 +47,7 @@ namespace NewHistoricalLog
                 {
                     for (int i = 0; i < Environment.GetCommandLineArgs().Length; i++)
                     {
-                       
+
                         if (Environment.GetCommandLineArgs()[i].ToUpper().Contains("MONITOR"))
                         {
                             Service.Monitor = Convert.ToInt32(Environment.GetCommandLineArgs()[i].Remove(0, Environment.GetCommandLineArgs()[i].IndexOf("_") + 1));
@@ -82,6 +78,12 @@ namespace NewHistoricalLog
             }
 
             #endregion
+            this.Loaded += OnLoad;
+		}
+
+        private void OnLoad(object sender, RoutedEventArgs e)
+        {
+           
 
             //Скрыли панельку с текстовыми фильтрами
             filterRow.Height = new GridLength(0);
@@ -92,8 +94,14 @@ namespace NewHistoricalLog
             //устанавливаем промежуток времени - один час назад от текущего времени
             startDate.EditValue = DateTime.Now.AddHours(-1);
             endDate.EditValue = DateTime.Now;
+            //в случае если заполнен адрес на сервере ДМЗ, то делаем доступным соответствующий пункт в меню
+            if (String.IsNullOrEmpty(Service.DmzPath))
+                sendToDmz.IsEnabled = false;
+            else
+                sendToDmz.IsEnabled = true;
         }
 
+        #region Обработчики событий контролов
         private void OnFilterPopupClose(object sender, EventArgs e)
         {
             for(int i=0;i<Service.Priorities.Length;i++)
@@ -167,6 +175,10 @@ namespace NewHistoricalLog
             filterRow.Height = new GridLength(0);
 			filterText.Text = "";
 			messageGrid.FilterCriteria = null;
+            red.IsChecked = true;
+            green.IsChecked = true;
+            gray.IsChecked = true;
+            yellow.IsChecked = true;
         }
         private void RefreshClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
         {
@@ -193,6 +205,8 @@ namespace NewHistoricalLog
         {
             try
             {
+                if (!Directory.Exists(String.Format("{0}\\SEMHistory\\Export", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments))))
+                    Directory.CreateDirectory(String.Format("{0}\\SEMHistory\\Export", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)));
                 string fileName = String.Format("Сообщения с {0} по {1}.pdf", Service.StartDate.ToString().Replace(":", "_"), Service.EndDate.ToString().Replace(":", "_"));
                 int counter = 1;
                 while (File.Exists(String.Format("{0}\\SEMHistory\\Export\\{1}", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), fileName)))
@@ -200,21 +214,19 @@ namespace NewHistoricalLog
                     fileName = String.Format("Сообщения с {0} по {1}_{2}.pdf", Service.StartDate.ToString().Replace(":", "_"), Service.EndDate.ToString().Replace(":", "_"), counter);
                     counter++;
                 }
+                messageView.ExportToPdf(String.Format("{0}\\SEMHistory\\Export\\{1}", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), fileName));
+                MessageBox.Show("Файл сохранен!", "Успешно!", MessageBoxButton.OK, MessageBoxImage.Information);
                 //DevExpress.XtraPrinting.RtfExportOptions options = new DevExpress.XtraPrinting.RtfExportOptions();
                 //options.ExportMode = DevExpress.XtraPrinting.RtfExportMode.SingleFile;
                 //options.ExportPageBreaks = true;
-                DevExpress.XtraPrinting.PdfExportOptions pdfOptions = new DevExpress.XtraPrinting.PdfExportOptions();
-                messageView.ExportToPdf(String.Format("{0}\\SEMHistory\\Export\\{1}", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), fileName));
                 //messageView.ExportToRtf(String.Format( "{0}\\SEMHistory\\Export\\{1}", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), fileName), options);
                 //messageView.ExportToCsv(String.Format("{0}\\SEMHistory\\Export\\{1}", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "test.csv"));
-                MessageBox.Show("Файл сохранен!", "Успешно!", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Файл сохранить не удалось. Для подробной информации см. лог приложения.", "Ошибка при сохранении файла!", MessageBoxButton.OK, MessageBoxImage.Error);
                 logger.Error(String.Format("Ошибка при сохранении файла: {0}", ex.Message));
             }
-            
         }
         private void ExitClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
         {
@@ -281,6 +293,14 @@ namespace NewHistoricalLog
                 var messData = MessageGridContent.LoadMessages(Service.StartDate, Service.EndDate);
                 messageGrid.ItemsSource = null;
                 messageGrid.ItemsSource = messData;
+                if (messData.Count > 0)
+                {
+                    tools.IsEnabled = true;
+                }
+                else
+                {
+                    tools.IsEnabled = false;
+                }
             }
             else
             {
@@ -309,11 +329,78 @@ namespace NewHistoricalLog
 
         private void SaveToClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
         {
-
+            ExpWindow wind = new ExpWindow();
+            if(wind.ShowDialog().Value)
+            {
+                try
+                {
+                    string fileName = String.Format("Сообщения с {0} по {1}.pdf", Service.StartDate.ToString().Replace(":", "_"), Service.EndDate.ToString().Replace(":", "_"));
+                    int counter = 1;
+                    while (File.Exists(String.Format("{0}\\{1}", wind.Path, fileName)))
+                    {
+                        fileName = String.Format("Сообщения с {0} по {1}_{2}.pdf", Service.StartDate.ToString().Replace(":", "_"), Service.EndDate.ToString().Replace(":", "_"), counter);
+                        counter++;
+                    }
+                    DevExpress.XtraPrinting.PdfExportOptions pdfOptions = new DevExpress.XtraPrinting.PdfExportOptions();
+                    messageView.ExportToPdf(String.Format("{0}\\{1}", wind.Path, fileName));
+                    MessageBox.Show("Файл сохранен!", "Успешно!", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Файл сохранить не удалось. Для подробной информации см. лог приложения.", "Ошибка при сохранении файла!", MessageBoxButton.OK, MessageBoxImage.Error);
+                    logger.Error(String.Format("Ошибка при сохранении файла: {0}", ex.Message));
+                }
+            }
         }
         private void AboutClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
         {
+            About wind = new About();
+            wind.Show();
+        }
 
+        private void OnSpecialKeyPressed(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if(e.Key==System.Windows.Input.Key.Escape)
+            {
+                Close();
+            }
+        }
+
+        private void SendToDmz(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
+        {
+            try
+            {
+                string fileName = String.Format("Сообщения с {0} по {1}.pdf", Service.StartDate.ToString().Replace(":", "_"), Service.EndDate.ToString().Replace(":", "_"));
+                int counter = 1;
+                while (File.Exists(String.Format("{0}\\{1}", Service.DmzPath, fileName)))
+                {
+                    fileName = String.Format("Сообщения с {0} по {1}_{2}.pdf", Service.StartDate.ToString().Replace(":", "_"), Service.EndDate.ToString().Replace(":", "_"), counter);
+                    counter++;
+                }
+                DevExpress.XtraPrinting.PdfExportOptions pdfOptions = new DevExpress.XtraPrinting.PdfExportOptions();
+                messageView.ExportToPdf(String.Format("{0}\\{1}", Service.DmzPath, fileName));
+                MessageBox.Show("Файл сохранен!", "Успешно!", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Файл сохранить не удалось. Для подробной информации см. лог приложения.", "Ошибка при сохранении файла!", MessageBoxButton.OK, MessageBoxImage.Error);
+                logger.Error(String.Format("Ошибка при сохранении файла: {0}", ex.Message));
+            }
+        }
+        #endregion
+
+        private void filterText_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if(Service.KeyboardNeeded)
+            {
+                OnScreenKeyboard keyboard = new OnScreenKeyboard();
+                keyboard.FormClosed += delegate (object send, System.Windows.Forms.FormClosedEventArgs args)
+                {
+                    (sender as TextEdit).Text = keyboard.GetText() == "" ? (sender as TextEdit).Text : keyboard.GetText();
+                };
+                keyboard.TopMost = true;
+                keyboard.ShowDialog();
+            }
         }
     }
     public class EditorLocalizerEx : EditorLocalizer

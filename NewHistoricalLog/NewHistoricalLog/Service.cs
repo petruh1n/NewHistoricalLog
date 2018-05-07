@@ -51,6 +51,10 @@ namespace NewHistoricalLog
         public static int CountLines { get; set; } = 50;
 
         public static int Monitor { get; set; } = 0;
+
+        public static string DmzPath { get; set; } = "";
+
+        public static bool KeyboardNeeded { get; set; } = false;
         #endregion
 
 
@@ -65,6 +69,8 @@ namespace NewHistoricalLog
             result.Add("Height", Height);
             result.Add("Connection string", ConnectionString);
             result.Add("Count rows in grid", CountLines);
+            result.Add("DmzPath", DmzPath);
+            result.Add("Need in OnScreen keyboaard", KeyboardNeeded);
             return result;
         }
         public static void ParseDictionary(Dictionary<string, object> dictionary)
@@ -77,6 +83,8 @@ namespace NewHistoricalLog
                 Height = Convert.ToDouble(dictionary["Height"]);
                 ConnectionString = dictionary["Connection string"].ToString();
                 CountLines = Convert.ToInt32(dictionary["Count rows in grid"]);
+                DmzPath = dictionary["DmzPath"].ToString();
+                KeyboardNeeded = Convert.ToBoolean(dictionary["Need in OnScreen keyboaard"]);
             }
             catch (Exception ex)
             {
