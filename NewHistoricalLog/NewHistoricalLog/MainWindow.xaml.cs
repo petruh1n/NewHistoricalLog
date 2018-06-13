@@ -6,6 +6,7 @@ using System.Windows;
 using DevExpress.Xpf.Editors;
 using DevExpress.Xpf.Grid;
 using System.Threading;
+using DevExpress.Xpf.Editors.Settings;
 using System.IO;
 using NLog;
 using DevExpress.Xpf.Core;
@@ -84,7 +85,7 @@ namespace NewHistoricalLog
         private void OnLoad(object sender, RoutedEventArgs e)
         {
            
-
+            
             //Скрыли панельку с текстовыми фильтрами
             filterRow.Height = new GridLength(0);
             //В комбобоксе текстового фильтра поставили "Сообщение" 
@@ -168,7 +169,7 @@ namespace NewHistoricalLog
 
         private void ShowTextFilterClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
         {
-            filterRow.Height = new GridLength(30);
+            filterRow.Height = new GridLength(40);
         }
         private void ClearTextFilterClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
         {
@@ -247,7 +248,7 @@ namespace NewHistoricalLog
 			var a = messageGrid.FilterString;
 			if(string.IsNullOrEmpty(a))
 				messageGrid.FilterCriteria = CriteriaOperator.Parse(String.Format("Contains([{0}] ,'{1}')",Service.FilterField,Service.FilterPhrase));
-			else if(a.Contains(currentFilterPhrase))
+			else if(a.Contains(currentFilterPhrase) & !string.IsNullOrEmpty(currentFilterPhrase))
 			{
 				a = a.Remove(0, String.Format("Contains([{0}] ,'{1}')", currentFilterColumn, currentFilterPhrase).Length);
 				messageGrid.FilterCriteria = CriteriaOperator.Parse(String.Format("Contains([{0}] ,'{1}') {2}", Service.FilterField, Service.FilterPhrase,a));
@@ -401,6 +402,24 @@ namespace NewHistoricalLog
                 keyboard.TopMost = true;
                 keyboard.ShowDialog();
             }
+        }
+
+        private void ShowSettingsClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
+        {
+            Settings wind = new Settings();
+            wind.Show();
+            wind.Closed += OnSettingsApply;
+        }
+
+        private void OnSettingsApply(object sender, EventArgs e)
+        {
+            if (Service.GridTextWrapping)
+                messageGrid.Columns["Text"].EditSettings = new TextEditSettings() { TextWrapping = TextWrapping.Wrap };
+            else
+            {
+                messageGrid.Columns["Text"].EditSettings = new TextEditSettings() { TextWrapping = TextWrapping.NoWrap };
+            }
+            messageView.PageSize = Service.CountLines;
         }
     }
     public class EditorLocalizerEx : EditorLocalizer

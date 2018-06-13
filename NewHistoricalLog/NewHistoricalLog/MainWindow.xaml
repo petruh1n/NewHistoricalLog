@@ -11,49 +11,73 @@
         xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol" 
         xmlns:local="clr-namespace:NewHistoricalLog" 
         x:Class="NewHistoricalLog.MainWindow" LocationChanged="WindowMoved" ResizeMode="NoResize" KeyDown="OnSpecialKeyPressed"
-        Title="Архив сообщений" Height="400" Width="750" MinHeight="400" MinWidth="750" Icon="pack://application:,,,/NewHistoricalLog;component/Images/Msg.ico" >
-    <!--<dx:ThemedWindow.DataContext>
-        <local:MainWindowViewModel/>
-    </dx:ThemedWindow.DataContext>-->
+        Title="Архив сообщений" Height="500" Width="800" MinHeight="500" MinWidth="800" Icon="pack://application:,,,/NewHistoricalLog;component/Images/Msg.ico" FontSize="14">
+    
     <dx:ThemedWindow.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/NewHistoricalLog;component/PrintDictionary.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+            <DataTemplate x:Key="BarItemTextTemplate">
+                <StackPanel>
+                    <TextBlock Text="{Binding}"  FontSize="14"></TextBlock>
+                </StackPanel>
+            </DataTemplate>
+            <Style TargetType="dxe:TextEdit">
+                <Setter Property="StyleSettings">
+                    <Setter.Value>
+                        <dxe:TextEditStyleSettings HighlightedTextBackground="Red"  />
+                    </Setter.Value>
+                </Setter>
+            </Style>
         </ResourceDictionary>
+        
     </dx:ThemedWindow.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="30" x:Name="filterRow"/>
-            <RowDefinition Height="30"/>
+            <RowDefinition Height="40" x:Name="filterRow"/>
+            <RowDefinition Height="40"/>
             <RowDefinition />
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <dxb:MainMenuControl VerticalAlignment="Top" >
-            <dxb:BarSubItem Content="Файл" >
-                <dxb:BarButtonItem Content="Обновить" ItemClick="RefreshClick" Glyph="{dx:DXImage Image=Recurrence_32x32.png}" LargeGlyph="{dx:DXImage Image=Recurrence_32x32.png}"/>
-                <dxb:BarButtonItem Content="Сохранить" ItemClick="SaveClick" Glyph="{dx:DXImage Image=Save_32x32.png}" LargeGlyph="{dx:DXImage Image=Save_32x32.png}"/>
-                <dxb:BarButtonItem Content="Сохранить на съемный носитель" ItemClick="SaveToClick" Glyph="{dx:DXImage Image=SaveTo_32x32.png}" LargeGlyph="{dx:DXImage Image=SaveTo_32x32.png}"/>
-                <dxb:BarButtonItem x:Name="sendToDmz" Content="Отправить на сервер ДМЗ" ItemClick="SendToDmz" Glyph="{dx:DXImage Image=SaveTo_32x32.png}" LargeGlyph="{dx:DXImage Image=SaveTo_32x32.png}"/>
-                <dxb:BarButtonItem Content="Выход" ItemClick="ExitClick" Glyph="{dx:DXImage Image=Close_32x32.png}" LargeGlyph="{dx:DXImage Image=Close_32x32.png}" />
+        <dxb:MainMenuControl VerticalAlignment="Top" FontSize="14">
+            <dxb:BarSubItem Content="Файл">
+                <dxb:BarButtonItem Content="Обновить" ItemClick="RefreshClick" Glyph="{dx:DXImage Image=Recurrence_32x32.png}" LargeGlyph="{dx:DXImage Image=Recurrence_32x32.png}" ContentTemplate="{StaticResource BarItemTextTemplate}"/>
+                <dxb:BarButtonItem Content="Сохранить" ItemClick="SaveClick" Glyph="{dx:DXImage Image=Save_32x32.png}" LargeGlyph="{dx:DXImage Image=Save_32x32.png}" ContentTemplate="{StaticResource BarItemTextTemplate}"/>
+                <dxb:BarButtonItem Content="Сохранить на съемный носитель" ItemClick="SaveToClick" Glyph="{dx:DXImage Image=SaveTo_32x32.png}" LargeGlyph="{dx:DXImage Image=SaveTo_32x32.png}" ContentTemplate="{StaticResource BarItemTextTemplate}"/>
+                <dxb:BarButtonItem x:Name="sendToDmz" Content="Отправить на сервер ДМЗ" ItemClick="SendToDmz" Glyph="{dx:DXImage Image=SaveTo_32x32.png}" LargeGlyph="{dx:DXImage Image=SaveTo_32x32.png}" ContentTemplate="{StaticResource BarItemTextTemplate}"/>
+                <dxb:BarButtonItem Content="Выход" ItemClick="ExitClick" Glyph="{dx:DXImage Image=Close_32x32.png}" LargeGlyph="{dx:DXImage Image=Close_32x32.png}" ContentTemplate="{StaticResource BarItemTextTemplate}"/>
             </dxb:BarSubItem>
             <dxb:BarSubItem x:Name="tools" Content="Инструменты" CloseUp="OnFilterPopupClose"  IsEnabled="False" >
-                <dxb:BarSubItem Content="Фильтрация" Glyph="{dx:DXImage Image=Filter_32x32.png}" LargeGlyph="{dx:DXImage Image=Filter_32x32.png}">
-                    <dxb:BarSubItem Content="Фильтр приоритетов" Glyph="{dx:DXImage Image=MultipleMasterFilter_32x32.png}" LargeGlyph="{dx:DXImage Image=MultipleMasterFilter_32x32.png}">
-                        <dxb:BarCheckItem x:Name="red" IsChecked="True" Content="Сообщения высшего приоритета" CloseSubMenuOnClick="False" Glyph="pack://application:,,,/NewHistoricalLog;component/Images/flag-red-32.png" BarItemDisplayMode="ContentAndGlyph" CheckedChanged="Priority_CheckedChanged"/>
-                        <dxb:BarCheckItem x:Name="yellow" IsChecked="True" Content="Сообщения среднего приоритета" CloseSubMenuOnClick="False" Glyph="pack://application:,,,/NewHistoricalLog;component/Images/flag-yellow-32.png" BarItemDisplayMode="ContentAndGlyph" CheckedChanged="Priority_CheckedChanged"/>
-                        <dxb:BarCheckItem x:Name="green" IsChecked="True" Content="Сообщения низкого приоритета" CloseSubMenuOnClick="False" Glyph="pack://application:,,,/NewHistoricalLog;component/Images/flag-green-32.png" BarItemDisplayMode="ContentAndGlyph" CheckedChanged="Priority_CheckedChanged"/>
-                        <dxb:BarCheckItem x:Name="gray" IsChecked="True" Content="Сообщения нормального приоритета" CloseSubMenuOnClick="False" Glyph="pack://application:,,,/NewHistoricalLog;component/Images/flag-grey-32.png" BarItemDisplayMode="ContentAndGlyph" CheckedChanged="Priority_CheckedChanged"/>
+                <dxb:BarSubItem Content="Фильтрация" Glyph="{dx:DXImage Image=Filter_32x32.png}" LargeGlyph="{dx:DXImage Image=Filter_32x32.png}" ContentTemplate="{StaticResource BarItemTextTemplate}">
+                    <dxb:BarSubItem Content="Фильтр приоритетов" Glyph="{dx:DXImage Image=MultipleMasterFilter_32x32.png}" LargeGlyph="{dx:DXImage Image=MultipleMasterFilter_32x32.png}" ContentTemplate="{StaticResource BarItemTextTemplate}">
+                        <dxb:BarCheckItem x:Name="red" IsChecked="True" Content="Сообщения высшего приоритета" CloseSubMenuOnClick="False" 
+                                          Glyph="pack://application:,,,/NewHistoricalLog;component/Images/flag-red-32.png" BarItemDisplayMode="ContentAndGlyph" 
+                                          CheckedChanged="Priority_CheckedChanged" ContentTemplate="{StaticResource BarItemTextTemplate}"/>
+                        <dxb:BarCheckItem x:Name="yellow" IsChecked="True" Content="Сообщения среднего приоритета" CloseSubMenuOnClick="False" 
+                                          Glyph="pack://application:,,,/NewHistoricalLog;component/Images/flag-yellow-32.png" BarItemDisplayMode="ContentAndGlyph"
+                                          CheckedChanged="Priority_CheckedChanged" ContentTemplate="{StaticResource BarItemTextTemplate}"/>
+                        <dxb:BarCheckItem x:Name="green" IsChecked="True" Content="Сообщения низкого приоритета" CloseSubMenuOnClick="False" 
+                                          Glyph="pack://application:,,,/NewHistoricalLog;component/Images/flag-green-32.png" BarItemDisplayMode="ContentAndGlyph" 
+                                          CheckedChanged="Priority_CheckedChanged" ContentTemplate="{StaticResource BarItemTextTemplate}"/>
+                        <dxb:BarCheckItem x:Name="gray" IsChecked="True" Content="Сообщения нормального приоритета" CloseSubMenuOnClick="False" 
+                                          Glyph="pack://application:,,,/NewHistoricalLog;component/Images/flag-grey-32.png" BarItemDisplayMode="ContentAndGlyph" 
+                                          CheckedChanged="Priority_CheckedChanged" ContentTemplate="{StaticResource BarItemTextTemplate}"/>
                     </dxb:BarSubItem>
-                    <dxb:BarButtonItem Content="Текстовый фильтр" ItemClick="ShowTextFilterClick" Glyph="{dx:DXImage Image=SortFilter_32x32.png}" LargeGlyph="{dx:DXImage Image=SortFilter_32x32.png}"/>
-                    <dxb:BarButtonItem Content="Очистить фильтр" ItemClick="ClearTextFilterClick" Glyph="{dx:DXImage Image=ClearFilter_32x32.png}" LargeGlyph="{dx:DXImage Image=ClearFilter_32x32.png}"/>
+                    <dxb:BarButtonItem Content="Текстовый фильтр" ItemClick="ShowTextFilterClick" Glyph="{dx:DXImage Image=SortFilter_32x32.png}" 
+                                       LargeGlyph="{dx:DXImage Image=SortFilter_32x32.png}" ContentTemplate="{StaticResource BarItemTextTemplate}"/>
+                    <dxb:BarButtonItem Content="Очистить фильтр" ItemClick="ClearTextFilterClick" Glyph="{dx:DXImage Image=ClearFilter_32x32.png}" 
+                                       LargeGlyph="{dx:DXImage Image=ClearFilter_32x32.png}" ContentTemplate="{StaticResource BarItemTextTemplate}"/>
 
                 </dxb:BarSubItem>
-                <dxb:BarButtonItem Content="Поиск" ItemClick="StartSearchClick"  Glyph="{dx:DXImage Image=Lookup&amp;Reference_32x32.png}" LargeGlyph="{dx:DXImage Image=Lookup&amp;Reference_32x32.png}"/>
+                <dxb:BarButtonItem Content="Поиск" ItemClick="StartSearchClick"  Glyph="{dx:DXImage Image=Lookup&amp;Reference_32x32.png}" 
+                                   LargeGlyph="{dx:DXImage Image=Lookup&amp;Reference_32x32.png}" ContentTemplate="{StaticResource BarItemTextTemplate}"/>
             </dxb:BarSubItem>
             <dxb:BarSubItem Content="Сервис" >
-                <dxb:BarButtonItem Content="Печать" ItemClick="PrintClick" Glyph="{dx:DXImage Image=Print_32x32.png}" LargeGlyph="{dx:DXImage Image=Print_32x32.png}"/>
+                <dxb:BarButtonItem Content="Настройки" ItemClick="ShowSettingsClick" Glyph="{dx:DXImage Image=Properties_32x32.png}" LargeGlyph="{dx:DXImage Image=Properties_32x32.png}" ContentTemplate="{StaticResource BarItemTextTemplate}"/>
+                <dxb:BarButtonItem Content="Печать" ItemClick="PrintClick" Glyph="{dx:DXImage Image=Print_32x32.png}" LargeGlyph="{dx:DXImage Image=Print_32x32.png}" ContentTemplate="{StaticResource BarItemTextTemplate}"/>
+                
                 <!--<dxb:BarButtonItem Content="О программе" ItemClick="AboutClick" Glyph="pack://application:,,,/NewHistoricalLog;component/Images/SEM.png" />-->
             </dxb:BarSubItem>
         </dxb:MainMenuControl>
@@ -61,7 +85,7 @@
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
-                <ColumnDefinition Width="270"/>
+                <ColumnDefinition Width="285"/>
             </Grid.ColumnDefinitions>
             <dxe:TextEdit x:Name="filterText" Margin="5,5,5,5" EditValueChanging="FilterTextChanging" PreviewMouseLeftButtonDown="filterText_PreviewMouseLeftButtonDown" />
             <dxe:ComboBoxEdit x:Name="filterBox"   Margin="5,5,5,5" Width="120" Grid.Column="1" HorizontalAlignment="Left" IsTextEditable="False" EditValueChanged="FilterColumnChanged">
@@ -74,26 +98,25 @@
         </Grid>
 
         <StackPanel Orientation="Horizontal" Grid.Row="2" Width="Auto"  HorizontalAlignment="Left">
-            <TextBlock Margin="5,5,5,5"><Run Text="Начало выборки"/></TextBlock>
-            <dxe:DateEdit x:Name="startDate" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150"  Mask="G" Margin="5,5,5,5" MaskUseAsDisplayFormat="True" EditValueChanged="StartDateChanged">
+            <TextBlock Margin="5,5,5,5" VerticalAlignment="Center"><Run Text="Начало выборки"/></TextBlock>
+            <dxe:DateEdit x:Name="startDate" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150"  Mask="G" Margin="5,5,5,5" MaskUseAsDisplayFormat="True" EditValueChanged="StartDateChanged" Height="30">
                 <dxe:DateEdit.StyleSettings>
                     <dxe:DateEditPickerStyleSettings/>
                 </dxe:DateEdit.StyleSettings>
             </dxe:DateEdit>
-            <TextBlock Margin="5,5,5,5"><Run Text="Окончание выборки"/></TextBlock>
-            <dxe:DateEdit HorizontalAlignment="Left" VerticalAlignment="Top" Width="150"  Mask="G" Margin="5,5,5,5" x:Name="endDate" MaskUseAsDisplayFormat="True" EditValueChanged="EndDateChanged">
+            <TextBlock Margin="5,5,5,5" VerticalAlignment="Center"><Run Text="Окончание выборки"/></TextBlock>
+            <dxe:DateEdit HorizontalAlignment="Left" VerticalAlignment="Top" Width="150"  Mask="G" Margin="5,5,5,5" x:Name="endDate" MaskUseAsDisplayFormat="True" EditValueChanged="EndDateChanged" Height="30">
                 <dxe:DateEdit.StyleSettings>
                     <dxe:DateEditPickerStyleSettings/>
                 </dxe:DateEdit.StyleSettings>
             </dxe:DateEdit>
         </StackPanel>
-
-
+        
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Row="2">
             <!--<dxe:TextEdit Width="150" Margin="5,5,0,5"/>
             <dx:SimpleButton Width="20" Margin="0,5,5,5" Glyph="pack://application:,,,/NewHistoricalLog;component/Images/search.png" GlyphAlignment="Right"/>-->
             <!--<dxe:SearchControl x:Name="searcher" Width="150" Margin="5" FilterCondition="Contains"/>-->
-            <dx:SimpleButton Width="170" Click="RefreshButtonClick" Margin="5" Content="Обновить"/>
+            <dx:SimpleButton Width="170" Click="RefreshButtonClick" Margin="5,5,5,5" Content="Обновить"/>
         </StackPanel>
 
         <dxg:GridControl AutoGenerateColumns="None" EnableSmartColumnsGeneration="True" Grid.Row="3" x:Name="messageGrid"  >
@@ -101,7 +124,8 @@
                 <dxg:TableView x:Name="messageView" AllowPerPixelScrolling="True" ShowTotalSummary="False" SearchPanelAllowFilter="False" SearchPanelClearOnClose="True" 
                                ShowGroupPanel="False" AllowEditing="False" AllowGrouping="False" ShowFilterPanelMode="Never" AllowPaging="True"
                                AllowDateTimeGroupIntervalMenu="False" IsRowCellMenuEnabled="False" IsGroupPanelMenuEnabled="False" 
-                               IsColumnMenuEnabled="False" IsGroupRowMenuEnabled="False" IsGroupFooterMenuEnabled="False" IsTotalSummaryMenuEnabled="False" >
+                               IsColumnMenuEnabled="False" IsGroupRowMenuEnabled="False" IsGroupFooterMenuEnabled="False" IsTotalSummaryMenuEnabled="False" 
+                               PageSize="{Binding Source={x:Static local:Service.CountLines}}">
                     <dxg:TableView.FormatConditions>
 
                         <dxg:FormatCondition ValueRule="Equal" Value1="2" FieldName="Type" ApplyToRow="True">
@@ -118,28 +142,48 @@
             </dxg:GridControl.View>
             <dxg:GridColumn FieldName="Date" IsSmart="True" Header="Дата" AllowGrouping="False" AllowSorting="True" AllowEditing="False" PrintCellStyle="{StaticResource DateColumnPrintingStyle}" AllowColumnFiltering="False">
                 <dxg:GridColumn.EditSettings>
-                    <dxe:DateEditSettings Mask="G" MaskUseAsDisplayFormat="True"/>
+                    <dxe:DateEditSettings Mask="G" MaskUseAsDisplayFormat="True">
+                        <dxe:DateEditSettings.StyleSettings>
+                            <dxe:DateEditCalendarStyleSettings HighlightedTextBackground="Blue"/>
+                        </dxe:DateEditSettings.StyleSettings>
+                    </dxe:DateEditSettings>
                 </dxg:GridColumn.EditSettings>
             </dxg:GridColumn>
             <dxg:GridColumn FieldName="Type" IsSmart="True" Width="0" Header="Приоритет" Visible="False" AllowGrouping="False" AllowSorting="False" AllowEditing="False"/>
             <dxg:GridColumn FieldName="Text" IsSmart="True" Width="*" Header="Текст сообщения" AllowGrouping="False" AllowSorting="True" AllowEditing="False" PrintCellStyle="{StaticResource ImageColumnPrintingStyle}" AllowColumnFiltering="False">
                 <dxg:GridColumn.EditSettings>
-                    <dxe:TextEditSettings/>
+                    <dxe:TextEditSettings >
+                        <dxe:TextEditSettings.StyleSettings>
+                            <dxe:TextEditStyleSettings HighlightedTextBackground="Blue"  />
+                        </dxe:TextEditSettings.StyleSettings>
+                    </dxe:TextEditSettings>
                 </dxg:GridColumn.EditSettings>
             </dxg:GridColumn>
             <dxg:GridColumn FieldName="User" IsSmart="True" Width="100" Header="Пользователь" AllowGrouping="False" AllowSorting="True" AllowEditing="False" PrintCellStyle="{StaticResource ImageColumnPrintingStyle}" AllowColumnFiltering="False">
                 <dxg:GridColumn.EditSettings>
-                    <dxe:TextEditSettings />
+                    <dxe:TextEditSettings >
+                        <dxe:TextEditSettings.StyleSettings>
+                            <dxe:TextEditStyleSettings HighlightedTextBackground="Blue"  />
+                        </dxe:TextEditSettings.StyleSettings>
+                    </dxe:TextEditSettings>
                 </dxg:GridColumn.EditSettings>
             </dxg:GridColumn>
             <dxg:GridColumn FieldName="Source" IsSmart="True" Width="100" Header="Источник" AllowGrouping="False" AllowSorting="True" AllowEditing="False" PrintCellStyle="{StaticResource ImageColumnPrintingStyle}" AllowColumnFiltering="False">
                 <dxg:GridColumn.EditSettings>
-                    <dxe:TextEditSettings />
+                    <dxe:TextEditSettings >
+                        <dxe:TextEditSettings.StyleSettings>
+                            <dxe:TextEditStyleSettings HighlightedTextBackground="Blue"  />
+                        </dxe:TextEditSettings.StyleSettings>
+                    </dxe:TextEditSettings>
                 </dxg:GridColumn.EditSettings>
             </dxg:GridColumn>
             <dxg:GridColumn FieldName="Value" IsSmart="True" Width="80" Header="Значение" AllowGrouping="False" AllowSorting="True" AllowEditing="False" PrintCellStyle="{StaticResource ImageColumnPrintingStyle}" AllowColumnFiltering="False">
                 <dxg:GridColumn.EditSettings>
-                    <dxe:TextEditSettings />
+                    <dxe:TextEditSettings >
+                        <dxe:TextEditSettings.StyleSettings>
+                            <dxe:TextEditStyleSettings HighlightedTextBackground="Blue"  />
+                        </dxe:TextEditSettings.StyleSettings>
+                    </dxe:TextEditSettings>
                 </dxg:GridColumn.EditSettings>
             </dxg:GridColumn>
 

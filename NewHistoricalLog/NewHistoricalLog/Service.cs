@@ -39,22 +39,42 @@ namespace NewHistoricalLog
         /// Массив приоритетов сообщений
         /// </summary>
         public static bool[] Priorities { get; set; } = new bool[] { true, true, true, true };
-
+        /// <summary>
+        /// Верхний левый угол экрана. Отступ сверху. 
+        /// </summary>
         public static double Top { get; set; }
-
+        /// <summary>
+        /// Верхний левый угол экрана. Отступ слева. 
+        /// </summary>
         public static double Left { get; set; }
-
+        /// <summary>
+        /// Ширина окна
+        /// </summary>
         public static double Width { get; set; }
-
+        /// <summary>
+        /// Высота окна
+        /// </summary>
         public static double Height { get; set; }
-
+        /// <summary>
+        /// Число строк в гриде
+        /// </summary>
         public static int CountLines { get; set; } = 50;
-
+        /// <summary>
+        /// Монитор, на котором будет открыто окно приложения
+        /// </summary>
         public static int Monitor { get; set; } = 0;
-
+        /// <summary>
+        /// Путь на ДМЗ
+        /// </summary>
         public static string DmzPath { get; set; } = "";
-
+        /// <summary>
+        /// Нужно ли использовать экранную клавиатуру
+        /// </summary>
         public static bool KeyboardNeeded { get; set; } = false;
+        /// <summary>
+        /// Нужно ли переносить текст в гриде на новую строку
+        /// </summary>
+        public static bool GridTextWrapping { get; set; } = false;
         #endregion
 
 
@@ -71,6 +91,7 @@ namespace NewHistoricalLog
             result.Add("Count rows in grid", CountLines);
             result.Add("DmzPath", DmzPath);
             result.Add("Need in OnScreen keyboaard", KeyboardNeeded);
+            result.Add("Need in grid text wrapping", GridTextWrapping);
             return result;
         }
         public static void ParseDictionary(Dictionary<string, object> dictionary)
@@ -85,6 +106,7 @@ namespace NewHistoricalLog
                 CountLines = Convert.ToInt32(dictionary["Count rows in grid"]);
                 DmzPath = dictionary["DmzPath"].ToString();
                 KeyboardNeeded = Convert.ToBoolean(dictionary["Need in OnScreen keyboaard"]);
+                GridTextWrapping = Convert.ToBoolean(dictionary["Need in grid text wrapping"]);
             }
             catch (Exception ex)
             {
