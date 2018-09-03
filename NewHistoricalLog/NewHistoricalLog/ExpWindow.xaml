@@ -4,7 +4,7 @@
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     x:Class="NewHistoricalLog.ExpWindow"
-    Title="Экспорт на съемный носитель" Height="200" Width="525"
+    Title="Экспорт на съемный носитель" Height="200" Width="525" Topmost="True"
     ResizeMode="NoResize" LocationChanged="ThemedWindow_LocationChanged" Icon="{dx:DXImage Image=SaveTo_32x32.png}"
     KeyDown="ThemedWindow_KeyDown">
 

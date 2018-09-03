@@ -5,7 +5,7 @@
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     xmlns:local="clr-namespace:NewHistoricalLog" 
     x:Class="NewHistoricalLog.Settings"
-    Title="Настройки" Height="210" Width="320" FontSize="14" ResizeMode="NoResize" ShowIcon="True" Icon="{dx:DXImage Image=Properties_32x32.png}"
+    Title="Настройки" Height="210" Width="320" FontSize="14" ResizeMode="NoResize" Topmost="True" ShowIcon="True" Icon="{dx:DXImage Image=Properties_32x32.png}"
     >
     <Grid>
         <Grid.RowDefinitions>

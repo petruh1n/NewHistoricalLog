@@ -1,2 +1,4 @@
 DevExpress.Xpf.Editors.ComboBoxEdit, DevExpress.Xpf.Core.v18.1, Version=18.1.2.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a
 DevExpress.Xpf.Editors.CheckEdit, DevExpress.Xpf.Core.v18.1, Version=18.1.2.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a
+DevExpress.Xpf.Editors.ListBoxEdit, DevExpress.Xpf.Core.v18.1, Version=18.1.2.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a
+DevExpress.Xpf.PdfViewer.PdfViewerControl, DevExpress.Xpf.PdfViewer.v18.1, Version=18.1.2.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a

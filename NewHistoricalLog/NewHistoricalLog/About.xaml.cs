@@ -10,6 +10,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Reflection;
 using DevExpress.Xpf.Core;
 
 
@@ -23,7 +24,8 @@ namespace NewHistoricalLog
         public About()
         {
             InitializeComponent();
-
+            Loaded += About_Loaded;
+            Width = Service.Width;
             if (Service.Monitor <= System.Windows.Forms.Screen.AllScreens.Length)
             {
                 Top = System.Windows.Forms.Screen.AllScreens[Service.Monitor].Bounds.Y + Service.Top + (Service.Height - Height) / 2;
@@ -33,6 +35,22 @@ namespace NewHistoricalLog
             {
                 Top = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Y + Service.Top + (Service.Height-Height)/2;
                 Left = System.Windows.Forms.Screen.PrimaryScreen.Bounds.X + Service.Left + (Service.Width-Width)/2;
+            }
+        }
+
+        private void About_Loaded(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Uri baseUri = new Uri(Assembly.GetEntryAssembly().Location);
+                Uri uri = new Uri(baseUri, "About.pdf");
+                pdfViewer.DocumentSource = uri;
+                settings1.HideThumbnailsViewer = true;
+                settings2.HideAttachmentsViewer = true;
+            }
+            catch
+            {
+                MessageBox.Show("Ошибка при открытии файла помощи.", "Ошибка!", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

@@ -3,16 +3,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.ComponentModel;
 using NLog;
 using System.Xml.Linq;
 using System.Xml;
 using System.IO;
+using Microsoft.Win32;
 
 namespace NewHistoricalLog
 {
 	public class Service
 	{
         static Logger logger = LogManager.GetCurrentClassLogger();
+        static bool isAdminMode = false;
+
+        public static event EventHandler<PropertyChangedEventArgs> StaticPropertyChanged;
+        private static void NotifyStaticPropertyChanged(string propertyName)
+        {
+            if (StaticPropertyChanged != null)
+                StaticPropertyChanged(null, new PropertyChangedEventArgs(propertyName));
+        }
 
         #region Global properties
         /// <summary>
@@ -34,7 +44,15 @@ namespace NewHistoricalLog
         /// <summary>
         /// Фраза для текстового фильтра
         /// </summary>
-        public static string FilterPhrase { get; set; } = "";
+        public static string TextFilterPhrase { get; set; } = "";
+        /// <summary>
+        /// Фраза для фильтра по подсистемам
+        /// </summary>
+        public static string SystemsFilterPhrase { get; set; } = "";
+        /// <summary>
+        /// Фраза для фильтра по приоритетам
+        /// </summary>
+        public static string PriorityFilterPhrase { get; set; } = "";
         /// <summary>
         /// Массив приоритетов сообщений
         /// </summary>
@@ -75,6 +93,28 @@ namespace NewHistoricalLog
         /// Нужно ли переносить текст в гриде на новую строку
         /// </summary>
         public static bool GridTextWrapping { get; set; } = false;
+        /// <summary>
+        /// Список таблиц, в которых находятся подситемы
+        /// </summary>
+        public static string TabsForScan { get; set; } = "ZDV-Задвижки;VS-Вспомсистемы;";
+
+        public static string HighPrioriry { get; set; } = "Высокий";
+
+        public static string MiddlePrioriry { get; set; } = "Средний";
+
+        public static string LowPrioriry { get; set; } = "Низкий";
+
+        public static string NormalPrioriry { get; set; } = "Нормальный";
+
+        public static bool IsAdminMode
+        {
+            get { return isAdminMode; }
+            set
+            {
+                isAdminMode = value;
+                NotifyStaticPropertyChanged("IsAdminMode");
+            }
+        }
         #endregion
 
 
@@ -83,30 +123,40 @@ namespace NewHistoricalLog
         public static Dictionary<string, object> GetSettingsDictionary()
         {
             Dictionary<string, object> result = new Dictionary<string, object>();
-            result.Add("Top", Top);
-            result.Add("Left", Left);
-            result.Add("Width", Width);
-            result.Add("Height", Height);
-            result.Add("Connection string", ConnectionString);
-            result.Add("Count rows in grid", CountLines);
-            result.Add("DmzPath", DmzPath);
-            result.Add("Need in OnScreen keyboaard", KeyboardNeeded);
-            result.Add("Need in grid text wrapping", GridTextWrapping);
+            result.Add("Отступ сверху", Top);
+            result.Add("Отступ слева", Left);
+            result.Add("Ширина", Width);
+            result.Add("Высота", Height);
+            result.Add("Строка подключения к БД", ConnectionString);
+            result.Add("Количество строк", CountLines);
+            result.Add("Путь к ДМЗ", DmzPath);
+            result.Add("Использовать экранную клавиатуру", KeyboardNeeded);
+            result.Add("Переносить текст в таблице", GridTextWrapping);
+            result.Add("Таблицы для массива подсистем", TabsForScan);
+            result.Add("Обозначние высокого приоритета", HighPrioriry);
+            result.Add("Обозначние среднего приоритета", MiddlePrioriry);
+            result.Add("Обозначние низкого приоритета", LowPrioriry);
+            result.Add("Обозначние нормального приоритета", NormalPrioriry);
             return result;
         }
         public static void ParseDictionary(Dictionary<string, object> dictionary)
         {
             try
             {
-                Top = Convert.ToDouble(dictionary["Top"]);
-                Left = Convert.ToDouble(dictionary["Left"]);
-                Width = Convert.ToDouble(dictionary["Width"]);
-                Height = Convert.ToDouble(dictionary["Height"]);
-                ConnectionString = dictionary["Connection string"].ToString();
-                CountLines = Convert.ToInt32(dictionary["Count rows in grid"]);
-                DmzPath = dictionary["DmzPath"].ToString();
-                KeyboardNeeded = Convert.ToBoolean(dictionary["Need in OnScreen keyboaard"]);
-                GridTextWrapping = Convert.ToBoolean(dictionary["Need in grid text wrapping"]);
+                Top = Convert.ToDouble(dictionary["Отступ сверху"]);
+                Left = Convert.ToDouble(dictionary["Отступ слева"]);
+                Width = Convert.ToDouble(dictionary["Ширина"]);
+                Height = Convert.ToDouble(dictionary["Высота"]);
+                ConnectionString = dictionary["Строка подключения к БД"].ToString();
+                CountLines = Convert.ToInt32(dictionary["Количество строк"]);
+                DmzPath = dictionary["Путь к ДМЗ"].ToString();
+                KeyboardNeeded = Convert.ToBoolean(dictionary["Использовать экранную клавиатуру"]);
+                GridTextWrapping = Convert.ToBoolean(dictionary["Переносить текст в таблице"]);
+                TabsForScan = dictionary["Таблицы для массива подсистем"].ToString();
+                HighPrioriry = dictionary["Обозначние высокого приоритета"].ToString();
+                MiddlePrioriry = dictionary["Обозначние среднего приоритета"].ToString();
+                LowPrioriry = dictionary["Обозначние низкого приоритета"].ToString();
+                NormalPrioriry = dictionary["Обозначние нормального приоритета"].ToString();
             }
             catch (Exception ex)
             {
@@ -121,7 +171,7 @@ namespace NewHistoricalLog
             try
             {
                 var dict = GetSettingsDictionary();
-                XDocument xdoc = XDocument.Load(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SEMHistory\\Config.xml");
+                XDocument xdoc = XDocument.Load(Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments) + "\\SEMHistory\\Config.xml");
                 foreach (XElement Element in xdoc.Element("ApplicationConfiguration").Element("Settings").Elements("Setting"))
                 {
                     XElement SettingName = Element.Element("Name");
@@ -152,7 +202,7 @@ namespace NewHistoricalLog
                 //получили словарь настроек
                 var dict = GetSettingsDictionary();
                 //открыли документ
-                XDocument xdoc = XDocument.Load(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SEMHistory\\Config.xml");
+                XDocument xdoc = XDocument.Load(Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments) + "\\SEMHistory\\Config.xml");
                 foreach (var setting in dict)
                 {
                     bool flag = false;
@@ -175,7 +225,7 @@ namespace NewHistoricalLog
                     }
                 }
 
-                xdoc.Save(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SEMHistory\\Config.xml");
+                xdoc.Save(Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments) + "\\SEMHistory\\Config.xml");
             }
             catch (Exception ex)
             {
@@ -183,13 +233,33 @@ namespace NewHistoricalLog
             }
 
         }
+        static bool ReadKey()
+        {
+            try
+            {
+                RegistryKey usersKey = Registry.Users.OpenSubKey(".Default");
+                RegistryKey settingsKey = usersKey.OpenSubKey("SEMSettings");
+                ConnectionString = string.Format("Data Source={0};Integrated Security=False; User = {1}; Password = {2}; Initial Catalog = {3}; Connection Timeout = 3;", 
+                    settingsKey.GetValue("SQL server").ToString(), settingsKey.GetValue("SQL user").ToString(), settingsKey.GetValue("SQL password").ToString(), 
+                    settingsKey.GetValue("SQL database").ToString());
+                settingsKey.Close();
+                usersKey.Close();                
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public static void GenerateXMLConfig()
         {
             try
             {
+                ReadKey();
                 #region Config.xml
-                Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SEMHistory");
-                XmlTextWriter textWritter = new XmlTextWriter(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SEMHistory\\Config.xml", Encoding.UTF8);
+                Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments) + "\\SEMHistory");
+                XmlTextWriter textWritter = new XmlTextWriter(Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments) + "\\SEMHistory\\Config.xml", Encoding.UTF8);
                 textWritter.WriteStartDocument();
                 textWritter.WriteStartElement("ApplicationConfiguration");
                 textWritter.WriteEndElement();
@@ -209,8 +279,8 @@ namespace NewHistoricalLog
 
                 parentElement.Add(settingsGroupElement);
                 xDoc.Add(parentElement);
-                //xDoc.WriteTo(new XmlTextWriter(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SEMTrends\\Config.xml", Encoding.UTF8));
-                xDoc.Save(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SEMHistory\\Config.xml");
+                //xDoc.WriteTo(new XmlTextWriter(Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments) + "\\SEMTrends\\Config.xml", Encoding.UTF8));
+                xDoc.Save(Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments) + "\\SEMHistory\\Config.xml");
                 #endregion
             }
             catch (Exception ex)

@@ -55,16 +55,16 @@ namespace NewHistoricalLog
 		}
 
 		private void App_Deactivated(object sender, EventArgs e)
-		{
-            foreach(Window window in app.Windows)
+        {
+            foreach (Window window in app.Windows)
             {
-                if(window!=app.MainWindow)
+                if (window != app.MainWindow)
                 {
                     window.Close();
                 }
             }
-			app.MainWindow.WindowState = WindowState.Minimized;
-		}
+            app.MainWindow.WindowState = WindowState.Minimized;
+        }
 
 		protected override void OnStartupNextInstance(StartupNextInstanceEventArgs eventArgs)
 		{
@@ -72,27 +72,42 @@ namespace NewHistoricalLog
 			{
 				// Subsequent launches
 				base.OnStartupNextInstance(eventArgs);
-
+                bool flag = false;
                 if (eventArgs.CommandLine != null)
                 {
                     try
                     {
                         for (int i = 0; i < eventArgs.CommandLine.Count; i++)
                         {
-
                             if (eventArgs.CommandLine[i].ToUpper().Contains("MONITOR"))
                             {
                                 Service.Monitor = Convert.ToInt32(eventArgs.CommandLine[i].Remove(0, eventArgs.CommandLine[i].IndexOf("_") + 1));
                             }
+                            if(eventArgs.CommandLine[i].ToUpper().Contains("USERGROUP"))
+                            {
+                                if (eventArgs.CommandLine[i].Remove(0, Environment.GetCommandLineArgs()[i].IndexOf("_") + 1).ToUpper() == "ADMIN")
+                                {
+                                    Service.IsAdminMode = true;
+                                }
+                                else
+                                {
+                                    Service.IsAdminMode = false;
+                                }
+                                flag = true;
+                            }
                         }
+                        if (!flag)
+                            Service.IsAdminMode = false;
                     }
                     catch (Exception ex)
                     {
                         logger.Error(String.Format("Ошибка при чтении ключей: {0}", ex.Message));
                         Service.Monitor = 0;
+                        Service.IsAdminMode = false;
                     }
                 }
-
+                app.MainWindow.Show();
+                app.MainWindow.WindowState = WindowState.Normal;
 
             }
 			catch (Exception ex)

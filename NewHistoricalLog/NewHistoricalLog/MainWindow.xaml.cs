@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Controls;
 using System.Text;
 using System.Windows;
 using DevExpress.Xpf.Editors;
@@ -10,7 +11,9 @@ using DevExpress.Xpf.Editors.Settings;
 using System.IO;
 using NLog;
 using DevExpress.Xpf.Core;
+using DevExpress.Xpf.Bars;
 using DevExpress.Data.Filtering;
+using DatabaseToolBox;
 
 namespace NewHistoricalLog
 {
@@ -21,9 +24,7 @@ namespace NewHistoricalLog
 	{
         #region Служебный переменные
         Logger logger = LogManager.GetCurrentClassLogger();
-		string currentFilterPhrase = "";
-		string currentFilterColumn = "";
-
+        System.Windows.Forms.NotifyIcon ni = new System.Windows.Forms.NotifyIcon();
 		#endregion
 
         static MainWindow()
@@ -34,8 +35,17 @@ namespace NewHistoricalLog
 		public MainWindow()
 		{
 			InitializeComponent();
+            ni.Icon = new System.Drawing.Icon("Msg.ico");
+            ni.Visible = false;
+            ni.Text = "Журнал исторических сообщений";
+            ni.DoubleClick +=
+                delegate (object sender, EventArgs args)
+                {
+                    this.Show();
+                    this.WindowState = WindowState.Normal;
+                };
             #region Чтение настроек приложения
-            if (File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SEMHistory\\Config.xml"))
+            if (File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments) + "\\SEMHistory\\Config.xml"))
                 Service.ReadSettings();
             else
                 Service.GenerateXMLConfig();
@@ -84,10 +94,10 @@ namespace NewHistoricalLog
 
         private void OnLoad(object sender, RoutedEventArgs e)
         {
-           
-            
             //Скрыли панельку с текстовыми фильтрами
-            filterRow.Height = new GridLength(0);
+            filterTextRow.Height = new GridLength(0);
+            //Скрыли панель с подсистемами
+            subSystemsColumn.Width = new GridLength(0);
             //В комбобоксе текстового фильтра поставили "Сообщение" 
 			filterBox.SelectedItem = filterBox.Items[0];
             //Число строк в гриде равно тому, что в настройках
@@ -100,87 +110,104 @@ namespace NewHistoricalLog
                 sendToDmz.IsEnabled = false;
             else
                 sendToDmz.IsEnabled = true;
+            var systems = ScanForSystems();
+            treeView.ItemsSource = FillListView(systems);
+
+            if (Environment.GetCommandLineArgs().Length > 0)
+            {
+                for (int i = 0; i < Environment.GetCommandLineArgs().Length; i++)
+                {
+                    try
+                    {
+
+                        switch (Environment.GetCommandLineArgs()[i].Remove(Environment.GetCommandLineArgs()[i].IndexOf("_")).ToUpper())
+                        {
+                            case "USERGROUP":
+                                if (Environment.GetCommandLineArgs()[i].Remove(0, Environment.GetCommandLineArgs()[i].IndexOf("_") + 1).ToUpper() == "ADMIN")
+                                {
+                                    Service.IsAdminMode = true;
+                                }
+                                else
+                                {
+                                    Service.IsAdminMode = false;
+                                }
+                                break;
+                            case "MONITOR":
+                                try
+                                {
+                                    Service.Monitor = Convert.ToInt32(Environment.GetCommandLineArgs()[i].Remove(0, Environment.GetCommandLineArgs()[i].IndexOf("_") + 1));
+                                }
+                                catch (Exception ex)
+                                {
+                                    logger.Error(String.Format("Ошибка чтения ключа {0}: {1}", Environment.GetCommandLineArgs()[i], ex.Message));
+                                }
+                                break;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.Error(String.Format("Ошибка чтения ключей: {0}", ex.Message));
+                    }
+
+                }
+            }
+
+            messageGrid.Columns["Date"].SortOrder = DevExpress.Data.ColumnSortOrder.Descending;
+            var messData = MessageGridContent.LoadMessages(Service.StartDate, Service.EndDate);
+            messageGrid.ItemsSource = null;
+            messageGrid.ItemsSource = messData;
         }
 
         #region Обработчики событий контролов
-        private void OnFilterPopupClose(object sender, EventArgs e)
-        {
-            for(int i=0;i<Service.Priorities.Length;i++)
-            {
-                if(!Service.Priorities[i])
-                {
-                    var a = messageGrid.FilterString;
-                    if (!String.IsNullOrEmpty(a))
-					{
-						if (!a.Contains(String.Format("[Type] <> {0}", i + 1)))
-							messageGrid.FilterCriteria = CriteriaOperator.Parse(String.Format("{0} AND [Type] <> {1}", a, i + 1));
-					}
-                    else
-                        messageGrid.FilterCriteria = CriteriaOperator.Parse(String.Format("[Type] <> {0}", i+1));
-                    
-                }
-				else
-				{
-					var a = messageGrid.FilterString;
-					if (!String.IsNullOrEmpty(a))
-					{
-						if(a.Contains(String.Format("[Type] <> {0}", i + 1)))
-						{
-							//если условие первое и единственное
-							if(a.IndexOf(String.Format("[Type] <> {0}", i + 1))==0 && a.Length== String.Format("[Type] <> {0}", i + 1).Length)
-							{
-								messageGrid.FilterCriteria = null;
-							}
-							//если условие первое, но не единственное
-							else if(a.IndexOf(String.Format("[Type] <> {0}", i + 1)) == 0)
-							{
-								a = a.Remove(0, String.Format("[Type] <> {0} AND ", i + 1).Length);
-								messageGrid.FilterCriteria = CriteriaOperator.Parse(a);
-							}
-							//если условие не первое
-							else
-							{
-								a = a.Remove(a.IndexOf(String.Format("[Type] <> {0}", i + 1))-5, String.Format("AND [Type] <> {0} ", i + 1).Length);
-								messageGrid.FilterCriteria = CriteriaOperator.Parse(a);
-							}
-						}
-					}
-				}
-            }
-        }
+        
 
         private void PrintClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
         {
-            messageView.Print();
+            SelectColumnWindow wind = new SelectColumnWindow();
+            if(wind.ShowDialog()!=false)
+            {
+                DXSplashScreen.Show<AwaitScreen>(WindowStartupLocation.CenterOwner, new SplashScreenOwner(this));
+                DXSplashScreen.SetState("Печать журнала");
+                messageGrid.Columns["Date"].AllowPrinting = wind.Fields[0];
+                messageGrid.Columns["Prior"].AllowPrinting = wind.Fields[1];
+                messageGrid.Columns["Kvited"].AllowPrinting = wind.Fields[2];
+                messageGrid.Columns["Text"].AllowPrinting = wind.Fields[3];
+                messageGrid.Columns["User"].AllowPrinting = wind.Fields[4];
+                messageGrid.Columns["Source"].AllowPrinting = wind.Fields[5];
+                messageGrid.Columns["Value"].AllowPrinting = wind.Fields[6];
+                messageView.PrintDirect();
+                DXSplashScreen.Close();
+            }
+            
             //messageView.ShowPrintPreviewDialog(this);
         }
 
-        private void Priority_CheckedChanged(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
+        void ClearFilters()
         {
-			try
-			{
-				Service.Priorities = new bool[] { gray.IsChecked.Value, green.IsChecked.Value, yellow.IsChecked.Value, red.IsChecked.Value };
-			}
-			catch
-			{
-				Service.Priorities = new bool[] { true,true,true,true};
-			}
+            filterText.Text = "";
+            messageGrid.FilterCriteria = null;
+            greenPriority.IsChecked = true;
+            grayPriority.IsChecked = true;
+            yellowPriority.IsChecked = true;
+            redPriority.IsChecked = true;
+            foreach (TreeViewItem items in treeView.Items)
+            {
+                items.FontWeight = FontWeights.Normal;
+                if (items.HasItems)
+                {
+                    foreach (TreeViewItem subitem in items.Items)
+                    {
+                        subitem.FontWeight = FontWeights.Normal;
+                    }
+                }
+            }
         }
 
-        private void ShowTextFilterClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
-        {
-            filterRow.Height = new GridLength(40);
-        }
         private void ClearTextFilterClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
         {
-            filterRow.Height = new GridLength(0);
-			filterText.Text = "";
-			messageGrid.FilterCriteria = null;
-            red.IsChecked = true;
-            green.IsChecked = true;
-            gray.IsChecked = true;
-            yellow.IsChecked = true;
+            ClearFilters();
         }
+
         private void RefreshClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
         {
             if(Service.EndDate>Service.StartDate)
@@ -188,47 +215,47 @@ namespace NewHistoricalLog
                 var messData = MessageGridContent.LoadMessages(Service.StartDate, Service.EndDate);
                 messageGrid.ItemsSource = null;
                 messageGrid.ItemsSource = messData;
-                if(messData.Count>0)
-                {
-                    tools.IsEnabled = true;
-                }
-                else
-                {
-                    tools.IsEnabled = false;
-                }
+                
             }
             else
             {
                 MessageBox.Show("Начало выборки должно быть раньше ее завершения!", "Некорректный промежуток времени!", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
         private void SaveClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
         {
             try
             {
-                if (!Directory.Exists(String.Format("{0}\\SEMHistory\\Export", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments))))
-                    Directory.CreateDirectory(String.Format("{0}\\SEMHistory\\Export", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)));
+                DXSplashScreen.Show<AwaitScreen>(WindowStartupLocation.CenterOwner, new SplashScreenOwner(this));
+                DXSplashScreen.SetState("Сохранение журнала");
+                if (!Directory.Exists(String.Format("{0}\\SEMHistory\\Export", Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments))))
+                    Directory.CreateDirectory(String.Format("{0}\\SEMHistory\\Export", Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments)));
                 string fileName = String.Format("Сообщения с {0} по {1}.pdf", Service.StartDate.ToString().Replace(":", "_"), Service.EndDate.ToString().Replace(":", "_"));
                 int counter = 1;
-                while (File.Exists(String.Format("{0}\\SEMHistory\\Export\\{1}", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), fileName)))
+                while (File.Exists(String.Format("{0}\\SEMHistory\\Export\\{1}", Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments), fileName)))
                 {
                     fileName = String.Format("Сообщения с {0} по {1}_{2}.pdf", Service.StartDate.ToString().Replace(":", "_"), Service.EndDate.ToString().Replace(":", "_"), counter);
                     counter++;
                 }
-                messageView.ExportToPdf(String.Format("{0}\\SEMHistory\\Export\\{1}", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), fileName));
+                messageView.ExportToPdf(String.Format("{0}\\SEMHistory\\Export\\{1}", Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments), fileName));
                 MessageBox.Show("Файл сохранен!", "Успешно!", MessageBoxButton.OK, MessageBoxImage.Information);
+                DXSplashScreen.Close();
                 //DevExpress.XtraPrinting.RtfExportOptions options = new DevExpress.XtraPrinting.RtfExportOptions();
                 //options.ExportMode = DevExpress.XtraPrinting.RtfExportMode.SingleFile;
                 //options.ExportPageBreaks = true;
-                //messageView.ExportToRtf(String.Format( "{0}\\SEMHistory\\Export\\{1}", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), fileName), options);
-                //messageView.ExportToCsv(String.Format("{0}\\SEMHistory\\Export\\{1}", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "test.csv"));
+                //messageView.ExportToRtf(String.Format( "{0}\\SEMHistory\\Export\\{1}", Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments), fileName), options);
+                //messageView.ExportToCsv(String.Format("{0}\\SEMHistory\\Export\\{1}", Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments), "test.csv"));
             }
             catch (Exception ex)
             {
+                if(DXSplashScreen.IsActive)
+                    DXSplashScreen.Close();
                 MessageBox.Show("Файл сохранить не удалось. Для подробной информации см. лог приложения.", "Ошибка при сохранении файла!", MessageBoxButton.OK, MessageBoxImage.Error);
                 logger.Error(String.Format("Ошибка при сохранении файла: {0}", ex.Message));
             }
         }
+
         private void ExitClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
         {
             Close();
@@ -238,6 +265,7 @@ namespace NewHistoricalLog
         {
             Service.StartDate = Convert.ToDateTime(startDate.EditValue);
         }
+
         private void EndDateChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
         {
             Service.EndDate = Convert.ToDateTime(endDate.EditValue);
@@ -245,19 +273,8 @@ namespace NewHistoricalLog
 
         private void LaunchFilterClick(object sender, RoutedEventArgs e)
         {
-			var a = messageGrid.FilterString;
-			if(string.IsNullOrEmpty(a))
-				messageGrid.FilterCriteria = CriteriaOperator.Parse(String.Format("Contains([{0}] ,'{1}')",Service.FilterField,Service.FilterPhrase));
-			else if(a.Contains(currentFilterPhrase) & !string.IsNullOrEmpty(currentFilterPhrase))
-			{
-				a = a.Remove(0, String.Format("Contains([{0}] ,'{1}')", currentFilterColumn, currentFilterPhrase).Length);
-				messageGrid.FilterCriteria = CriteriaOperator.Parse(String.Format("Contains([{0}] ,'{1}') {2}", Service.FilterField, Service.FilterPhrase,a));
-			}
-			else
-				messageGrid.FilterCriteria = CriteriaOperator.Parse(String.Format("Contains([{0}] ,'{1}') AND {2}", Service.FilterField, Service.FilterPhrase, a));
-			currentFilterColumn = Service.FilterField;
-			currentFilterPhrase = Service.FilterPhrase;
-
+            Service.TextFilterPhrase = string.IsNullOrEmpty(filterText.Text)?"":string.Format("Contains([{0}], '{1}')", Service.FilterField, filterText.Text);
+            ChangeFilterCriteria();
 		}
 
         private void FilterColumnChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
@@ -279,13 +296,7 @@ namespace NewHistoricalLog
             }
         }
 
-        private void FilterTextChanging(object sender, DevExpress.Xpf.Editors.EditValueChangingEventArgs e)
-        {
-            if(e.NewValue!=null)
-                Service.FilterPhrase = e.NewValue.ToString();
-            else
-                Service.FilterPhrase = "";
-        }
+        
 
 		private void RefreshButtonClick(object sender, RoutedEventArgs e)
 		{
@@ -294,14 +305,7 @@ namespace NewHistoricalLog
                 var messData = MessageGridContent.LoadMessages(Service.StartDate, Service.EndDate);
                 messageGrid.ItemsSource = null;
                 messageGrid.ItemsSource = messData;
-                if (messData.Count > 0)
-                {
-                    tools.IsEnabled = true;
-                }
-                else
-                {
-                    tools.IsEnabled = false;
-                }
+                
             }
             else
             {
@@ -335,6 +339,8 @@ namespace NewHistoricalLog
             {
                 try
                 {
+                    DXSplashScreen.Show<AwaitScreen>(WindowStartupLocation.CenterOwner, new SplashScreenOwner(this));
+                    DXSplashScreen.SetState("Сохранение журнала");
                     string fileName = String.Format("Сообщения с {0} по {1}.pdf", Service.StartDate.ToString().Replace(":", "_"), Service.EndDate.ToString().Replace(":", "_"));
                     int counter = 1;
                     while (File.Exists(String.Format("{0}\\{1}", wind.Path, fileName)))
@@ -345,14 +351,18 @@ namespace NewHistoricalLog
                     DevExpress.XtraPrinting.PdfExportOptions pdfOptions = new DevExpress.XtraPrinting.PdfExportOptions();
                     messageView.ExportToPdf(String.Format("{0}\\{1}", wind.Path, fileName));
                     MessageBox.Show("Файл сохранен!", "Успешно!", MessageBoxButton.OK, MessageBoxImage.Information);
+                    DXSplashScreen.Close();
                 }
                 catch (Exception ex)
                 {
+                    if (DXSplashScreen.IsActive)
+                        DXSplashScreen.Close();
                     MessageBox.Show("Файл сохранить не удалось. Для подробной информации см. лог приложения.", "Ошибка при сохранении файла!", MessageBoxButton.OK, MessageBoxImage.Error);
                     logger.Error(String.Format("Ошибка при сохранении файла: {0}", ex.Message));
                 }
             }
         }
+
         private void AboutClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
         {
             About wind = new About();
@@ -404,13 +414,6 @@ namespace NewHistoricalLog
             }
         }
 
-        private void ShowSettingsClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
-        {
-            Settings wind = new Settings();
-            wind.Show();
-            wind.Closed += OnSettingsApply;
-        }
-
         private void OnSettingsApply(object sender, EventArgs e)
         {
             if (Service.GridTextWrapping)
@@ -420,6 +423,236 @@ namespace NewHistoricalLog
                 messageGrid.Columns["Text"].EditSettings = new TextEditSettings() { TextWrapping = TextWrapping.NoWrap };
             }
             messageView.PageSize = Service.CountLines;
+        }
+
+        private void FilterPriorityChanged(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Service.Priorities = new bool[] { grayPriority.IsChecked.Value, greenPriority.IsChecked.Value, yellowPriority.IsChecked.Value, redPriority.IsChecked.Value };
+            }
+            catch
+            {
+                Service.Priorities = new bool[] { true, true, true, true };
+            }
+
+            for (int i = 0; i < Service.Priorities.Length; i++)
+            {
+                ///если надо отключить сообщения определенного типа
+                if (!Service.Priorities[i])
+                {
+                    //если строка не пустая
+                    if (!String.IsNullOrEmpty(Service.PriorityFilterPhrase))
+                    {
+                        //если строка не содержит фильтра "Type <> приоритет" 
+                        if (!Service.PriorityFilterPhrase.Contains(String.Format("[Type] <> {0}", i + 1)))
+                            //добавляем в конец строки фильтр "Type <> приоритет" 
+                            Service.PriorityFilterPhrase= String.Format("{0} AND [Type] <> {1}", Service.PriorityFilterPhrase, i + 1);
+                    }
+                    //если строка пустая
+                    else
+                        //добавляем в конец строки фильтр "Type <> приоритет" 
+                        Service.PriorityFilterPhrase = String.Format("[Type] <> {0}", i + 1);
+
+                }
+                //если надо включить сообщения определнного проиоритета 
+                else
+                {
+                    //если строка не пустая
+                    if (!String.IsNullOrEmpty(Service.PriorityFilterPhrase))
+                    {
+                        //если строка содержит фильтр "Type <> приоритет" 
+                        if (Service.PriorityFilterPhrase.Contains(String.Format("[Type] <> {0}", i + 1)))
+                        {
+                            //если условие первое и единственное
+                            if (Service.PriorityFilterPhrase.IndexOf(String.Format("[Type] <> {0}", i + 1)) == 0 && Service.PriorityFilterPhrase.Length == String.Format("[Type] <> {0}", i + 1).Length)
+                            {
+                                //очищаем строку с условием
+                                Service.PriorityFilterPhrase = "";
+                            }
+                            //если условие первое, но не единственное
+                            else if (Service.PriorityFilterPhrase.IndexOf(String.Format("[Type] <> {0}", i + 1)) == 0)
+                            {
+                                Service.PriorityFilterPhrase = Service.PriorityFilterPhrase.Remove(0, String.Format("[Type] <> {0} AND ", i + 1).Length);
+                            }
+                            //если условие не первое
+                            else
+                            {
+                                Service.PriorityFilterPhrase = Service.PriorityFilterPhrase.Remove(Service.PriorityFilterPhrase.IndexOf(String.Format("[Type] <> {0}", i + 1)) - 5, String.Format("AND [Type] <> {0} ", i + 1).Length);
+                            }
+                        }
+                    }
+                }
+                ChangeFilterCriteria();
+            }
+
+        }
+
+        public List<TreeViewItem> FillListView(List<SystemsItems> list)
+        {
+            List<TreeViewItem> Result = new List<TreeViewItem>();
+            foreach(var item in list)
+            {
+                TreeViewItem temp = new TreeViewItem() { Header = item.Name };
+                if(item.Children.Count>0)
+                {
+                    foreach(var subItem in FillListView(item.Children))
+                    {
+                        temp.Items.Add(subItem);
+                    }
+                }
+                temp.MouseDoubleClick += Temp_MouseDoubleClick;
+                Result.Add(temp);
+                
+            }
+            return Result;
+        }
+
+        private void Temp_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+           if((sender as TreeViewItem).Parent!=null)
+            {
+                if((sender as TreeViewItem).FontWeight==FontWeights.Bold)
+                {
+                    (sender as TreeViewItem).FontWeight = FontWeights.Normal;
+                    if(Service.SystemsFilterPhrase.Contains(string.Format("Contains([Text], '{0}') Or ", (sender as TreeViewItem).Header)))
+                    {
+                        Service.SystemsFilterPhrase = Service.SystemsFilterPhrase.Replace(string.Format("Contains([Text], '{0}') Or ", (sender as TreeViewItem).Header), "");
+                    }
+                    else if (Service.SystemsFilterPhrase.Contains(string.Format("Or Contains([Text], '{0}')", (sender as TreeViewItem).Header)))
+                    {
+                        Service.SystemsFilterPhrase = Service.SystemsFilterPhrase.Replace(string.Format("Or Contains([Text], '{0}')", (sender as TreeViewItem).Header), "");
+                    }
+                    else if (Service.SystemsFilterPhrase.Contains(string.Format("Contains([Text], '{0}')", (sender as TreeViewItem).Header)))
+                    {
+                        Service.SystemsFilterPhrase = Service.SystemsFilterPhrase.Replace(string.Format("Contains([Text], '{0}')", (sender as TreeViewItem).Header), "");
+                    }
+                }
+                else
+                {
+                    (sender as TreeViewItem).FontWeight = FontWeights.Bold;
+                    //если строка фильтрация по подсистемам пустая
+                    if (string.IsNullOrEmpty(Service.SystemsFilterPhrase))
+                    {
+                        Service.SystemsFilterPhrase = string.Format("Contains([Text], '{0}')", (sender as TreeViewItem).Header);
+                    }
+                    else
+                    {
+                        Service.SystemsFilterPhrase = string.Format("{0} Or Contains([Text], '{1}')", Service.SystemsFilterPhrase, (sender as TreeViewItem).Header);
+                    }
+                }
+                ChangeFilterCriteria();
+            }
+        }
+
+        public void ChangeFilterCriteria()
+        {
+            string criteria = "";
+            if(!string.IsNullOrEmpty(Service.SystemsFilterPhrase))
+            {
+                criteria = string.Format("({0})", Service.SystemsFilterPhrase);
+            }
+            if(!string.IsNullOrEmpty(Service.TextFilterPhrase))
+            {
+                if(string.IsNullOrEmpty(criteria))
+                {
+                    criteria = string.Format("({0})", Service.TextFilterPhrase);
+                }
+                else
+                {
+                    criteria = string.Format("({0}) AND ({1})", criteria, Service.TextFilterPhrase);
+                }
+            }
+            if(!string.IsNullOrEmpty(Service.PriorityFilterPhrase))
+            {
+                if (string.IsNullOrEmpty(criteria))
+                {
+                    criteria = string.Format("({0})", Service.PriorityFilterPhrase);
+                }
+                else
+                {
+                    criteria = string.Format("({0}) AND ({1})", criteria, Service.PriorityFilterPhrase);
+                }
+            }
+            messageGrid.FilterCriteria = CriteriaOperator.Parse(criteria);
+        }
+
+        public List<SystemsItems> ScanForSystems()
+        {
+            try
+            {
+                List<SystemsItems> result = new List<SystemsItems>();
+                var splitedSystems = Service.TabsForScan.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                foreach(var note in splitedSystems)
+                {
+                    SystemsItems item = new SystemsItems();
+                    var splitNote = note.Split(new char[] { '-' });
+                    item.Name = splitNote[1].Trim();
+                    var connection = SQL.GetSqlConnection(Service.ConnectionString);
+                    connection.Open();
+                    var data = SQL.GetDataList(connection,
+                        string.Format("SELECT ParamName FROM dbo.{0} ", splitNote[0]));
+                    for(int i=0;i<data.Count;i++)
+                    {
+                        SystemsItems subItem = new SystemsItems() { Name = data[i].Split(new char[] { ';' })[0].Trim() };
+                        item.Children.Add(subItem);
+                    }
+                    result.Add(item);
+                }
+                return result;
+            }
+            catch(Exception ex)
+            {
+                logger.Error("Ошибка при формировании массива подсистем: {0}", ex.Message);
+                return new List<SystemsItems>();
+            }
+        }       
+
+        private void BarCheckItem_CheckedChanged(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
+        {
+            if((sender as BarCheckItem).IsChecked.Value)
+            {
+                filterTextRow.Height = new GridLength(40);
+                subSystemsColumn.Width = new GridLength(220);
+            }
+            else
+            {
+                filterTextRow.Height = new GridLength(0);
+                subSystemsColumn.Width = new GridLength(0);
+            }
+        }
+
+        private void ThemedWindow_StateChanged(object sender, EventArgs e)
+        {
+            if(WindowState==WindowState.Minimized)
+            {
+                ClearFilters();
+                messageGrid.ItemsSource = null;
+                ni.Visible = true;
+                Hide();
+            }
+            if(WindowState==WindowState.Normal)
+            {
+                //устанавливаем промежуток времени - один час назад от текущего времени
+                startDate.EditValue = DateTime.Now.AddHours(-1);
+                endDate.EditValue = DateTime.Now;
+                var messData = MessageGridContent.LoadMessages(Service.StartDate, Service.EndDate);
+                messageGrid.ItemsSource = null;
+                messageGrid.ItemsSource = messData;
+                GC.Collect();
+            }
+        }
+
+        private void ThemedWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            e.Cancel = true;
+            WindowState = WindowState.Minimized;
+        }
+
+        private void messageView_CustomRowAppearance(object sender, CustomRowAppearanceEventArgs e)
+        {
+            e.Result = e.ConditionalValue;
+            e.Handled = true;
         }
     }
     public class EditorLocalizerEx : EditorLocalizer
@@ -439,5 +672,39 @@ namespace NewHistoricalLog
             this.AddString(EditorStringId.DatePickerHours, "час");
             this.AddString(EditorStringId.DatePickerSeconds, "сек");
         }
+    }
+    public class SystemsItems
+    {
+        bool hasChildren = false;
+        List<SystemsItems> children = new List<SystemsItems>();
+
+        public string Name { get; set; } = "";
+        //public string Description { get; set; } = "";
+        public bool Selected { get; set; } = true;
+        public List<SystemsItems> Children
+        {
+            get { return children; }
+            set
+            {
+                children = value;
+                if (children.Count > 0)
+                {
+                    hasChildren = true;
+                }
+                else
+                {
+                    hasChildren = false;
+                }
+            }
+        }
+        public bool HasChildren
+        {
+            get { return hasChildren; }
+        }
+
+        //public SystemsItems()
+        //{
+        //    Children.
+        //}
     }
 }
