@@ -25,6 +25,7 @@ namespace NewHistoricalLog
         #region Служебный переменные
         Logger logger = LogManager.GetCurrentClassLogger();
         System.Windows.Forms.NotifyIcon ni = new System.Windows.Forms.NotifyIcon();
+        Thread LoadMessagesThread;
 		#endregion
 
         static MainWindow()
@@ -153,9 +154,13 @@ namespace NewHistoricalLog
             }
 
             messageGrid.Columns["Date"].SortOrder = DevExpress.Data.ColumnSortOrder.Descending;
-            var messData = MessageGridContent.LoadMessages(Service.StartDate, Service.EndDate);
-            messageGrid.ItemsSource = null;
-            messageGrid.ItemsSource = messData;
+            LoadMessagesThread = new Thread(LoadMessagesMethod) { IsBackground = true };
+            DXSplashScreen.Show<AwaitScreen>(WindowStartupLocation.CenterOwner, new SplashScreenOwner(this));
+            DXSplashScreen.SetState(string.Format("Получение сообщений с {0} по {1}", Service.StartDate, Service.EndDate));
+            LoadMessagesThread.Start();
+            messageGrid.RefreshData();
+            //messageGrid.ItemsSource = null;
+            //messageGrid.ItemsSource = messData;
         }
 
         #region Обработчики событий контролов
@@ -212,10 +217,14 @@ namespace NewHistoricalLog
         {
             if(Service.EndDate>Service.StartDate)
             {
-                var messData = MessageGridContent.LoadMessages(Service.StartDate, Service.EndDate);
-                messageGrid.ItemsSource = null;
-                messageGrid.ItemsSource = messData;
-                
+                //var messData = MessageGridContent.LoadMessages(Service.StartDate, Service.EndDate);
+                //messageGrid.ItemsSource = null;
+                //messageGrid.ItemsSource = messData;
+                LoadMessagesThread = new Thread(LoadMessagesMethod) { IsBackground = true };
+                DXSplashScreen.Show<AwaitScreen>(WindowStartupLocation.CenterOwner, new SplashScreenOwner(this));
+                DXSplashScreen.SetState(string.Format("Получение сообщений с {0} по {1}", Service.StartDate, Service.EndDate));
+                LoadMessagesThread.Start();
+
             }
             else
             {
@@ -302,9 +311,13 @@ namespace NewHistoricalLog
 		{
             if (Service.EndDate > Service.StartDate)
             {
-                var messData = MessageGridContent.LoadMessages(Service.StartDate, Service.EndDate);
-                messageGrid.ItemsSource = null;
-                messageGrid.ItemsSource = messData;
+                //var messData = MessageGridContent.LoadMessages(Service.StartDate, Service.EndDate);
+                //messageGrid.ItemsSource = null;
+                //messageGrid.ItemsSource = messData;
+                LoadMessagesThread = new Thread(LoadMessagesMethod) { IsBackground = true };
+                DXSplashScreen.Show<AwaitScreen>(WindowStartupLocation.CenterOwner, new SplashScreenOwner(this));
+                DXSplashScreen.SetState(string.Format("Получение сообщений с {0} по {1}",Service.StartDate, Service.EndDate));
+                LoadMessagesThread.Start();
                 
             }
             else
@@ -636,9 +649,10 @@ namespace NewHistoricalLog
                 //устанавливаем промежуток времени - один час назад от текущего времени
                 startDate.EditValue = DateTime.Now.AddHours(-1);
                 endDate.EditValue = DateTime.Now;
-                var messData = MessageGridContent.LoadMessages(Service.StartDate, Service.EndDate);
-                messageGrid.ItemsSource = null;
-                messageGrid.ItemsSource = messData;
+                Service.Messages = MessageGridContent.LoadMessages(Service.StartDate, Service.EndDate);
+                //messageGrid.ItemsSource = null;
+                //messageGrid.ItemsSource = messData;
+                messageGrid.RefreshData();
                 GC.Collect();
             }
         }
@@ -653,6 +667,17 @@ namespace NewHistoricalLog
         {
             e.Result = e.ConditionalValue;
             e.Handled = true;
+        }
+
+        public void LoadMessagesMethod()
+        {
+            Service.IsOperating = false;
+            Service.Messages = MessageGridContent.LoadMessages(Service.StartDate, Service.EndDate);
+            if (DXSplashScreen.IsActive)
+                DXSplashScreen.Close();
+            Dispatcher.Invoke(() => messageGrid.ItemsSource = null);
+            Dispatcher.Invoke(() => messageGrid.ItemsSource = Service.Messages);
+            Service.IsOperating = true;
         }
     }
     public class EditorLocalizerEx : EditorLocalizer

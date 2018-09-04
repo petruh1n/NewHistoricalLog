@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,8 +24,18 @@ namespace NewHistoricalLog
             if (StaticPropertyChanged != null)
                 StaticPropertyChanged(null, new PropertyChangedEventArgs(propertyName));
         }
+        static bool isOperating = true;
 
         #region Global properties
+        public static bool IsOperating
+        {
+            get { return isOperating; }
+            set { isOperating = value; NotifyStaticPropertyChanged("IsOperating"); }
+        }
+        /// <summary>
+        /// Глобальная коллекция сообщений
+        /// </summary>
+        public static ObservableCollection<MessageGridContent> Messages { get; set; } = new ObservableCollection<MessageGridContent>();
         /// <summary>
         /// Стартовая дата выборки
         /// </summary>

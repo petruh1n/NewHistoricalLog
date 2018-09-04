@@ -78,7 +78,8 @@
 
         <Grid Grid.Row="1" Grid.ColumnSpan="2">
             
-            <dxb:ToolBarControl Height="40" AllowHide="False" AllowCustomizationMenu="False" AllowQuickCustomization="False" BarItemDisplayMode="ContentAndGlyph" UseWholeRow="True" IsCollapsed="False" Orientation="Horizontal" AllowCollapse="False" >
+            <dxb:ToolBarControl Height="40" AllowHide="False" AllowCustomizationMenu="False" AllowQuickCustomization="False" BarItemDisplayMode="ContentAndGlyph" 
+                                UseWholeRow="True" IsCollapsed="False" Orientation="Horizontal" AllowCollapse="False" IsEnabled="{Binding Path=(local:Service.IsOperating), UpdateSourceTrigger=PropertyChanged}">
                 <dxb:BarSubItem Content="Действия" ContentTemplate="{StaticResource BarItemTextTemplate}" LargeGlyph="{dx:DXImage Image=SelectTool_32x32.png}" Glyph="{dx:DXImage Image=SelectTool_16x16.png}">
                     <dxb:BarButtonItem Content="Обновить" ItemClick="RefreshClick" Glyph="{dx:DXImage Image=Recurrence_32x32.png}" LargeGlyph="{dx:DXImage Image=Recurrence_32x32.png}" ContentTemplate="{StaticResource BarItemTextTemplate}"/>
                     <dxb:BarButtonItem Content="Сохранить" ItemClick="SaveClick" Glyph="{dx:DXImage Image=Save_32x32.png}" LargeGlyph="{dx:DXImage Image=Save_32x32.png}" ContentTemplate="{StaticResource BarItemTextTemplate}"/>
@@ -120,7 +121,7 @@
             <dx:SimpleButton   Margin="5,5,5,5" Width="Auto" Content="Применить фильтр" HorizontalAlignment="Right" Grid.Column="2" Click="LaunchFilterClick"/>
         </Grid>
 
-        <StackPanel Orientation="Horizontal" Grid.Row="4" Width="Auto"  HorizontalAlignment="Left" Grid.ColumnSpan="2">
+        <StackPanel Orientation="Horizontal" Grid.Row="4" Width="Auto"  HorizontalAlignment="Left" Grid.ColumnSpan="2" IsEnabled="{Binding Path=(local:Service.IsOperating), UpdateSourceTrigger=PropertyChanged}">
             <TextBlock Margin="5,5,5,5" VerticalAlignment="Center"><Run Text="Начало выборки"/></TextBlock>
             <dxe:DateEdit x:Name="startDate" HorizontalAlignment="Left" VerticalAlignment="Top" Width="165"  Mask="G" Margin="5,5,5,5" MaskUseAsDisplayFormat="True" EditValueChanged="StartDateChanged" Height="30">
                 <dxe:DateEdit.StyleSettings>
@@ -142,7 +143,7 @@
             <dx:SimpleButton Width="170" Click="RefreshButtonClick" Margin="5,5,5,5" Content="Обновить"/>
         </StackPanel>
 
-        <dxg:GridControl AutoGenerateColumns="None" EnableSmartColumnsGeneration="True" Grid.Row="5" x:Name="messageGrid" Grid.Column="1" >
+        <dxg:GridControl AutoGenerateColumns="None" EnableSmartColumnsGeneration="True" Grid.Row="5" x:Name="messageGrid" Grid.Column="1" ItemsSource="{Binding Path=(local:Service.Messages), UpdateSourceTrigger=PropertyChanged}">
             <dxg:GridControl.View>
                 <dxg:TableView x:Name="messageView" AllowPerPixelScrolling="True" ShowTotalSummary="False" SearchPanelAllowFilter="False" SearchPanelClearOnClose="True" 
                                ShowGroupPanel="False" AllowEditing="False" AllowGrouping="False" ShowFilterPanelMode="Never" AllowPaging="True"
