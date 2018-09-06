@@ -26,6 +26,7 @@ namespace NewHistoricalLog
         Logger logger = LogManager.GetCurrentClassLogger();
         System.Windows.Forms.NotifyIcon ni = new System.Windows.Forms.NotifyIcon();
         Thread LoadMessagesThread;
+        Thread SaveMessagesThread;
 		#endregion
 
         static MainWindow()
@@ -238,18 +239,8 @@ namespace NewHistoricalLog
             {
                 DXSplashScreen.Show<AwaitScreen>(WindowStartupLocation.CenterOwner, new SplashScreenOwner(this));
                 DXSplashScreen.SetState("Сохранение журнала");
-                if (!Directory.Exists(String.Format("{0}\\SEMHistory\\Export", Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments))))
-                    Directory.CreateDirectory(String.Format("{0}\\SEMHistory\\Export", Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments)));
-                string fileName = String.Format("Сообщения с {0} по {1}.pdf", Service.StartDate.ToString().Replace(":", "_"), Service.EndDate.ToString().Replace(":", "_"));
-                int counter = 1;
-                while (File.Exists(String.Format("{0}\\SEMHistory\\Export\\{1}", Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments), fileName)))
-                {
-                    fileName = String.Format("Сообщения с {0} по {1}_{2}.pdf", Service.StartDate.ToString().Replace(":", "_"), Service.EndDate.ToString().Replace(":", "_"), counter);
-                    counter++;
-                }
-                messageView.ExportToPdf(String.Format("{0}\\SEMHistory\\Export\\{1}", Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments), fileName));
-                MessageBox.Show("Файл сохранен!", "Успешно!", MessageBoxButton.OK, MessageBoxImage.Information);
-                DXSplashScreen.Close();
+                SaveMessagesThread = new Thread(SaveMethod) { IsBackground = true };
+                SaveMessagesThread.Start();
                 //DevExpress.XtraPrinting.RtfExportOptions options = new DevExpress.XtraPrinting.RtfExportOptions();
                 //options.ExportMode = DevExpress.XtraPrinting.RtfExportMode.SingleFile;
                 //options.ExportPageBreaks = true;
@@ -263,6 +254,25 @@ namespace NewHistoricalLog
                 MessageBox.Show("Файл сохранить не удалось. Для подробной информации см. лог приложения.", "Ошибка при сохранении файла!", MessageBoxButton.OK, MessageBoxImage.Error);
                 logger.Error(String.Format("Ошибка при сохранении файла: {0}", ex.Message));
             }
+        }
+
+        void SaveMethod()
+        {
+            Service.IsOperating = false;
+            if (!Directory.Exists(String.Format("{0}\\SEMHistory\\Export", Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments))))
+                Directory.CreateDirectory(String.Format("{0}\\SEMHistory\\Export", Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments)));
+            string fileName = String.Format("Сообщения с {0} по {1}.pdf", Service.StartDate.ToString().Replace(":", "_"), Service.EndDate.ToString().Replace(":", "_"));
+            int counter = 1;
+            while (File.Exists(String.Format("{0}\\SEMHistory\\Export\\{1}", Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments), fileName)))
+            {
+                fileName = String.Format("Сообщения с {0} по {1}_{2}.pdf", Service.StartDate.ToString().Replace(":", "_"), Service.EndDate.ToString().Replace(":", "_"), counter);
+                counter++;
+            }
+            messageView.ExportToPdf(String.Format("{0}\\SEMHistory\\Export\\{1}", Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments), fileName));
+            MessageBox.Show("Файл сохранен!", "Успешно!", MessageBoxButton.OK, MessageBoxImage.Information);
+            if(DXSplashScreen.IsActive)
+                DXSplashScreen.Close();
+            Service.IsOperating = true;
         }
 
         private void ExitClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)

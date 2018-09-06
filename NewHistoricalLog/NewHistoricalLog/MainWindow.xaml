@@ -136,10 +136,7 @@
             </dxe:DateEdit>
         </StackPanel>
 
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Row="4" Grid.ColumnSpan="2">
-            <!--<dxe:TextEdit Width="150" Margin="5,5,0,5"/>
-            <dx:SimpleButton Width="20" Margin="0,5,5,5" Glyph="pack://application:,,,/NewHistoricalLog;component/Images/search.png" GlyphAlignment="Right"/>-->
-            <!--<dxe:SearchControl x:Name="searcher" Width="150" Margin="5" FilterCondition="Contains"/>-->
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Row="4" Grid.ColumnSpan="2" IsEnabled="{Binding Path=(local:Service.IsOperating), UpdateSourceTrigger=PropertyChanged}">          
             <dx:SimpleButton Width="170" Click="RefreshButtonClick" Margin="5,5,5,5" Content="Обновить"/>
         </StackPanel>
 
