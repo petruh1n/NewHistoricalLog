@@ -6,6 +6,8 @@ using System.Text;
 using System.Windows;
 using DevExpress.Xpf.Editors;
 using DevExpress.Xpf.Grid;
+using DevExpress.Xpf.Printing;
+using DevExpress.XtraPrinting;
 using System.Threading;
 using DevExpress.Xpf.Editors.Settings;
 using System.IO;
@@ -27,6 +29,8 @@ namespace NewHistoricalLog
         System.Windows.Forms.NotifyIcon ni = new System.Windows.Forms.NotifyIcon();
         Thread LoadMessagesThread;
         Thread SaveMessagesThread;
+        bool created = false;
+        bool cleared = false;
 		#endregion
 
         static MainWindow()
@@ -160,6 +164,7 @@ namespace NewHistoricalLog
             DXSplashScreen.SetState(string.Format("Получение сообщений с {0} по {1}", Service.StartDate, Service.EndDate));
             LoadMessagesThread.Start();
             messageGrid.RefreshData();
+            WindowState = WindowState.Minimized;
             //messageGrid.ItemsSource = null;
             //messageGrid.ItemsSource = messData;
         }
@@ -181,11 +186,18 @@ namespace NewHistoricalLog
                 messageGrid.Columns["User"].AllowPrinting = wind.Fields[4];
                 messageGrid.Columns["Source"].AllowPrinting = wind.Fields[5];
                 messageGrid.Columns["Value"].AllowPrinting = wind.Fields[6];
-                messageView.PrintDirect();
+                Thread printThread = new Thread(PrintMethod);
+                printThread.IsBackground = true;
+                printThread.Start();
                 DXSplashScreen.Close();
             }
             
             //messageView.ShowPrintPreviewDialog(this);
+        }
+
+        void PrintMethod()
+        {
+            Dispatcher.Invoke(()=> messageView.PrintDirect());
         }
 
         void ClearFilters()
@@ -218,9 +230,6 @@ namespace NewHistoricalLog
         {
             if(Service.EndDate>Service.StartDate)
             {
-                //var messData = MessageGridContent.LoadMessages(Service.StartDate, Service.EndDate);
-                //messageGrid.ItemsSource = null;
-                //messageGrid.ItemsSource = messData;
                 LoadMessagesThread = new Thread(LoadMessagesMethod) { IsBackground = true };
                 DXSplashScreen.Show<AwaitScreen>(WindowStartupLocation.CenterOwner, new SplashScreenOwner(this));
                 DXSplashScreen.SetState(string.Format("Получение сообщений с {0} по {1}", Service.StartDate, Service.EndDate));
@@ -239,40 +248,92 @@ namespace NewHistoricalLog
             {
                 DXSplashScreen.Show<AwaitScreen>(WindowStartupLocation.CenterOwner, new SplashScreenOwner(this));
                 DXSplashScreen.SetState("Сохранение журнала");
+                DXSplashScreen.Progress(0);
                 SaveMessagesThread = new Thread(SaveMethod) { IsBackground = true };
                 SaveMessagesThread.Start();
-                //DevExpress.XtraPrinting.RtfExportOptions options = new DevExpress.XtraPrinting.RtfExportOptions();
-                //options.ExportMode = DevExpress.XtraPrinting.RtfExportMode.SingleFile;
-                //options.ExportPageBreaks = true;
-                //messageView.ExportToRtf(String.Format( "{0}\\SEMHistory\\Export\\{1}", Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments), fileName), options);
-                //messageView.ExportToCsv(String.Format("{0}\\SEMHistory\\Export\\{1}", Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments), "test.csv"));
             }
             catch (Exception ex)
             {
                 if(DXSplashScreen.IsActive)
                     DXSplashScreen.Close();
-                MessageBox.Show("Файл сохранить не удалось. Для подробной информации см. лог приложения.", "Ошибка при сохранении файла!", MessageBoxButton.OK, MessageBoxImage.Error);
+                Dispatcher.Invoke(() => DXMessageBox.Show("Файл сохранить не удалось. Для подробной информации см. лог приложения.", "Ошибка при сохранении файла!", MessageBoxButton.OK, MessageBoxImage.Error));
                 logger.Error(String.Format("Ошибка при сохранении файла: {0}", ex.Message));
             }
         }
 
         void SaveMethod()
         {
-            Service.IsOperating = false;
-            if (!Directory.Exists(String.Format("{0}\\SEMHistory\\Export", Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments))))
-                Directory.CreateDirectory(String.Format("{0}\\SEMHistory\\Export", Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments)));
-            string fileName = String.Format("Сообщения с {0} по {1}.pdf", Service.StartDate.ToString().Replace(":", "_"), Service.EndDate.ToString().Replace(":", "_"));
-            int counter = 1;
-            while (File.Exists(String.Format("{0}\\SEMHistory\\Export\\{1}", Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments), fileName)))
+            try
             {
-                fileName = String.Format("Сообщения с {0} по {1}_{2}.pdf", Service.StartDate.ToString().Replace(":", "_"), Service.EndDate.ToString().Replace(":", "_"), counter);
-                counter++;
+                Service.IsOperating = false;
+                if (!Directory.Exists(String.Format("{0}\\SEMHistory\\Export", Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments))))
+                    Directory.CreateDirectory(String.Format("{0}\\SEMHistory\\Export", Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments)));
+                string fileName = String.Format("Сообщения с {0} по {1}.pdf", Service.StartDate.ToString().Replace(":", "_"), Service.EndDate.ToString().Replace(":", "_"));
+                int counter = 1;
+                while (File.Exists(String.Format("{0}\\SEMHistory\\Export\\{1}", Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments), fileName)))
+                {
+                    fileName = String.Format("Сообщения с {0} по {1}_{2}.pdf", Service.StartDate.ToString().Replace(":", "_"), Service.EndDate.ToString().Replace(":", "_"), counter);
+                    counter++;
+                }
+                //messageView.ExportToPdf(String.Format("{0}\\SEMHistory\\Export\\{1}", Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments), fileName));
+                PrintableControlLink link = null;
+                Dispatcher.Invoke(() => link = new PrintableControlLink(messageGrid.View));
+                link.PrintingSystem.ExportOptions.Xls.TextExportMode = TextExportMode.Text;
+                //var xlsExportOptions = new XlsExportOptions();
+                //xlsExportOptions.ExportMode = XlsExportMode.SingleFile;
+                try
+                {
+                    link.PrintingSystem.ProgressReflector.PositionChanged += ProgressReflector_PositionChanged; ;
+                }
+                finally
+                {
+                    link.PrintingSystem.ResetProgressReflector();
+                }
+                if (DXSplashScreen.IsActive)
+                {
+                    DXSplashScreen.SetState("Создание файла");
+                }
+                Dispatcher.Invoke(() => link.CreateDocument(true));
+                Dispatcher.Invoke(() => link.CreateDocumentFinished += (o, ee) => {
+                    link.PrintingSystem.ProgressReflector.MaximizeRange();
+                    link.ExportToPdf(String.Format("{0}\\SEMHistory\\Export\\{1}", Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments), fileName));
+                });
             }
-            messageView.ExportToPdf(String.Format("{0}\\SEMHistory\\Export\\{1}", Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments), fileName));
-            MessageBox.Show("Файл сохранен!", "Успешно!", MessageBoxButton.OK, MessageBoxImage.Information);
+            catch(Exception ex)
+            {
+                Dispatcher.Invoke(() => DXMessageBox.Show("Файл сохранить не удалось. Для подробной информации см. лог приложения.", "Ошибка при сохранении файла!", MessageBoxButton.OK, MessageBoxImage.Error));
+                logger.Error(String.Format("Ошибка при сохранении файла: {0}", ex.Message));
+            }
+            
+        }
+
+        private void ProgressReflector_PositionChanged(object sender, EventArgs e)
+        {
             if(DXSplashScreen.IsActive)
-                DXSplashScreen.Close();
-            Service.IsOperating = true;
+            {
+                DXSplashScreen.Progress((sender as ProgressReflector).Position, (sender as ProgressReflector).Maximum);
+            }
+            
+            if((sender as ProgressReflector).Position ==  (sender as ProgressReflector).Maximum)
+            {
+                if(created)
+                {
+                    Service.IsOperating = true;
+                    if (DXSplashScreen.IsActive)
+                        DXSplashScreen.Close();
+                    created = false;
+                    Dispatcher.Invoke(() => DXMessageBox.Show("Файл сохранен!", "Успешно!", MessageBoxButton.OK, MessageBoxImage.Information));
+                }
+                else
+                {
+                    created = true;
+                    if(DXSplashScreen.IsActive)
+                    {
+                        DXSplashScreen.SetState("Сохранение файла");
+                    }
+                }  
+                
+            }
         }
 
         private void ExitClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
@@ -321,9 +382,6 @@ namespace NewHistoricalLog
 		{
             if (Service.EndDate > Service.StartDate)
             {
-                //var messData = MessageGridContent.LoadMessages(Service.StartDate, Service.EndDate);
-                //messageGrid.ItemsSource = null;
-                //messageGrid.ItemsSource = messData;
                 LoadMessagesThread = new Thread(LoadMessagesMethod) { IsBackground = true };
                 DXSplashScreen.Show<AwaitScreen>(WindowStartupLocation.CenterOwner, new SplashScreenOwner(this));
                 DXSplashScreen.SetState(string.Format("Получение сообщений с {0} по {1}",Service.StartDate, Service.EndDate));
@@ -358,32 +416,67 @@ namespace NewHistoricalLog
         private void SaveToClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
         {
             ExpWindow wind = new ExpWindow();
-            if(wind.ShowDialog().Value)
+            if (wind.ShowDialog().Value)
             {
                 try
                 {
                     DXSplashScreen.Show<AwaitScreen>(WindowStartupLocation.CenterOwner, new SplashScreenOwner(this));
                     DXSplashScreen.SetState("Сохранение журнала");
-                    string fileName = String.Format("Сообщения с {0} по {1}.pdf", Service.StartDate.ToString().Replace(":", "_"), Service.EndDate.ToString().Replace(":", "_"));
-                    int counter = 1;
-                    while (File.Exists(String.Format("{0}\\{1}", wind.Path, fileName)))
-                    {
-                        fileName = String.Format("Сообщения с {0} по {1}_{2}.pdf", Service.StartDate.ToString().Replace(":", "_"), Service.EndDate.ToString().Replace(":", "_"), counter);
-                        counter++;
-                    }
-                    DevExpress.XtraPrinting.PdfExportOptions pdfOptions = new DevExpress.XtraPrinting.PdfExportOptions();
-                    messageView.ExportToPdf(String.Format("{0}\\{1}", wind.Path, fileName));
-                    MessageBox.Show("Файл сохранен!", "Успешно!", MessageBoxButton.OK, MessageBoxImage.Information);
-                    DXSplashScreen.Close();
+                    DXSplashScreen.Progress(0);
+                    SaveMessagesThread = new Thread(new ParameterizedThreadStart(SaveToMethod)) { IsBackground = true };
+                    SaveMessagesThread.Start(wind.Path);
                 }
                 catch (Exception ex)
                 {
                     if (DXSplashScreen.IsActive)
                         DXSplashScreen.Close();
-                    MessageBox.Show("Файл сохранить не удалось. Для подробной информации см. лог приложения.", "Ошибка при сохранении файла!", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Dispatcher.Invoke(() => DXMessageBox.Show("Файл сохранить не удалось. Для подробной информации см. лог приложения.", "Ошибка при сохранении файла!", MessageBoxButton.OK, MessageBoxImage.Error));
                     logger.Error(String.Format("Ошибка при сохранении файла: {0}", ex.Message));
                 }
             }
+        }
+
+        void SaveToMethod(object path)
+        {
+            try
+            {
+                Service.IsOperating = false;
+                string fileName = String.Format("Сообщения с {0} по {1}.pdf", Service.StartDate.ToString().Replace(":", "_"), Service.EndDate.ToString().Replace(":", "_"));
+                int counter = 1;
+                while (File.Exists(String.Format("{0}\\{1}", (string)path, fileName)))
+                {
+                    fileName = String.Format("Сообщения с {0} по {1}_{2}.pdf", Service.StartDate.ToString().Replace(":", "_"), Service.EndDate.ToString().Replace(":", "_"), counter);
+                    counter++;
+                }
+                PrintableControlLink link = null;
+                Dispatcher.Invoke(() => link = new PrintableControlLink(messageGrid.View));
+                link.PrintingSystem.ExportOptions.Xls.TextExportMode = TextExportMode.Text;
+                try
+                {
+                    link.PrintingSystem.ProgressReflector.PositionChanged += ProgressReflector_PositionChanged; ;
+                }
+                finally
+                {
+                    link.PrintingSystem.ResetProgressReflector();
+                }
+                if (DXSplashScreen.IsActive)
+                {
+                    DXSplashScreen.SetState("Создание файла");
+                }
+                Dispatcher.Invoke(() => link.CreateDocument(true));
+                Dispatcher.Invoke(() => link.CreateDocumentFinished += (o, ee) => {
+                    link.PrintingSystem.ProgressReflector.MaximizeRange();
+                    link.ExportToPdf(String.Format("{0}\\{1}", (string)path, fileName));
+                });
+            }
+            catch(Exception ex)
+            {
+                if (DXSplashScreen.IsActive)
+                    DXSplashScreen.Close();
+                Dispatcher.Invoke(()=>DXMessageBox.Show("Файл сохранить не удалось. Для подробной информации см. лог приложения.", "Ошибка при сохранении файла!", MessageBoxButton.OK, MessageBoxImage.Error));
+                logger.Error(String.Format("Ошибка при сохранении файла: {0}", ex.Message));
+            }
+            
         }
 
         private void AboutClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
@@ -404,6 +497,25 @@ namespace NewHistoricalLog
         {
             try
             {
+                DXSplashScreen.Show<AwaitScreen>(WindowStartupLocation.CenterOwner, new SplashScreenOwner(this));
+                DXSplashScreen.SetState("Сохранение журнала");
+                DXSplashScreen.Progress(0);
+                SaveMessagesThread = new Thread(SendToDMZMethod) { IsBackground = true };
+                SaveMessagesThread.Start();
+            }
+            catch (Exception ex)
+            {
+                Dispatcher.Invoke(() => DXMessageBox.Show("Файл сохранить не удалось. Для подробной информации см. лог приложения.", "Ошибка при сохранении файла!", MessageBoxButton.OK, MessageBoxImage.Error));
+                logger.Error(String.Format("Ошибка при сохранении файла: {0}", ex.Message));
+            }
+        }
+        #endregion
+
+        void SendToDMZMethod()
+        {
+            try
+            {
+                Service.IsOperating = false;
                 string fileName = String.Format("Сообщения с {0} по {1}.pdf", Service.StartDate.ToString().Replace(":", "_"), Service.EndDate.ToString().Replace(":", "_"));
                 int counter = 1;
                 while (File.Exists(String.Format("{0}\\{1}", Service.DmzPath, fileName)))
@@ -411,17 +523,35 @@ namespace NewHistoricalLog
                     fileName = String.Format("Сообщения с {0} по {1}_{2}.pdf", Service.StartDate.ToString().Replace(":", "_"), Service.EndDate.ToString().Replace(":", "_"), counter);
                     counter++;
                 }
-                DevExpress.XtraPrinting.PdfExportOptions pdfOptions = new DevExpress.XtraPrinting.PdfExportOptions();
-                messageView.ExportToPdf(String.Format("{0}\\{1}", Service.DmzPath, fileName));
-                MessageBox.Show("Файл сохранен!", "Успешно!", MessageBoxButton.OK, MessageBoxImage.Information);
+                PrintableControlLink link = null;
+                Dispatcher.Invoke(() => link = new PrintableControlLink(messageGrid.View));
+                link.PrintingSystem.ExportOptions.Xls.TextExportMode = TextExportMode.Text;
+                //var xlsExportOptions = new XlsExportOptions();
+                //xlsExportOptions.ExportMode = XlsExportMode.SingleFile;
+                try
+                {
+                    link.PrintingSystem.ProgressReflector.PositionChanged += ProgressReflector_PositionChanged; ;
+                }
+                finally
+                {
+                    link.PrintingSystem.ResetProgressReflector();
+                }
+                if (DXSplashScreen.IsActive)
+                {
+                    DXSplashScreen.SetState("Создание файла");
+                }
+                Dispatcher.Invoke(() => link.CreateDocument(true));
+                Dispatcher.Invoke(() => link.CreateDocumentFinished += (o, ee) => {
+                    link.PrintingSystem.ProgressReflector.MaximizeRange();
+                    link.ExportToPdf(String.Format("{0}\\{1}", Service.DmzPath, fileName));
+                });
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
-                MessageBox.Show("Файл сохранить не удалось. Для подробной информации см. лог приложения.", "Ошибка при сохранении файла!", MessageBoxButton.OK, MessageBoxImage.Error);
+                Dispatcher.Invoke(() => DXMessageBox.Show("Файл сохранить не удалось. Для подробной информации см. лог приложения.", "Ошибка при сохранении файла!", MessageBoxButton.OK, MessageBoxImage.Error));
                 logger.Error(String.Format("Ошибка при сохранении файла: {0}", ex.Message));
             }
         }
-        #endregion
 
         private void filterText_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
@@ -649,27 +779,36 @@ namespace NewHistoricalLog
         {
             if(WindowState==WindowState.Minimized)
             {
-                ClearFilters();
-                messageGrid.ItemsSource = null;
                 ni.Visible = true;
                 Hide();
             }
             if(WindowState==WindowState.Normal)
             {
                 //устанавливаем промежуток времени - один час назад от текущего времени
-                startDate.EditValue = DateTime.Now.AddHours(-1);
-                endDate.EditValue = DateTime.Now;
-                Service.Messages = MessageGridContent.LoadMessages(Service.StartDate, Service.EndDate);
-                //messageGrid.ItemsSource = null;
-                //messageGrid.ItemsSource = messData;
-                messageGrid.RefreshData();
+                if(cleared)
+                {
+                    startDate.EditValue = DateTime.Now.AddHours(-1);
+                    endDate.EditValue = DateTime.Now;
+                    Service.Messages = MessageGridContent.LoadMessages(Service.StartDate, Service.EndDate);
+                    messageGrid.RefreshData();
+                    cleared = false;
+                }
+                
                 GC.Collect();
             }
+        }
+
+        private void ClearMessages()
+        {
+            ClearFilters();
+            messageGrid.ItemsSource = null;
+            cleared = true;
         }
 
         private void ThemedWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             e.Cancel = true;
+            ClearMessages();
             WindowState = WindowState.Minimized;
         }
 
