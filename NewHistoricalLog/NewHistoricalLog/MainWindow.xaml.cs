@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Media;
 using System.Windows.Controls;
-using System.Text;
+using System.Windows.Threading;
 using System.Windows;
 using DevExpress.Xpf.Editors;
 using DevExpress.Xpf.Grid;
@@ -40,6 +41,7 @@ namespace NewHistoricalLog
 
 		public MainWindow()
 		{
+
 			InitializeComponent();
             ni.Icon = new System.Drawing.Icon("Msg.ico");
             ni.Visible = false;
@@ -95,6 +97,8 @@ namespace NewHistoricalLog
             }
 
             #endregion
+
+            
             this.Loaded += OnLoad;
 		}
 
@@ -407,10 +411,45 @@ namespace NewHistoricalLog
                 this.Left = System.Windows.Forms.Screen.PrimaryScreen.Bounds.X + Service.Left;
             }
         }
-
+        private T GetVisualChild<T>(DependencyObject parent) where T : Visual
+        {
+            T child = null;
+            int count = VisualTreeHelper.GetChildrenCount(parent);
+            for (int i = 0; i < count; i++)
+            {
+                var v = (Visual)VisualTreeHelper.GetChild(parent, i);
+                child = v as T;
+                if (child == null) child = GetVisualChild<T>(v);
+                if (child != null) break;
+            }
+            return child;
+        }
         private void StartSearchClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
         {
             messageView.ShowSearchPanel(true);
+            TextBox a = null;
+            if(messageView.SearchControl==null)
+            {
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    GetVisualChild<TextBox>(messageView.SearchControl).PreviewMouseLeftButtonDown += MainWindow_PreviewMouseLeftButtonDown; ;
+                }), DispatcherPriority.Loaded);
+            }
+            
+        }
+
+        private void MainWindow_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (Service.KeyboardNeeded)
+            {
+                OnScreenKeyboard keyboard = new OnScreenKeyboard();
+                keyboard.FormClosed += delegate (object send, System.Windows.Forms.FormClosedEventArgs args)
+                {
+                    (sender as TextBox).Text = keyboard.GetText() == "" ? (sender as TextBox).Text : keyboard.GetText();
+                };
+                keyboard.TopMost = true;
+                keyboard.ShowDialog();
+            }
         }
 
         private void SaveToClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
@@ -827,6 +866,11 @@ namespace NewHistoricalLog
             Dispatcher.Invoke(() => messageGrid.ItemsSource = null);
             Dispatcher.Invoke(() => messageGrid.ItemsSource = Service.Messages);
             Service.IsOperating = true;
+        }
+
+        private void messageView_ShowingEditor(object sender, ShowingEditorEventArgs e)
+        {
+
         }
     }
     public class EditorLocalizerEx : EditorLocalizer

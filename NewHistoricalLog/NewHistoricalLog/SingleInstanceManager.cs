@@ -132,6 +132,7 @@ namespace NewHistoricalLog
 			catch (Exception ex)
 			{
 				logger.Error(String.Format("Ошибка старта первого эеземпляра приложения: {0}", ex.Message));
+                Environment.Exit(0);
 			}
 		}
 

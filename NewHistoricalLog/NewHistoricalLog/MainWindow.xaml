@@ -144,9 +144,11 @@
             <dxg:GridControl.View>
                 <dxg:TableView x:Name="messageView" AllowPerPixelScrolling="True" SearchPanelAllowFilter="False" 
                                ShowGroupPanel="False" AllowEditing="False" AllowGrouping="False" ShowFilterPanelMode="Never" AllowPaging="True"
-                               AllowDateTimeGroupIntervalMenu="False" IsRowCellMenuEnabled="False" IsGroupPanelMenuEnabled="False" 
+                               AllowDateTimeGroupIntervalMenu="False" IsRowCellMenuEnabled="False" IsGroupPanelMenuEnabled="False"
                                IsColumnMenuEnabled="False" IsGroupRowMenuEnabled="False" IsGroupFooterMenuEnabled="False" IsTotalSummaryMenuEnabled="False" 
-                               PageSize="{Binding Source={x:Static local:Service.CountLines}}" CustomRowAppearance="messageView_CustomRowAppearance" NavigationStyle="Row">
+                               PageSize="{Binding Source={x:Static local:Service.CountLines}}" CustomRowAppearance="messageView_CustomRowAppearance" NavigationStyle="Row" 
+                               >
+                    
                     <dxg:TableView.FormatConditions>
 
                         <dxg:FormatCondition ValueRule="Equal" Value1="2" FieldName="Type" ApplyToRow="True">
