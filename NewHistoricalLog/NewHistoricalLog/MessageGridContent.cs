@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Media;
 //using System.Drawing;
 using DatabaseToolBox;
+using System.Data.SqlClient;
 using NLog;
 
 namespace NewHistoricalLog
@@ -31,27 +32,33 @@ namespace NewHistoricalLog
             ObservableCollection<MessageGridContent> result = new ObservableCollection<MessageGridContent>();
             try
             {
-                var connection = SQL.GetSqlConnection(Service.ConnectionString);
+                //var connection = SQL.GetSqlConnection(Service.ConnectionString);
+                //connection.Open();
+                SqlConnection connection = new SqlConnection();
+                connection.ConnectionString = Service.ConnectionString;
+                string querry = string.Format("SELECT DTime, Message, UserName, Place, Value, Priority, DTimeAck FROM dbo.PLCMessage WHERE DTime>=CAST ('{0}' as datetime2) AND DTime<=CAST ('{1}' as datetime2) ORDER BY ID", starTime, finishTime);
+                //var data = SQL.GetDataList(connection, 
+                //    string.Format("SELECT DTime, Message, UserName, Place, Value, Priority, DTimeAck FROM dbo.PLCMessage WHERE DTime>=CAST ('{0}' as datetime2) AND DTime<=CAST ('{1}' as datetime2) ORDER BY ID",starTime,finishTime));
                 connection.Open();
-                var data = SQL.GetDataList(connection, 
-                    string.Format("SELECT DTime, Message, UserName, Place, Value, Priority, DTimeAck FROM dbo.PLCMessage WHERE DTime>=CAST ('{0}' as datetime2) AND DTime<=CAST ('{1}' as datetime2) ORDER BY ID",starTime,finishTime));
-                for(int i=0; i<data.Count;i++)
+                SqlCommand command = connection.CreateCommand();
+                command.CommandText = querry;
+                SqlDataReader reader = command.ExecuteReader();
+                while(reader.Read())
                 {
-                    var splited = data[i].Split(new char[] { ';' }, StringSplitOptions.None);
                     MessageGridContent gridContent = new MessageGridContent
                     {
-                        Date = Convert.ToDateTime(splited[0]),
-                        Text = splited[1].Trim(),
-                        User = splited[2].Trim(),
-                        Source = splited[3].Trim(),
-                        Value = splited[4].Trim().ToUpper()=="NAN"?"":splited[4].Trim(),
-                        Type = Convert.ToInt32(splited[5]),
-                        Kvited = splited[6]
+                        Date = Convert.ToDateTime(reader["DTime"]),
+                        Text = reader["Message"].ToString().Trim(),
+                        User = reader["UserName"].ToString().Trim(),
+                        Source = reader["Place"].ToString().Trim(),
+                        Value = reader["Value"].ToString().Trim().ToUpper() == "NAN" ? "" : reader["Value"].ToString().Trim(),
+                        Type = Convert.ToInt32(reader["Priority"]),
+                        Kvited = reader["DTimeAck"].ToString()
                     };
-                    switch(gridContent.Type)
+                    switch (gridContent.Type)
                     {
                         case 1:
-                            gridContent.TypeColor = new SolidColorBrush(Color.FromRgb(192,192,192));
+                            gridContent.TypeColor = new SolidColorBrush(Color.FromRgb(192, 192, 192));
                             gridContent.Prior = Service.NormalPrioriry;
                             break;
                         case 2:
@@ -69,6 +76,7 @@ namespace NewHistoricalLog
                     }
                     result.Add(gridContent);
                 }
+                reader.Close();                
                 connection.Close();
             }
             catch(Exception ex)

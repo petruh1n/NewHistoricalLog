@@ -165,7 +165,7 @@
             </dxg:GridControl.View>
             <dxg:GridColumn FieldName="Date" IsSmart="True" Header="Дата" AllowGrouping="False" AllowSorting="True" AllowEditing="False" PrintCellStyle="{StaticResource DateColumnPrintingStyle}" AllowColumnFiltering="False">
                 <dxg:GridColumn.EditSettings>
-                    <dxe:DateEditSettings Mask="G" MaskUseAsDisplayFormat="True">
+                    <dxe:DateEditSettings Mask="dd.MM.yyyy HH:mm:ss.ff" MaskUseAsDisplayFormat="True">
                         <dxe:DateEditSettings.StyleSettings>
                             <dxe:DateEditCalendarStyleSettings HighlightedTextBackground="Blue"/>
                         </dxe:DateEditSettings.StyleSettings>

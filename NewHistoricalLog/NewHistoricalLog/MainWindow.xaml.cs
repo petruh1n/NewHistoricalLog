@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Controls;
 using System.Windows.Threading;
@@ -30,6 +31,7 @@ namespace NewHistoricalLog
         System.Windows.Forms.NotifyIcon ni = new System.Windows.Forms.NotifyIcon();
         Thread LoadMessagesThread;
         Thread SaveMessagesThread;
+        Thread printThread;
         bool created = false;
         bool cleared = false;
 		#endregion
@@ -164,8 +166,8 @@ namespace NewHistoricalLog
 
             messageGrid.Columns["Date"].SortOrder = DevExpress.Data.ColumnSortOrder.Descending;
             LoadMessagesThread = new Thread(LoadMessagesMethod) { IsBackground = true };
-            DXSplashScreen.Show<AwaitScreen>(WindowStartupLocation.CenterOwner, new SplashScreenOwner(this));
-            DXSplashScreen.SetState(string.Format("Получение сообщений с {0} по {1}", Service.StartDate, Service.EndDate));
+            //DXSplashScreen.Show<AwaitScreen>(WindowStartupLocation.CenterOwner, new SplashScreenOwner(this));
+            //DXSplashScreen.SetState(string.Format("Получение сообщений с {0} по {1}", Service.StartDate, Service.EndDate));
             LoadMessagesThread.Start();
             messageGrid.RefreshData();
             WindowState = WindowState.Minimized;
@@ -190,7 +192,7 @@ namespace NewHistoricalLog
                 messageGrid.Columns["User"].AllowPrinting = wind.Fields[4];
                 messageGrid.Columns["Source"].AllowPrinting = wind.Fields[5];
                 messageGrid.Columns["Value"].AllowPrinting = wind.Fields[6];
-                Thread printThread = new Thread(PrintMethod);
+                printThread = new Thread(PrintMethod);
                 printThread.IsBackground = true;
                 printThread.Start();
                 DXSplashScreen.Close();
@@ -201,7 +203,7 @@ namespace NewHistoricalLog
 
         void PrintMethod()
         {
-            Dispatcher.Invoke(()=> messageView.PrintDirect());
+            Dispatcher.Invoke(()=> messageView.PrintDirect()); 
         }
 
         void ClearFilters()
@@ -819,6 +821,8 @@ namespace NewHistoricalLog
             if(WindowState==WindowState.Minimized)
             {
                 ni.Visible = true;
+                if (DXSplashScreen.IsActive)
+                    DXSplashScreen.Close();
                 Hide();
             }
             if(WindowState==WindowState.Normal)
@@ -848,6 +852,16 @@ namespace NewHistoricalLog
         {
             e.Cancel = true;
             ClearMessages();
+            if(SaveMessagesThread!=null)
+            {
+                if (SaveMessagesThread.IsAlive)
+                    SaveMessagesThread.Abort();
+            }
+            if(printThread!=null)
+            {
+                if (printThread.IsAlive)
+                    printThread.Abort();
+            }
             WindowState = WindowState.Minimized;
         }
 
