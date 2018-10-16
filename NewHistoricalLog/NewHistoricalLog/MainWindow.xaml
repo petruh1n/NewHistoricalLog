@@ -77,7 +77,10 @@
         </Grid.ColumnDefinitions>
 
         <Grid Grid.Row="1" Grid.ColumnSpan="2">
-            
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="150"/>
+            </Grid.ColumnDefinitions>
             <dxb:ToolBarControl Height="40" AllowHide="False" AllowCustomizationMenu="False" AllowQuickCustomization="False" BarItemDisplayMode="ContentAndGlyph" 
                                 UseWholeRow="True" IsEnabled="{Binding Path=(local:Service.IsOperating), UpdateSourceTrigger=PropertyChanged}">
                 <dxb:BarSubItem Content="Действия" ContentTemplate="{StaticResource BarItemTextTemplate}" LargeGlyph="{dx:DXImage Image=SelectTool_32x32.png}" Glyph="{dx:DXImage Image=SelectTool_16x16.png}">
@@ -87,15 +90,15 @@
                                        ContentTemplate="{StaticResource BarItemTextTemplate}" IsVisible="{Binding Path=(local:Service.IsAdminMode), UpdateSourceTrigger=PropertyChanged}"/>
                     <dxb:BarButtonItem x:Name="sendToDmz" Content="Отправить на сервер ДМЗ" ItemClick="SendToDmz" Glyph="{dx:DXImage Image=SaveTo_32x32.png}" LargeGlyph="{dx:DXImage Image=SaveTo_32x32.png}" 
                                        ContentTemplate="{StaticResource BarItemTextTemplate}" IsVisible="{Binding Path=(local:Service.IsAdminMode), UpdateSourceTrigger=PropertyChanged}"/>
-                    <dxb:BarButtonItem Content="Печать" ItemClick="PrintClick" Glyph="{dx:DXImage Image=Print_32x32.png}" LargeGlyph="{dx:DXImage Image=Print_32x32.png}" ContentTemplate="{StaticResource BarItemTextTemplate}"/>
+                    <dxb:BarButtonItem Content="Печать" ItemClick="PrintClick" Glyph="{dx:DXImage Image=Print_32x32.png}" LargeGlyph="{dx:DXImage Image=Print_32x32.png}" ContentTemplate="{StaticResource BarItemTextTemplate}" IsEnabled="{Binding Path=(local:Service.Printing), Converter={local:BackBoolConverter}, UpdateSourceTrigger=PropertyChanged}"/>
                     <dxb:BarButtonItem Content="О программе" ItemClick="AboutClick" LargeGlyph="{dx:DXImage Image=Logical_32x32.png}" Glyph="{dx:DXImage Image=Logical_16x16.png}" ContentTemplate="{StaticResource BarItemTextTemplate}" />
                     <dxb:BarButtonItem Content="Выход" ItemClick="ExitClick" Glyph="{dx:DXImage Image=Close_32x32.png}" LargeGlyph="{dx:DXImage Image=Close_32x32.png}" ContentTemplate="{StaticResource BarItemTextTemplate}"/>                    
                 </dxb:BarSubItem>
                 <dxb:BarCheckItem Content="Фильтр" CheckedChanged="BarCheckItem_CheckedChanged" LargeGlyph="{dx:DXImage Image=Filter_32x32.png}" Glyph="{dx:DXImage Image=Filter_16x16.png}" ContentTemplate="{StaticResource BarItemTextTemplate}"/>
                 <dxb:BarButtonItem Content="Поиск" LargeGlyph="{dx:DXImage Image=Find_32x32.png}" Glyph="{dx:DXImage Image=Find_16x16.png}" ContentTemplate="{StaticResource BarItemTextTemplate}" ItemClick="StartSearchClick"/>
                 <dxb:BarButtonItem Content="Очистить фильтр" LargeGlyph="{dx:DXImage Image=IgnoreMasterFilter_32x32.png}" Glyph="{dx:DXImage Image=IgnoreMasterFilter_16x16.png}" ContentTemplate="{StaticResource BarItemTextTemplate}" ItemClick="ClearTextFilterClick"/>
-                
             </dxb:ToolBarControl>
+            <TextBlock Text="Идет печать..." FontSize="18" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.Column="1" Visibility="{Binding Path=(local:Service.Printing), Converter={local:BoolToVisibleConverter}, UpdateSourceTrigger=PropertyChanged}"/>
         </Grid>
 
         <Grid Grid.Row="2" Grid.ColumnSpan="2" IsEnabled="{Binding Path=(local:Service.IsOperating), UpdateSourceTrigger=PropertyChanged}">
@@ -146,7 +149,7 @@
                                ShowGroupPanel="False" AllowEditing="False" AllowGrouping="False" ShowFilterPanelMode="Never" AllowPaging="True"
                                AllowDateTimeGroupIntervalMenu="False" IsRowCellMenuEnabled="False" IsGroupPanelMenuEnabled="False"
                                IsColumnMenuEnabled="False" IsGroupRowMenuEnabled="False" IsGroupFooterMenuEnabled="False" IsTotalSummaryMenuEnabled="False" 
-                               PageSize="{Binding Source={x:Static local:Service.CountLines}}" CustomRowAppearance="messageView_CustomRowAppearance" NavigationStyle="Row" 
+                               PageSize="{Binding Source={x:Static local:Service.CountLines}}" CustomRowAppearance="messageView_CustomRowAppearance" NavigationStyle="Row" AllowColumnMoving="False" 
                                >
                     
                     <dxg:TableView.FormatConditions>

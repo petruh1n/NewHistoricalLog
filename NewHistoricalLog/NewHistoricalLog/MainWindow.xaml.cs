@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Linq;
 using System.Windows.Documents;
 using System.Windows.Media;
@@ -34,6 +35,7 @@ namespace NewHistoricalLog
         Thread printThread;
         bool created = false;
         bool cleared = false;
+        static bool[] fileds;
 		#endregion
 
         static MainWindow()
@@ -183,28 +185,45 @@ namespace NewHistoricalLog
             SelectColumnWindow wind = new SelectColumnWindow();
             if(wind.ShowDialog()!=false)
             {
-                DXSplashScreen.Show<AwaitScreen>(WindowStartupLocation.CenterOwner, new SplashScreenOwner(this));
-                DXSplashScreen.SetState("Печать журнала");
-                messageGrid.Columns["Date"].AllowPrinting = wind.Fields[0];
-                messageGrid.Columns["Prior"].AllowPrinting = wind.Fields[1];
-                messageGrid.Columns["Kvited"].AllowPrinting = wind.Fields[2];
-                messageGrid.Columns["Text"].AllowPrinting = wind.Fields[3];
-                messageGrid.Columns["User"].AllowPrinting = wind.Fields[4];
-                messageGrid.Columns["Source"].AllowPrinting = wind.Fields[5];
-                messageGrid.Columns["Value"].AllowPrinting = wind.Fields[6];
-                printThread = new Thread(PrintMethod);
-                printThread.IsBackground = true;
-                printThread.Start();
-                DXSplashScreen.Close();
+                if (Service.TestDefaultPrinterConnection())
+                {
+                    messageGrid.Columns["Date"].AllowPrinting = wind.Fields[0];
+                    messageGrid.Columns["Prior"].AllowPrinting = wind.Fields[1];
+                    messageGrid.Columns["Kvited"].AllowPrinting = wind.Fields[2];
+                    messageGrid.Columns["Text"].AllowPrinting = wind.Fields[3];
+                    messageGrid.Columns["User"].AllowPrinting = wind.Fields[4];
+                    messageGrid.Columns["Source"].AllowPrinting = wind.Fields[5];
+                    messageGrid.Columns["Value"].AllowPrinting = wind.Fields[6];
+                    Thread hidePrintThread = new Thread(PrintMethod);
+                    hidePrintThread.SetApartmentState(ApartmentState.STA);
+                    hidePrintThread.IsBackground = true;
+                    hidePrintThread.Start();
+                }
+                else
+                {
+                    DXMessageBox.Show("Принтер, установленный в системе по умолчанию, занят или недоступен!", "Принтер недоступен", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
             }
-            
-            //messageView.ShowPrintPreviewDialog(this);
-        }
+        }    
 
         void PrintMethod()
         {
-            Dispatcher.Invoke(()=> messageView.PrintDirect()); 
-        }
+            try
+            {
+                CriteriaOperator co=null;
+                List<MessageGridContent> mess = Service.Messages.ToList();
+                Dispatcher.Invoke(() => co = messageGrid.FilterCriteria);
+                HiddenPrintWindow window = new HiddenPrintWindow();
+                window.MessagesToPrint = mess;
+                window.CriteriaOperator = co;
+                Service.Printing = true;
+                window.ShowDialog();                
+            }
+            catch(Exception ex)
+            {
+                logger.Error("Ошибка печати: {0}", ex.Message);
+            }
+        }       
 
         void ClearFilters()
         {

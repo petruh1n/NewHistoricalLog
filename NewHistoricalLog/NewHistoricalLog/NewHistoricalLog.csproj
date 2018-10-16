@@ -81,6 +81,7 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Management" />
     <Reference Include="System.Printing" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
@@ -110,6 +111,9 @@
     <Compile Include="ExpWindow.xaml.cs">
       <DependentUpon>ExpWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="HiddenPrintWindow.xaml.cs">
+      <DependentUpon>HiddenPrintWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MessageGridContent.cs" />
     <Compile Include="OnScreenKeyboard.cs">
       <SubType>Form</SubType>
@@ -134,6 +138,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ExpWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="HiddenPrintWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
