@@ -52,8 +52,15 @@ namespace NewHistoricalLog
 
         private void HiddenPrintWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            SetWindowPos(new System.Windows.Interop.WindowInteropHelper(this).Handle, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
-            Work();
+            try
+            {
+                SetWindowPos(new System.Windows.Interop.WindowInteropHelper(this).Handle, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+                Work();
+            }
+            catch
+            {
+                Close();
+            }
         }
 
         void Work()
@@ -68,7 +75,7 @@ namespace NewHistoricalLog
             }
             catch (Exception ex)
             {
-                DXMessageBox.Show("Ошибка печати: " + ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                //DXMessageBox.Show("Ошибка печати: " + ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 logger.Error("Ошибка печати: {0}", ex.Message);
             }
         }

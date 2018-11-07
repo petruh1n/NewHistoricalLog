@@ -32,11 +32,11 @@ namespace NewHistoricalLog
         System.Windows.Forms.NotifyIcon ni = new System.Windows.Forms.NotifyIcon();
         Thread LoadMessagesThread;
         Thread SaveMessagesThread;
-        Thread printThread;
         bool created = false;
         bool cleared = false;
         static bool[] fileds;
-		#endregion
+        Thread hidePrintThread;
+        #endregion
 
         static MainWindow()
         {
@@ -194,7 +194,8 @@ namespace NewHistoricalLog
                     messageGrid.Columns["User"].AllowPrinting = wind.Fields[4];
                     messageGrid.Columns["Source"].AllowPrinting = wind.Fields[5];
                     messageGrid.Columns["Value"].AllowPrinting = wind.Fields[6];
-                    Thread hidePrintThread = new Thread(PrintMethod);
+                    hidePrintThread = new Thread(PrintMethod);
+                    
                     hidePrintThread.SetApartmentState(ApartmentState.STA);
                     hidePrintThread.IsBackground = true;
                     hidePrintThread.Start();
@@ -728,17 +729,17 @@ namespace NewHistoricalLog
                 if((sender as TreeViewItem).FontWeight==FontWeights.Bold)
                 {
                     (sender as TreeViewItem).FontWeight = FontWeights.Normal;
-                    if(Service.SystemsFilterPhrase.Contains(string.Format("Contains([Text], '{0}') Or ", (sender as TreeViewItem).Header)))
+                    if(Service.SystemsFilterPhrase.Contains(string.Format("Contains([Text], '{0}') Or ", (sender as TreeViewItem).Header+". ")))
                     {
-                        Service.SystemsFilterPhrase = Service.SystemsFilterPhrase.Replace(string.Format("Contains([Text], '{0}') Or ", (sender as TreeViewItem).Header), "");
+                        Service.SystemsFilterPhrase = Service.SystemsFilterPhrase.Replace(string.Format("Contains([Text], '{0}') Or ", (sender as TreeViewItem).Header + ". "), "");
                     }
-                    else if (Service.SystemsFilterPhrase.Contains(string.Format("Or Contains([Text], '{0}')", (sender as TreeViewItem).Header)))
+                    else if (Service.SystemsFilterPhrase.Contains(string.Format("Or Contains([Text], '{0}')", (sender as TreeViewItem).Header + ". ")))
                     {
-                        Service.SystemsFilterPhrase = Service.SystemsFilterPhrase.Replace(string.Format("Or Contains([Text], '{0}')", (sender as TreeViewItem).Header), "");
+                        Service.SystemsFilterPhrase = Service.SystemsFilterPhrase.Replace(string.Format("Or Contains([Text], '{0}')", (sender as TreeViewItem).Header + ". "), "");
                     }
-                    else if (Service.SystemsFilterPhrase.Contains(string.Format("Contains([Text], '{0}')", (sender as TreeViewItem).Header)))
+                    else if (Service.SystemsFilterPhrase.Contains(string.Format("Contains([Text], '{0}')", (sender as TreeViewItem).Header + ". ")))
                     {
-                        Service.SystemsFilterPhrase = Service.SystemsFilterPhrase.Replace(string.Format("Contains([Text], '{0}')", (sender as TreeViewItem).Header), "");
+                        Service.SystemsFilterPhrase = Service.SystemsFilterPhrase.Replace(string.Format("Contains([Text], '{0}')", (sender as TreeViewItem).Header + ". "), "");
                     }
                 }
                 else
@@ -747,11 +748,11 @@ namespace NewHistoricalLog
                     //если строка фильтрация по подсистемам пустая
                     if (string.IsNullOrEmpty(Service.SystemsFilterPhrase))
                     {
-                        Service.SystemsFilterPhrase = string.Format("Contains([Text], '{0}')", (sender as TreeViewItem).Header);
+                        Service.SystemsFilterPhrase = string.Format("Contains([Text], '{0}')", (sender as TreeViewItem).Header + ". ");
                     }
                     else
                     {
-                        Service.SystemsFilterPhrase = string.Format("{0} Or Contains([Text], '{1}')", Service.SystemsFilterPhrase, (sender as TreeViewItem).Header);
+                        Service.SystemsFilterPhrase = string.Format("{0} Or Contains([Text], '{1}')", Service.SystemsFilterPhrase, (sender as TreeViewItem).Header + ". ");
                     }
                 }
                 ChangeFilterCriteria();
@@ -876,10 +877,14 @@ namespace NewHistoricalLog
                 if (SaveMessagesThread.IsAlive)
                     SaveMessagesThread.Abort();
             }
-            if(printThread!=null)
+            if(hidePrintThread!=null)
             {
-                if (printThread.IsAlive)
-                    printThread.Abort();
+                if (hidePrintThread.IsAlive)
+                {
+                    hidePrintThread.Abort();
+                    Service.Printing = false;
+                }
+                    
             }
             WindowState = WindowState.Minimized;
         }

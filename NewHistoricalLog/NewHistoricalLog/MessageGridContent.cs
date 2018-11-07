@@ -52,7 +52,7 @@ namespace NewHistoricalLog
                         User = reader["UserName"].ToString().Trim(),
                         Source = reader["Place"].ToString().Trim(),
                         Value = reader["Value"].ToString().Trim().ToUpper() == "NAN" ? "" : reader["Value"].ToString().Trim(),
-                        Type = Convert.ToInt32(reader["Priority"]),
+                        Type = string.IsNullOrEmpty(reader["Priority"].ToString()) | Convert.ToInt32(reader["Priority"]) == 0 ? 1: Convert.ToInt32(reader["Priority"]),
                         Kvited = reader["DTimeAck"].ToString()
                     };
                     switch (gridContent.Type)
