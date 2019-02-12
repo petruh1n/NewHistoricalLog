@@ -141,6 +141,8 @@ namespace NewHistoricalLog
                 NotifyStaticPropertyChanged("Printing");
             }
         }
+
+        public static bool[] Fields { get; set; }
         #endregion
 
         private static string GetDefaultPrinterName()

@@ -34,6 +34,8 @@ namespace NewHistoricalLog
         /// </summary>
         public CriteriaOperator CriteriaOperator { get; set; }
 
+        public bool[] Fields;
+
         Logger logger = LogManager.GetCurrentClassLogger();
 
         [DllImport("user32.dll")]
@@ -67,6 +69,13 @@ namespace NewHistoricalLog
         {
             try
             {
+                messageGrid.Columns["Date"].AllowPrinting = Service.Fields[0];
+                messageGrid.Columns["Prior"].AllowPrinting = Service.Fields[1];
+                messageGrid.Columns["Kvited"].AllowPrinting = Service.Fields[2];
+                messageGrid.Columns["Text"].AllowPrinting = Service.Fields[3];
+                messageGrid.Columns["User"].AllowPrinting = Service.Fields[4];
+                messageGrid.Columns["Source"].AllowPrinting = Service.Fields[5];
+                messageGrid.Columns["Value"].AllowPrinting = Service.Fields[6];
                 messageGrid.ItemsSource = MessagesToPrint;
                 messageGrid.FilterCriteria = CriteriaOperator;
                 messageView.PrintDirect();

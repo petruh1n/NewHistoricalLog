@@ -194,6 +194,7 @@ namespace NewHistoricalLog
                     messageGrid.Columns["User"].AllowPrinting = wind.Fields[4];
                     messageGrid.Columns["Source"].AllowPrinting = wind.Fields[5];
                     messageGrid.Columns["Value"].AllowPrinting = wind.Fields[6];
+                    Service.Fields = wind.Fields;
                     hidePrintThread = new Thread(PrintMethod);
                     
                     hidePrintThread.SetApartmentState(ApartmentState.STA);
@@ -788,7 +789,16 @@ namespace NewHistoricalLog
                     criteria = string.Format("({0}) AND ({1})", criteria, Service.PriorityFilterPhrase);
                 }
             }
-            messageGrid.FilterCriteria = CriteriaOperator.Parse(criteria);
+            try
+            {
+                messageGrid.FilterCriteria = CriteriaOperator.Parse(criteria);
+            }
+            catch 
+            {
+                DXMessageBox.Show("Некорректная фраза текстового фильтра.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                filterText.Clear();
+            }
+            
         }
 
         public List<SystemsItems> ScanForSystems()

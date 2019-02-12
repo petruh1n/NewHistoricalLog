@@ -170,7 +170,7 @@
                 <dxg:GridColumn.EditSettings>
                     <dxe:DateEditSettings Mask="dd.MM.yyyy HH:mm:ss.ff" MaskUseAsDisplayFormat="True">
                         <dxe:DateEditSettings.StyleSettings>
-                            <dxe:DateEditCalendarStyleSettings HighlightedTextBackground="Blue"/>
+                            <dxe:DateEditCalendarStyleSettings HighlightedTextBackground="LightBlue"/>
                         </dxe:DateEditSettings.StyleSettings>
                     </dxe:DateEditSettings>
                 </dxg:GridColumn.EditSettings>
@@ -180,7 +180,7 @@
                 <dxg:GridColumn.EditSettings>
                     <dxe:TextEditSettings >
                         <dxe:TextEditSettings.StyleSettings>
-                            <dxe:TextEditStyleSettings HighlightedTextBackground="Blue"  />
+                            <dxe:TextEditStyleSettings HighlightedTextBackground="LightBlue"  />
                         </dxe:TextEditSettings.StyleSettings>
                     </dxe:TextEditSettings>
                 </dxg:GridColumn.EditSettings>
@@ -189,7 +189,7 @@
                 <dxg:GridColumn.EditSettings>
                     <dxe:TextEditSettings >
                         <dxe:TextEditSettings.StyleSettings>
-                            <dxe:TextEditStyleSettings HighlightedTextBackground="Blue"  />
+                            <dxe:TextEditStyleSettings HighlightedTextBackground="LightBlue"  />
                         </dxe:TextEditSettings.StyleSettings>
                     </dxe:TextEditSettings>
                 </dxg:GridColumn.EditSettings>
@@ -198,7 +198,7 @@
                 <dxg:GridColumn.EditSettings>
                     <dxe:TextEditSettings >
                         <dxe:TextEditSettings.StyleSettings>
-                            <dxe:TextEditStyleSettings HighlightedTextBackground="Blue"  />
+                            <dxe:TextEditStyleSettings HighlightedTextBackground="LightBlue"  />
                         </dxe:TextEditSettings.StyleSettings>
                     </dxe:TextEditSettings>
                 </dxg:GridColumn.EditSettings>
@@ -207,7 +207,7 @@
                 <dxg:GridColumn.EditSettings>
                     <dxe:TextEditSettings >
                         <dxe:TextEditSettings.StyleSettings>
-                            <dxe:TextEditStyleSettings HighlightedTextBackground="Blue"  />
+                            <dxe:TextEditStyleSettings HighlightedTextBackground="LightBlue"  />
                         </dxe:TextEditSettings.StyleSettings>
                     </dxe:TextEditSettings>
                 </dxg:GridColumn.EditSettings>
@@ -216,7 +216,7 @@
                 <dxg:GridColumn.EditSettings>
                     <dxe:TextEditSettings >
                         <dxe:TextEditSettings.StyleSettings>
-                            <dxe:TextEditStyleSettings HighlightedTextBackground="Blue"  />
+                            <dxe:TextEditStyleSettings HighlightedTextBackground="LightBlue"/>
                         </dxe:TextEditSettings.StyleSettings>
                     </dxe:TextEditSettings>
                 </dxg:GridColumn.EditSettings>
@@ -225,7 +225,7 @@
                 <dxg:GridColumn.EditSettings>
                     <dxe:TextEditSettings >
                         <dxe:TextEditSettings.StyleSettings>
-                            <dxe:TextEditStyleSettings HighlightedTextBackground="Blue"  />
+                            <dxe:TextEditStyleSettings HighlightedTextBackground="LightBlue"/>
                         </dxe:TextEditSettings.StyleSettings>
                     </dxe:TextEditSettings>
                 </dxg:GridColumn.EditSettings>
