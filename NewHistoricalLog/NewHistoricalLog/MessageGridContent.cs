@@ -35,7 +35,7 @@ namespace NewHistoricalLog
                 //var connection = SQL.GetSqlConnection(Service.ConnectionString);
                 //connection.Open();
                 SqlConnection connection = new SqlConnection();
-                connection.ConnectionString = Service.ConnectionString;
+                connection.ConnectionString = Service.SqlConnectionString;
                 string querry = string.Format("SELECT DTime, Message, UserName, Place, Value, Priority, DTimeAck FROM dbo.PLCMessage WHERE DTime>=CAST ('{0}' as datetime2) AND DTime<=CAST ('{1}' as datetime2) ORDER BY ID", starTime, finishTime);
                 //var data = SQL.GetDataList(connection, 
                 //    string.Format("SELECT DTime, Message, UserName, Place, Value, Priority, DTimeAck FROM dbo.PLCMessage WHERE DTime>=CAST ('{0}' as datetime2) AND DTime<=CAST ('{1}' as datetime2) ORDER BY ID",starTime,finishTime));

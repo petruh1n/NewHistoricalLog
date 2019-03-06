@@ -812,7 +812,7 @@ namespace NewHistoricalLog
                     SystemsItems item = new SystemsItems();
                     var splitNote = note.Split(new char[] { '-' });
                     item.Name = splitNote[1].Trim();
-                    var connection = SQL.GetSqlConnection(Service.ConnectionString);
+                    var connection = SQL.GetSqlConnection(Service.SqlConnectionString);
                     connection.Open();
                     var data = SQL.GetDataList(connection,
                         string.Format("SELECT ParamName FROM dbo.{0} ", splitNote[0]));

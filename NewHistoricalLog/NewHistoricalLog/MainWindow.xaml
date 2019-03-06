@@ -166,7 +166,7 @@
                     </dxg:TableView.FormatConditions>
                 </dxg:TableView>
             </dxg:GridControl.View>
-            <dxg:GridColumn FieldName="Date" IsSmart="True" Header="Дата" AllowGrouping="False" AllowSorting="True" AllowEditing="False" PrintCellStyle="{StaticResource DateColumnPrintingStyle}" AllowColumnFiltering="False">
+            <dxg:GridColumn FieldName="Date" IsSmart="True" Header="Дата" AllowGrouping="False" AllowSorting="True" AllowEditing="False" PrintCellStyle="{StaticResource DateColumnPrintingStyle}" AllowColumnFiltering="False" Width="150">
                 <dxg:GridColumn.EditSettings>
                     <dxe:DateEditSettings Mask="dd.MM.yyyy HH:mm:ss.ff" MaskUseAsDisplayFormat="True">
                         <dxe:DateEditSettings.StyleSettings>
@@ -176,7 +176,7 @@
                 </dxg:GridColumn.EditSettings>
             </dxg:GridColumn>
             <dxg:GridColumn FieldName="Type" IsSmart="True" Width="0" Visible="False" AllowGrouping="False" AllowSorting="False" AllowEditing="False" AllowPrinting="False"/>
-            <dxg:GridColumn FieldName="Prior" IsSmart="True" Width="90" AllowGrouping="False" AllowSorting="False" Header="Приоритет" AllowEditing="False" PrintCellStyle="{StaticResource ImageColumnPrintingStyle}">
+            <dxg:GridColumn FieldName="Prior" IsSmart="True" Width="120" AllowGrouping="False" AllowSorting="False" Header="Приоритет" AllowEditing="False" PrintCellStyle="{StaticResource ImageColumnPrintingStyle}">
                 <dxg:GridColumn.EditSettings>
                     <dxe:TextEditSettings >
                         <dxe:TextEditSettings.StyleSettings>

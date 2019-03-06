@@ -49,13 +49,22 @@ namespace NewHistoricalLog
         /// Конечная дата выборки
         /// </summary>
         public static DateTime EndDate { get; set; } = new DateTime(2017, 3, 7, 20, 0, 0, 0, DateTimeKind.Local);
+
+        public static string SqlServer { get; set; } = "";
+
+        public static string SqlDb { get; set; } = "";
+
+        public static string SqlUser { get; set; } = "";
+
+        public static string SqlPassword { get; set; } = "";
+
+        public static string SqlConnectionString
+        {
+            get { return string.Format("Data Source={0};Integrated Security=False; User = {2}; Password = {3}; Initial Catalog = {1}; Connection Timeout = 3;", SqlServer, SqlDb, SqlUser, SqlPassword); }
+        }
         /// <summary>
-        /// Строка подключения к БД
-        /// </summary>
-        public static string ConnectionString { get; set; } = "Data Source=ORPO-165\\MYSERVER;Integrated Security=False; User = ORPO; Password = Bzpa/123456789; Initial Catalog = SARD_BEREZOVOE; Connection Timeout = 3;";
-        /// <summary>
-        /// Столбец, по которому осуществляется текстовая фильтрация
-        /// </summary>
+         /// Столбец, по которому осуществляется текстовая фильтрация
+         /// </summary>
         public static string FilterField { get; set; } = "Text";
         /// <summary>
         /// Фраза для текстового фильтра
@@ -214,7 +223,10 @@ namespace NewHistoricalLog
             result.Add("Отступ слева", Left);
             result.Add("Ширина", Width);
             result.Add("Высота", Height);
-            result.Add("Строка подключения к БД", ConnectionString);
+            result.Add("Адрес сервера", SqlServer);
+            result.Add("Имя БД", SqlDb);
+            result.Add("Имя пользователя БД", SqlUser);
+            result.Add("Пароль пользователя БД", ServiceLib.EncryptingFunctions.Encrypt(SqlPassword));
             result.Add("Количество строк", CountLines);
             result.Add("Путь к ДМЗ", DmzPath);
             result.Add("Использовать экранную клавиатуру", KeyboardNeeded);
@@ -234,7 +246,10 @@ namespace NewHistoricalLog
                 Left = Convert.ToDouble(dictionary["Отступ слева"]);
                 Width = Convert.ToDouble(dictionary["Ширина"]);
                 Height = Convert.ToDouble(dictionary["Высота"]);
-                ConnectionString = dictionary["Строка подключения к БД"].ToString();
+                SqlServer = (dictionary["Адрес сервера"]).ToString();
+                SqlDb = (dictionary["Имя БД"]).ToString();
+                SqlUser = (dictionary["Имя пользователя БД"]).ToString();
+                SqlPassword = ServiceLib.EncryptingFunctions.Decrypt((dictionary["Пароль пользователя БД"]).ToString());
                 CountLines = Convert.ToInt32(dictionary["Количество строк"]);
                 DmzPath = dictionary["Путь к ДМЗ"].ToString();
                 KeyboardNeeded = Convert.ToBoolean(dictionary["Использовать экранную клавиатуру"]);
@@ -326,9 +341,10 @@ namespace NewHistoricalLog
             {
                 RegistryKey usersKey = Registry.Users.OpenSubKey(".Default");
                 RegistryKey settingsKey = usersKey.OpenSubKey("SEMSettings");
-                ConnectionString = string.Format("Data Source={0};Integrated Security=False; User = {1}; Password = {2}; Initial Catalog = {3}; Connection Timeout = 3;", 
-                    settingsKey.GetValue("SQL server").ToString(), settingsKey.GetValue("SQL user").ToString(), settingsKey.GetValue("SQL password").ToString(), 
-                    settingsKey.GetValue("SQL database").ToString());
+                SqlServer = settingsKey.GetValue("SQL server").ToString();
+                SqlDb = settingsKey.GetValue("SQL database").ToString();
+                SqlUser = settingsKey.GetValue("SQL user").ToString();
+                SqlPassword = ServiceLib.EncryptingFunctions.Decrypt(settingsKey.GetValue("SQL password").ToString());
                 settingsKey.Close();
                 usersKey.Close();                
                 return true;
