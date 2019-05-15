@@ -36,6 +36,8 @@ namespace NewHistoricalLog
         bool cleared = false;
         static bool[] fileds;
         Thread hidePrintThread;
+        bool locker = false;
+        bool notNow = false;
         #endregion
 
         static MainWindow()
@@ -180,10 +182,13 @@ namespace NewHistoricalLog
         #region Обработчики событий контролов
         
 
-        private void PrintClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
+        private async void PrintClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
         {
+            var scheduler = TaskScheduler.FromCurrentSynchronizationContext();
+            //await Task.Factory.StartNew(() => { PrintMethod(); }, CancellationToken.None, TaskCreationOptions.None, scheduler);
+            //await Task.Factory.StartNew(() => { messageView.PrintDirect(); }, CancellationToken.None, TaskCreationOptions.None, scheduler);
             SelectColumnWindow wind = new SelectColumnWindow();
-            if(wind.ShowDialog()!=false)
+            if (wind.ShowDialog() != false)
             {
                 if (Service.TestDefaultPrinterConnection())
                 {
@@ -196,9 +201,8 @@ namespace NewHistoricalLog
                     messageGrid.Columns["Value"].AllowPrinting = wind.Fields[6];
                     Service.Fields = wind.Fields;
                     hidePrintThread = new Thread(PrintMethod);
-                    
                     hidePrintThread.SetApartmentState(ApartmentState.STA);
-                    hidePrintThread.IsBackground = true;
+                    //hidePrintThread.IsBackground = true;
                     hidePrintThread.Start();
                 }
                 else
@@ -210,12 +214,12 @@ namespace NewHistoricalLog
 
         void PrintMethod()
         {
+            CriteriaOperator co = null;
+            List<MessageGridContent> mess = Service.Messages.ToList();
+            Dispatcher.Invoke(() => co = messageGrid.FilterCriteria);
+            HiddenPrintWindow window = new HiddenPrintWindow();
             try
             {
-                CriteriaOperator co=null;
-                List<MessageGridContent> mess = Service.Messages.ToList();
-                Dispatcher.Invoke(() => co = messageGrid.FilterCriteria);
-                HiddenPrintWindow window = new HiddenPrintWindow();
                 window.MessagesToPrint = mess;
                 window.CriteriaOperator = co;
                 Service.Printing = true;
@@ -223,6 +227,7 @@ namespace NewHistoricalLog
             }
             catch(Exception ex)
             {
+                window.Close();
                 logger.Error("Ошибка печати: {0}", ex.Message);
             }
         }       
@@ -235,6 +240,9 @@ namespace NewHistoricalLog
             grayPriority.IsChecked = true;
             yellowPriority.IsChecked = true;
             redPriority.IsChecked = true;
+            Service.PriorityFilterPhrase = "";
+            Service.SystemsFilterPhrase = "";
+            Service.TextFilterPhrase = "";
             foreach (TreeViewItem items in treeView.Items)
             {
                 items.FontWeight = FontWeights.Normal;
@@ -293,8 +301,8 @@ namespace NewHistoricalLog
             try
             {
                 Service.IsOperating = false;
-                if (!Directory.Exists(String.Format("{0}\\SEMHistory\\Export", Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments))))
-                    Directory.CreateDirectory(String.Format("{0}\\SEMHistory\\Export", Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments)));
+                if (!Directory.Exists(Service.SavePath))
+                    Directory.CreateDirectory(Service.SavePath);
                 string fileName = String.Format("Сообщения с {0} по {1}.pdf", Service.StartDate.ToString().Replace(":", "_"), Service.EndDate.ToString().Replace(":", "_"));
                 int counter = 1;
                 while (File.Exists(String.Format("{0}\\SEMHistory\\Export\\{1}", Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments), fileName)))
@@ -323,7 +331,7 @@ namespace NewHistoricalLog
                 Dispatcher.Invoke(() => link.CreateDocument(true));
                 Dispatcher.Invoke(() => link.CreateDocumentFinished += (o, ee) => {
                     link.PrintingSystem.ProgressReflector.MaximizeRange();
-                    link.ExportToPdf(String.Format("{0}\\SEMHistory\\Export\\{1}", Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments), fileName));
+                    link.ExportToPdf(String.Format("{0}\\{1}", Service.SavePath, fileName));
                 });
             }
             catch(Exception ex)
@@ -730,17 +738,17 @@ namespace NewHistoricalLog
                 if((sender as TreeViewItem).FontWeight==FontWeights.Bold)
                 {
                     (sender as TreeViewItem).FontWeight = FontWeights.Normal;
-                    if(Service.SystemsFilterPhrase.Contains(string.Format("Contains([Text], '{0}') Or ", (sender as TreeViewItem).Header+". ")))
+                    if(Service.SystemsFilterPhrase.Contains(string.Format("Contains([Text], '{0}') Or ", (sender as TreeViewItem).Header+" ")))
                     {
-                        Service.SystemsFilterPhrase = Service.SystemsFilterPhrase.Replace(string.Format("Contains([Text], '{0}') Or ", (sender as TreeViewItem).Header + ". "), "");
+                        Service.SystemsFilterPhrase = Service.SystemsFilterPhrase.Replace(string.Format("Contains([Text], '{0}') Or ", (sender as TreeViewItem).Header + " "), "");
                     }
-                    else if (Service.SystemsFilterPhrase.Contains(string.Format("Or Contains([Text], '{0}')", (sender as TreeViewItem).Header + ". ")))
+                    else if (Service.SystemsFilterPhrase.Contains(string.Format("Or Contains([Text], '{0}')", (sender as TreeViewItem).Header + " ")))
                     {
-                        Service.SystemsFilterPhrase = Service.SystemsFilterPhrase.Replace(string.Format("Or Contains([Text], '{0}')", (sender as TreeViewItem).Header + ". "), "");
+                        Service.SystemsFilterPhrase = Service.SystemsFilterPhrase.Replace(string.Format("Or Contains([Text], '{0}')", (sender as TreeViewItem).Header + " "), "");
                     }
-                    else if (Service.SystemsFilterPhrase.Contains(string.Format("Contains([Text], '{0}')", (sender as TreeViewItem).Header + ". ")))
+                    else if (Service.SystemsFilterPhrase.Contains(string.Format("Contains([Text], '{0}')", (sender as TreeViewItem).Header + " ")))
                     {
-                        Service.SystemsFilterPhrase = Service.SystemsFilterPhrase.Replace(string.Format("Contains([Text], '{0}')", (sender as TreeViewItem).Header + ". "), "");
+                        Service.SystemsFilterPhrase = Service.SystemsFilterPhrase.Replace(string.Format("Contains([Text], '{0}')", (sender as TreeViewItem).Header + " "), "");
                     }
                 }
                 else
@@ -749,11 +757,11 @@ namespace NewHistoricalLog
                     //если строка фильтрация по подсистемам пустая
                     if (string.IsNullOrEmpty(Service.SystemsFilterPhrase))
                     {
-                        Service.SystemsFilterPhrase = string.Format("Contains([Text], '{0}')", (sender as TreeViewItem).Header + ". ");
+                        Service.SystemsFilterPhrase = string.Format("Contains([Text], '{0}')", (sender as TreeViewItem).Header + " ");
                     }
                     else
                     {
-                        Service.SystemsFilterPhrase = string.Format("{0} Or Contains([Text], '{1}')", Service.SystemsFilterPhrase, (sender as TreeViewItem).Header + ". ");
+                        Service.SystemsFilterPhrase = string.Format("{0} Or Contains([Text], '{1}')", Service.SystemsFilterPhrase, (sender as TreeViewItem).Header + " ");
                     }
                 }
                 ChangeFilterCriteria();
@@ -866,7 +874,8 @@ namespace NewHistoricalLog
                     messageGrid.RefreshData();
                     cleared = false;
                 }
-                
+                messageGrid.ClearSorting();
+                messageGrid.SortBy(messageGrid.Columns["Date"], DevExpress.Data.ColumnSortOrder.Descending);
                 GC.Collect();
             }
         }
@@ -880,6 +889,14 @@ namespace NewHistoricalLog
 
         private void ThemedWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            if(Service.Printing)
+            {
+                if(DXMessageBox.Show("Идет печать. При закрытии процесс печати прервется. Действительно закрыть?","Прервать печать?",MessageBoxButton.YesNo,MessageBoxImage.Question)==MessageBoxResult.No)
+                {
+                    e.Cancel = true;
+                    return;
+                }
+            }
             e.Cancel = true;
             ClearMessages();
             if(SaveMessagesThread!=null)
@@ -919,6 +936,44 @@ namespace NewHistoricalLog
         private void messageView_ShowingEditor(object sender, ShowingEditorEventArgs e)
         {
 
+        }
+
+        void SortGrid(GridColumn sortColumn)
+        {
+            var a = messageGrid.SortInfo;
+            
+        }
+
+        //private async void messageGrid_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        //{
+        //    var info = messageView.CalcHitInfo(e.GetPosition(messageView));
+        //    if (info.HitTest == TableViewHitTest.ColumnHeader && e.ClickCount > 1)
+        //    {
+        //        messageView.BestFitColumn(info.Column);
+        //        locker = true;
+        //    }
+        //    else if (info.HitTest == TableViewHitTest.ColumnHeader && e.ClickCount == 1)
+        //    {
+        //        await Task.Delay(300);
+        //        if (!locker)
+        //        {
+        //            foreach (GridColumn col in messageGrid.Columns)
+        //            {
+        //                if (info.Column != col)
+        //                    col.SortOrder = DevExpress.Data.ColumnSortOrder.None;
+        //            }
+        //            messageGrid.SortBy(info.Column, info.Column.SortOrder == DevExpress.Data.ColumnSortOrder.Ascending ? DevExpress.Data.ColumnSortOrder.Descending : DevExpress.Data.ColumnSortOrder.Ascending);
+        //        }
+        //        locker = false;
+        //    }
+        //}
+        private void messageView_PreviewMouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            var info = messageView.CalcHitInfo(e.GetPosition(messageView));
+            if (info.HitTest == TableViewHitTest.RowCell)
+            {
+                messageView.BestFitColumn(info.Column);
+            }
         }
     }
     public class EditorLocalizerEx : EditorLocalizer

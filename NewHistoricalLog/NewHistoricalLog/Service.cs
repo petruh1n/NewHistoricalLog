@@ -152,6 +152,8 @@ namespace NewHistoricalLog
         }
 
         public static bool[] Fields { get; set; }
+
+        public static string SavePath { get; set; } = String.Format("{0}\\SEMHistory\\Export", Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments));
         #endregion
 
         private static string GetDefaultPrinterName()
@@ -236,6 +238,7 @@ namespace NewHistoricalLog
             result.Add("Обозначние среднего приоритета", MiddlePrioriry);
             result.Add("Обозначние низкого приоритета", LowPrioriry);
             result.Add("Обозначние нормального приоритета", NormalPrioriry);
+            result.Add("Путь для сохранения", SavePath);
             return result;
         }
         public static void ParseDictionary(Dictionary<string, object> dictionary)
@@ -259,6 +262,7 @@ namespace NewHistoricalLog
                 MiddlePrioriry = dictionary["Обозначние среднего приоритета"].ToString();
                 LowPrioriry = dictionary["Обозначние низкого приоритета"].ToString();
                 NormalPrioriry = dictionary["Обозначние нормального приоритета"].ToString();
+                SavePath = dictionary["Путь для сохранения"].ToString();
             }
             catch (Exception ex)
             {

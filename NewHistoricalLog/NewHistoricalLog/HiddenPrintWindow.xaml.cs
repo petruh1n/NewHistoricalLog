@@ -85,7 +85,8 @@ namespace NewHistoricalLog
             catch (Exception ex)
             {
                 //DXMessageBox.Show("Ошибка печати: " + ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                logger.Error("Ошибка печати: {0}", ex.Message);
+                logger.Error("Ошибка печати inside: {0}", ex.Message);
+                Close();
             }
         }
 

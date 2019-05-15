@@ -58,7 +58,7 @@ namespace NewHistoricalLog
         {
             foreach (Window window in app.Windows)
             {
-                if (window != app.MainWindow)
+                if (window != app.MainWindow & !(window is HiddenPrintWindow))
                 {
                     window.Close();
                 }

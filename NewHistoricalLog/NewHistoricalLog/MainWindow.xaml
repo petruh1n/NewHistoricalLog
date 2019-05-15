@@ -143,14 +143,15 @@
             <dx:SimpleButton Width="170" Click="RefreshButtonClick" Margin="5,5,5,5" Content="Обновить"/>
         </StackPanel>
 
-        <dxg:GridControl EnableSmartColumnsGeneration="True" Grid.Row="5" x:Name="messageGrid" Grid.Column="1" ItemsSource="{Binding Path=(local:Service.Messages), UpdateSourceTrigger=PropertyChanged}">
+        <dxg:GridControl EnableSmartColumnsGeneration="True" Grid.Row="5" x:Name="messageGrid" Grid.Column="1" ItemsSource="{Binding Path=(local:Service.Messages), UpdateSourceTrigger=PropertyChanged}" 
+                          PreviewMouseDoubleClick="messageView_PreviewMouseDoubleClick">
             <dxg:GridControl.View>
                 <dxg:TableView x:Name="messageView" AllowPerPixelScrolling="True" SearchPanelAllowFilter="False" 
                                ShowGroupPanel="False" AllowEditing="False" AllowGrouping="False" ShowFilterPanelMode="Never" AllowPaging="True"
                                AllowDateTimeGroupIntervalMenu="False" IsRowCellMenuEnabled="False" IsGroupPanelMenuEnabled="False"
                                IsColumnMenuEnabled="False" IsGroupRowMenuEnabled="False" IsGroupFooterMenuEnabled="False" IsTotalSummaryMenuEnabled="False" 
                                PageSize="{Binding Source={x:Static local:Service.CountLines}}" CustomRowAppearance="messageView_CustomRowAppearance" NavigationStyle="Row" AllowColumnMoving="False" 
-                               >
+                                AllowSorting="True">
                     
                     <dxg:TableView.FormatConditions>
 
@@ -166,7 +167,7 @@
                     </dxg:TableView.FormatConditions>
                 </dxg:TableView>
             </dxg:GridControl.View>
-            <dxg:GridColumn FieldName="Date" IsSmart="True" Header="Дата" AllowGrouping="False" AllowSorting="True" AllowEditing="False" PrintCellStyle="{StaticResource DateColumnPrintingStyle}" AllowColumnFiltering="False" Width="150">
+            <dxg:GridColumn FieldName="Date" IsSmart="True" Header="Дата" AllowGrouping="False" AllowEditing="False" PrintCellStyle="{StaticResource DateColumnPrintingStyle}" AllowColumnFiltering="False" Width="150" FixedWidth="True" AllowResizing="False">
                 <dxg:GridColumn.EditSettings>
                     <dxe:DateEditSettings Mask="dd.MM.yyyy HH:mm:ss.ff" MaskUseAsDisplayFormat="True">
                         <dxe:DateEditSettings.StyleSettings>
@@ -175,8 +176,8 @@
                     </dxe:DateEditSettings>
                 </dxg:GridColumn.EditSettings>
             </dxg:GridColumn>
-            <dxg:GridColumn FieldName="Type" IsSmart="True" Width="0" Visible="False" AllowGrouping="False" AllowSorting="False" AllowEditing="False" AllowPrinting="False"/>
-            <dxg:GridColumn FieldName="Prior" IsSmart="True" Width="120" AllowGrouping="False" AllowSorting="False" Header="Приоритет" AllowEditing="False" PrintCellStyle="{StaticResource ImageColumnPrintingStyle}">
+            <dxg:GridColumn FieldName="Type" IsSmart="True" Width="0" Visible="False" AllowGrouping="False"  AllowEditing="False" AllowPrinting="False"/>
+            <dxg:GridColumn FieldName="Prior" IsSmart="True" Width="120" AllowGrouping="False"  Header="Приоритет" AllowEditing="False" PrintCellStyle="{StaticResource ImageColumnPrintingStyle}">
                 <dxg:GridColumn.EditSettings>
                     <dxe:TextEditSettings >
                         <dxe:TextEditSettings.StyleSettings>
@@ -185,7 +186,7 @@
                     </dxe:TextEditSettings>
                 </dxg:GridColumn.EditSettings>
             </dxg:GridColumn>
-            <dxg:GridColumn FieldName="Text" IsSmart="True" Width="*" Header="Текст сообщения" AllowGrouping="False" AllowSorting="True" AllowEditing="False" PrintCellStyle="{StaticResource ImageColumnPrintingStyle}" AllowColumnFiltering="False">
+            <dxg:GridColumn FieldName="Text" IsSmart="True" Width="*" Header="Текст сообщения" AllowGrouping="False"  AllowEditing="False" PrintCellStyle="{StaticResource ImageColumnPrintingStyle}" AllowColumnFiltering="False">
                 <dxg:GridColumn.EditSettings>
                     <dxe:TextEditSettings >
                         <dxe:TextEditSettings.StyleSettings>
@@ -194,7 +195,7 @@
                     </dxe:TextEditSettings>
                 </dxg:GridColumn.EditSettings>
             </dxg:GridColumn>
-            <dxg:GridColumn FieldName="Kvited" IsSmart="True" Width="100" AllowGrouping="False" AllowSorting="False" AllowEditing="False" Header="Квитировано" PrintCellStyle="{StaticResource ImageColumnPrintingStyle}">
+            <dxg:GridColumn FieldName="Kvited" IsSmart="True" Width="100" AllowGrouping="False"  AllowEditing="False" Header="Квитировано" PrintCellStyle="{StaticResource ImageColumnPrintingStyle}" SortOrder="Ascending" SortIndex="0">
                 <dxg:GridColumn.EditSettings>
                     <dxe:TextEditSettings >
                         <dxe:TextEditSettings.StyleSettings>
@@ -203,7 +204,7 @@
                     </dxe:TextEditSettings>
                 </dxg:GridColumn.EditSettings>
             </dxg:GridColumn>
-            <dxg:GridColumn FieldName="User" IsSmart="True" Width="100" Header="Пользователь" AllowGrouping="False" AllowSorting="True" AllowEditing="False" PrintCellStyle="{StaticResource ImageColumnPrintingStyle}" AllowColumnFiltering="False">
+            <dxg:GridColumn FieldName="User" IsSmart="True" Width="100" Header="Пользователь" AllowGrouping="False"  AllowEditing="False" PrintCellStyle="{StaticResource ImageColumnPrintingStyle}" AllowColumnFiltering="False">
                 <dxg:GridColumn.EditSettings>
                     <dxe:TextEditSettings >
                         <dxe:TextEditSettings.StyleSettings>
@@ -212,7 +213,7 @@
                     </dxe:TextEditSettings>
                 </dxg:GridColumn.EditSettings>
             </dxg:GridColumn>
-            <dxg:GridColumn FieldName="Source" IsSmart="True" Width="100" Header="Источник" AllowGrouping="False" AllowSorting="True" AllowEditing="False" PrintCellStyle="{StaticResource ImageColumnPrintingStyle}" AllowColumnFiltering="False">
+            <dxg:GridColumn FieldName="Source" IsSmart="True" Width="100" Header="Источник" AllowGrouping="False"  AllowEditing="False" PrintCellStyle="{StaticResource ImageColumnPrintingStyle}" AllowColumnFiltering="False">
                 <dxg:GridColumn.EditSettings>
                     <dxe:TextEditSettings >
                         <dxe:TextEditSettings.StyleSettings>
@@ -221,7 +222,7 @@
                     </dxe:TextEditSettings>
                 </dxg:GridColumn.EditSettings>
             </dxg:GridColumn>
-            <dxg:GridColumn FieldName="Value" IsSmart="True" Width="80" Header="Значение" AllowGrouping="False" AllowSorting="True" AllowEditing="False" PrintCellStyle="{StaticResource ImageColumnPrintingStyle}" AllowColumnFiltering="False">
+            <dxg:GridColumn FieldName="Value" IsSmart="True" Width="80" Header="Значение" AllowGrouping="False" AllowEditing="False" PrintCellStyle="{StaticResource ImageColumnPrintingStyle}" AllowColumnFiltering="False">
                 <dxg:GridColumn.EditSettings>
                     <dxe:TextEditSettings >
                         <dxe:TextEditSettings.StyleSettings>
