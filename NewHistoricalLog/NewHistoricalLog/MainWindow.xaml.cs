@@ -254,6 +254,10 @@ namespace NewHistoricalLog
                     }
                 }
             }
+            foreach(var fc in Service.SubSystemsFiltersList)
+            {
+                fc.Selected = false;
+            }
         }
 
         private void ClearTextFilterClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
@@ -716,17 +720,20 @@ namespace NewHistoricalLog
             List<TreeViewItem> Result = new List<TreeViewItem>();
             foreach(var item in list)
             {
-                TreeViewItem temp = new TreeViewItem() { Header = item.Name };
-                if(item.Children.Count>0)
+                if(item.Name!="")
                 {
-                    foreach(var subItem in FillListView(item.Children))
+                    TreeViewItem temp = new TreeViewItem() { Header = item.Name };
+                    Service.SubSystemsFiltersList.Add(new FilterClass(item.Name));
+                    if (item.Children.Count > 0)
                     {
-                        temp.Items.Add(subItem);
+                        foreach (var subItem in FillListView(item.Children))
+                        {
+                            temp.Items.Add(subItem);
+                        }
                     }
+                    temp.MouseDoubleClick += Temp_MouseDoubleClick;
+                    Result.Add(temp);
                 }
-                temp.MouseDoubleClick += Temp_MouseDoubleClick;
-                Result.Add(temp);
-                
             }
             return Result;
         }
@@ -738,32 +745,17 @@ namespace NewHistoricalLog
                 if((sender as TreeViewItem).FontWeight==FontWeights.Bold)
                 {
                     (sender as TreeViewItem).FontWeight = FontWeights.Normal;
-                    if(Service.SystemsFilterPhrase.Contains(string.Format("Contains([Text], '{0}') Or ", (sender as TreeViewItem).Header+" ")))
-                    {
-                        Service.SystemsFilterPhrase = Service.SystemsFilterPhrase.Replace(string.Format("Contains([Text], '{0}') Or ", (sender as TreeViewItem).Header + " "), "");
-                    }
-                    else if (Service.SystemsFilterPhrase.Contains(string.Format("Or Contains([Text], '{0}')", (sender as TreeViewItem).Header + " ")))
-                    {
-                        Service.SystemsFilterPhrase = Service.SystemsFilterPhrase.Replace(string.Format("Or Contains([Text], '{0}')", (sender as TreeViewItem).Header + " "), "");
-                    }
-                    else if (Service.SystemsFilterPhrase.Contains(string.Format("Contains([Text], '{0}')", (sender as TreeViewItem).Header + " ")))
-                    {
-                        Service.SystemsFilterPhrase = Service.SystemsFilterPhrase.Replace(string.Format("Contains([Text], '{0}')", (sender as TreeViewItem).Header + " "), "");
-                    }
+                    FilterClass.GetByName(Service.SubSystemsFiltersList, (sender as TreeViewItem).Header.ToString()).Selected=false;
+                    Service.SystemsFilterPhrase = FilterClass.GetFilterString(Service.SubSystemsFiltersList);                    
                 }
                 else
                 {
                     (sender as TreeViewItem).FontWeight = FontWeights.Bold;
-                    //если строка фильтрация по подсистемам пустая
-                    if (string.IsNullOrEmpty(Service.SystemsFilterPhrase))
-                    {
-                        Service.SystemsFilterPhrase = string.Format("Contains([Text], '{0}')", (sender as TreeViewItem).Header + " ");
-                    }
-                    else
-                    {
-                        Service.SystemsFilterPhrase = string.Format("{0} Or Contains([Text], '{1}')", Service.SystemsFilterPhrase, (sender as TreeViewItem).Header + " ");
-                    }
+                    FilterClass.GetByName(Service.SubSystemsFiltersList, (sender as TreeViewItem).Header.ToString()).Selected = true;
+                    Service.SystemsFilterPhrase = FilterClass.GetFilterString(Service.SubSystemsFiltersList);                   
                 }
+                //Service.SystemsFilterPhrase.Replace("  ", " ");
+                //Service.SystemsFilterPhrase.Trim();
                 ChangeFilterCriteria();
             }
         }

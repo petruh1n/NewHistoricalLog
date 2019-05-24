@@ -116,6 +116,7 @@
     <Compile Include="ExpWindow.xaml.cs">
       <DependentUpon>ExpWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="FilterClass.cs" />
     <Compile Include="HiddenPrintWindow.xaml.cs">
       <DependentUpon>HiddenPrintWindow.xaml</DependentUpon>
     </Compile>

@@ -154,6 +154,8 @@ namespace NewHistoricalLog
         public static bool[] Fields { get; set; }
 
         public static string SavePath { get; set; } = String.Format("{0}\\SEMHistory\\Export", Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments));
+
+        public static List<FilterClass> SubSystemsFiltersList { get; set; } = new List<FilterClass>();
         #endregion
 
         private static string GetDefaultPrinterName()
