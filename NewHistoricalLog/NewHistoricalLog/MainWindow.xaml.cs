@@ -284,12 +284,23 @@ namespace NewHistoricalLog
         private void SaveClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
         {
             try
-            {
-                DXSplashScreen.Show<AwaitScreen>(WindowStartupLocation.CenterOwner, new SplashScreenOwner(this));
-                DXSplashScreen.SetState("Сохранение журнала");
-                DXSplashScreen.Progress(0);
-                SaveMessagesThread = new Thread(SaveMethod) { IsBackground = true };
-                SaveMessagesThread.Start();
+            {               
+                SelectColumnWindow wind = new SelectColumnWindow();
+                if (wind.ShowDialog() != false)
+                {
+                    messageGrid.Columns["Date"].AllowPrinting = wind.Fields[0];
+                    messageGrid.Columns["Prior"].AllowPrinting = wind.Fields[1];
+                    messageGrid.Columns["Kvited"].AllowPrinting = wind.Fields[2];
+                    messageGrid.Columns["Text"].AllowPrinting = wind.Fields[3];
+                    messageGrid.Columns["User"].AllowPrinting = wind.Fields[4];
+                    messageGrid.Columns["Source"].AllowPrinting = wind.Fields[5];
+                    messageGrid.Columns["Value"].AllowPrinting = wind.Fields[6];
+                    DXSplashScreen.Show<AwaitScreen>(WindowStartupLocation.CenterOwner, new SplashScreenOwner(this));
+                    DXSplashScreen.SetState("Сохранение журнала");
+                    DXSplashScreen.Progress(0);
+                    SaveMessagesThread = new Thread(SaveMethod) { IsBackground = true };
+                    SaveMessagesThread.Start();
+                }                    
             }
             catch (Exception ex)
             {
@@ -309,17 +320,14 @@ namespace NewHistoricalLog
                     Directory.CreateDirectory(Service.SavePath);
                 string fileName = String.Format("Сообщения с {0} по {1}.pdf", Service.StartDate.ToString().Replace(":", "_"), Service.EndDate.ToString().Replace(":", "_"));
                 int counter = 1;
-                while (File.Exists(String.Format("{0}\\SEMHistory\\Export\\{1}", Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments), fileName)))
+                while (File.Exists(String.Format("{0}\\{1}", Service.SavePath, fileName)))
                 {
                     fileName = String.Format("Сообщения с {0} по {1}_{2}.pdf", Service.StartDate.ToString().Replace(":", "_"), Service.EndDate.ToString().Replace(":", "_"), counter);
                     counter++;
                 }
-                //messageView.ExportToPdf(String.Format("{0}\\SEMHistory\\Export\\{1}", Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments), fileName));
                 PrintableControlLink link = null;
                 Dispatcher.Invoke(() => link = new PrintableControlLink(messageGrid.View));
                 link.PrintingSystem.ExportOptions.Xls.TextExportMode = TextExportMode.Text;
-                //var xlsExportOptions = new XlsExportOptions();
-                //xlsExportOptions.ExportMode = XlsExportMode.SingleFile;
                 try
                 {
                     link.PrintingSystem.ProgressReflector.PositionChanged += ProgressReflector_PositionChanged; ;
@@ -494,11 +502,22 @@ namespace NewHistoricalLog
             {
                 try
                 {
-                    DXSplashScreen.Show<AwaitScreen>(WindowStartupLocation.CenterOwner, new SplashScreenOwner(this));
-                    DXSplashScreen.SetState("Сохранение журнала");
-                    DXSplashScreen.Progress(0);
-                    SaveMessagesThread = new Thread(new ParameterizedThreadStart(SaveToMethod)) { IsBackground = true };
-                    SaveMessagesThread.Start(wind.Path);
+                    SelectColumnWindow wind1 = new SelectColumnWindow();
+                    if (wind1.ShowDialog() != false)
+                    {
+                        messageGrid.Columns["Date"].AllowPrinting = wind1.Fields[0];
+                        messageGrid.Columns["Prior"].AllowPrinting = wind1.Fields[1];
+                        messageGrid.Columns["Kvited"].AllowPrinting = wind1.Fields[2];
+                        messageGrid.Columns["Text"].AllowPrinting = wind1.Fields[3];
+                        messageGrid.Columns["User"].AllowPrinting = wind1.Fields[4];
+                        messageGrid.Columns["Source"].AllowPrinting = wind1.Fields[5];
+                        messageGrid.Columns["Value"].AllowPrinting = wind1.Fields[6];
+                        DXSplashScreen.Show<AwaitScreen>(WindowStartupLocation.CenterOwner, new SplashScreenOwner(this));
+                        DXSplashScreen.SetState("Сохранение журнала");
+                        DXSplashScreen.Progress(0);
+                        SaveMessagesThread = new Thread(new ParameterizedThreadStart(SaveToMethod)) { IsBackground = true };
+                        SaveMessagesThread.Start(wind.Path);
+                    }                    
                 }
                 catch (Exception ex)
                 {
@@ -571,11 +590,22 @@ namespace NewHistoricalLog
         {
             try
             {
-                DXSplashScreen.Show<AwaitScreen>(WindowStartupLocation.CenterOwner, new SplashScreenOwner(this));
-                DXSplashScreen.SetState("Сохранение журнала");
-                DXSplashScreen.Progress(0);
-                SaveMessagesThread = new Thread(SendToDMZMethod) { IsBackground = true };
-                SaveMessagesThread.Start();
+                SelectColumnWindow wind1 = new SelectColumnWindow();
+                if (wind1.ShowDialog() != false)
+                {
+                    messageGrid.Columns["Date"].AllowPrinting = wind1.Fields[0];
+                    messageGrid.Columns["Prior"].AllowPrinting = wind1.Fields[1];
+                    messageGrid.Columns["Kvited"].AllowPrinting = wind1.Fields[2];
+                    messageGrid.Columns["Text"].AllowPrinting = wind1.Fields[3];
+                    messageGrid.Columns["User"].AllowPrinting = wind1.Fields[4];
+                    messageGrid.Columns["Source"].AllowPrinting = wind1.Fields[5];
+                    messageGrid.Columns["Value"].AllowPrinting = wind1.Fields[6];
+                    DXSplashScreen.Show<AwaitScreen>(WindowStartupLocation.CenterOwner, new SplashScreenOwner(this));
+                    DXSplashScreen.SetState("Сохранение журнала");
+                    DXSplashScreen.Progress(0);
+                    SaveMessagesThread = new Thread(SendToDMZMethod) { IsBackground = true };
+                    SaveMessagesThread.Start();
+                }                
             }
             catch (Exception ex)
             {
