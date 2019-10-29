@@ -21,19 +21,27 @@ namespace NewHistoricalLog
     public partial class SelectColumnWindow : ThemedWindow
     {
         public bool[] Fields { get; set; } = new bool[] { true, true, true, true, true, true, true };
+        public string Path { get; set; } = "";
         public SelectColumnWindow()
         {
             InitializeComponent();
-            if (Service.Monitor <= System.Windows.Forms.Screen.AllScreens.Length)
-            {
-                Top = System.Windows.Forms.Screen.AllScreens[Service.Monitor].Bounds.Y + Service.Top + Math.Abs(Height - Service.Height) / 2;
-                Left = System.Windows.Forms.Screen.AllScreens[Service.Monitor].Bounds.X + Service.Left + Math.Abs(Width - Service.Width) / 2;
-            }
-            else
-            {
-                Top = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Y + Service.Top + Math.Abs(Height - Service.Height) / 2;
-                Left = System.Windows.Forms.Screen.PrimaryScreen.Bounds.X + Service.Left + Math.Abs(Width - Service.Width) / 2;
-            }
+            //if (Service.Monitor <= System.Windows.Forms.Screen.AllScreens.Length)
+            //{
+            //    Top = System.Windows.Forms.Screen.AllScreens[Service.Monitor].Bounds.Y + Service.Top + Math.Abs(Height - Service.Height) / 2;
+            //    Left = System.Windows.Forms.Screen.AllScreens[Service.Monitor].Bounds.X + Service.Left + Math.Abs(Width - Service.Width) / 2;
+            //}
+            //else
+            //{
+            //    Top = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Y + Service.Top + Math.Abs(Height - Service.Height) / 2;
+            //    Left = System.Windows.Forms.Screen.PrimaryScreen.Bounds.X + Service.Left + Math.Abs(Width - Service.Width) / 2;
+            //}
+            this.Loaded += SelectColumnWindow_Loaded;            
+        }
+
+        private void SelectColumnWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(Path))
+                place.Text = string.Format("Место сохранения: {0}",Path);
         }
 
         private void CheckedChange(object sender, RoutedEventArgs e)

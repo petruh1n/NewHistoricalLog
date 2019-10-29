@@ -286,6 +286,7 @@ namespace NewHistoricalLog
             try
             {               
                 SelectColumnWindow wind = new SelectColumnWindow();
+                wind.Owner = this;
                 if (wind.ShowDialog() != false)
                 {
                     messageGrid.Columns["Date"].AllowPrinting = wind.Fields[0];
@@ -503,6 +504,8 @@ namespace NewHistoricalLog
                 try
                 {
                     SelectColumnWindow wind1 = new SelectColumnWindow();
+                    wind1.Owner = this;
+                    wind1.Path = wind.Path;
                     if (wind1.ShowDialog() != false)
                     {
                         messageGrid.Columns["Date"].AllowPrinting = wind1.Fields[0];
@@ -591,6 +594,8 @@ namespace NewHistoricalLog
             try
             {
                 SelectColumnWindow wind1 = new SelectColumnWindow();
+                wind1.Owner = this;
+                wind1.Path = Service.DmzPath;
                 if (wind1.ShowDialog() != false)
                 {
                     messageGrid.Columns["Date"].AllowPrinting = wind1.Fields[0];
@@ -996,6 +1001,29 @@ namespace NewHistoricalLog
             {
                 messageView.BestFitColumn(info.Column);
             }
+        }
+
+        private void SettingsClick(object sender, ItemClickEventArgs e)
+        {
+            Settings wind = new Settings();
+            wind.Owner = this;
+            if(wind.ShowDialog()==true)
+            {
+                if (Service.GridTextWrapping)
+                    messageGrid.Columns["Text"].EditSettings = new TextEditSettings() { TextWrapping = TextWrapping.Wrap };
+                else
+                {
+                    messageGrid.Columns["Text"].EditSettings = new TextEditSettings() { TextWrapping = TextWrapping.NoWrap };
+                }
+                messageView.PageSize = Service.CountLines;
+            }
+        }
+
+        private void InfoClick(object sender, ItemClickEventArgs e)
+        {
+            InfoWindow window = new InfoWindow();
+            window.Owner = this;
+            window.ShowDialog();
         }
     }
     public class EditorLocalizerEx : EditorLocalizer

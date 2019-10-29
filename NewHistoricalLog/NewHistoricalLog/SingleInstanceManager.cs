@@ -85,7 +85,7 @@ namespace NewHistoricalLog
                             }
                             if(eventArgs.CommandLine[i].ToUpper().Contains("USERGROUP"))
                             {
-                                if (eventArgs.CommandLine[i].Remove(0, Environment.GetCommandLineArgs()[i].IndexOf("_") + 1).ToUpper() == "ADMIN")
+                                if (eventArgs.CommandLine[i].Remove(0, eventArgs.CommandLine[i].IndexOf("_") + 1).ToUpper() == "ADMIN")
                                 {
                                     Service.IsAdminMode = true;
                                 }

@@ -87,11 +87,14 @@
                     <dxb:BarButtonItem Content="Обновить" ItemClick="RefreshClick" Glyph="{dx:DXImage Image=Recurrence_32x32.png}" LargeGlyph="{dx:DXImage Image=Recurrence_32x32.png}" ContentTemplate="{StaticResource BarItemTextTemplate}"/>
                     <dxb:BarButtonItem Content="Сохранить" ItemClick="SaveClick" Glyph="{dx:DXImage Image=Save_32x32.png}" LargeGlyph="{dx:DXImage Image=Save_32x32.png}" ContentTemplate="{StaticResource BarItemTextTemplate}"/>
                     <dxb:BarButtonItem Content="Сохранить на съемный носитель" ItemClick="SaveToClick" Glyph="{dx:DXImage Image=SaveTo_32x32.png}" LargeGlyph="{dx:DXImage Image=SaveTo_32x32.png}" 
-                                       ContentTemplate="{StaticResource BarItemTextTemplate}" IsVisible="{Binding Path=(local:Service.IsAdminMode), UpdateSourceTrigger=PropertyChanged}"/>
+                                       ContentTemplate="{StaticResource BarItemTextTemplate}" />
                     <dxb:BarButtonItem x:Name="sendToDmz" Content="Отправить на сервер ДМЗ" ItemClick="SendToDmz" Glyph="{dx:DXImage Image=SaveTo_32x32.png}" LargeGlyph="{dx:DXImage Image=SaveTo_32x32.png}" 
                                        ContentTemplate="{StaticResource BarItemTextTemplate}"/>
                     <dxb:BarButtonItem Content="Печать" ItemClick="PrintClick" Glyph="{dx:DXImage Image=Print_32x32.png}" LargeGlyph="{dx:DXImage Image=Print_32x32.png}" ContentTemplate="{StaticResource BarItemTextTemplate}" IsEnabled="{Binding Path=(local:Service.Printing), Converter={local:BackBoolConverter}, UpdateSourceTrigger=PropertyChanged}"/>
-                    <dxb:BarButtonItem Content="О программе" ItemClick="AboutClick" LargeGlyph="{dx:DXImage Image=Logical_32x32.png}" Glyph="{dx:DXImage Image=Logical_16x16.png}" ContentTemplate="{StaticResource BarItemTextTemplate}" />
+                    <dxb:BarButtonItem Content="Настройки" ItemClick="SettingsClick" LargeGlyph="{dx:DXImage Image=Properties_32x32.png}" Glyph="{dx:DXImage Image=Properties_16x16.png}" ContentTemplate="{StaticResource BarItemTextTemplate}"
+                                       IsVisible="{Binding Path=(local:Service.IsAdminMode), UpdateSourceTrigger=PropertyChanged}"/>
+                    <dxb:BarButtonItem Content="Справка" ItemClick="AboutClick" LargeGlyph="{dx:DXImage Image=Logical_32x32.png}" Glyph="{dx:DXImage Image=Logical_16x16.png}" ContentTemplate="{StaticResource BarItemTextTemplate}" />
+                    <dxb:BarButtonItem Content="О программе" ItemClick="InfoClick" LargeGlyph="{dx:DXImage Image=Info_32x32.png}" Glyph="{dx:DXImage Image=Info_16x16.png}" ContentTemplate="{StaticResource BarItemTextTemplate}" />
                     <dxb:BarButtonItem Content="Выход" ItemClick="ExitClick" Glyph="{dx:DXImage Image=Close_32x32.png}" LargeGlyph="{dx:DXImage Image=Close_32x32.png}" ContentTemplate="{StaticResource BarItemTextTemplate}"/>                    
                 </dxb:BarSubItem>
                 <dxb:BarCheckItem Content="Фильтр" CheckedChanged="BarCheckItem_CheckedChanged" LargeGlyph="{dx:DXImage Image=Filter_32x32.png}" Glyph="{dx:DXImage Image=Filter_16x16.png}" ContentTemplate="{StaticResource BarItemTextTemplate}"/>

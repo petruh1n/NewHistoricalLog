@@ -1,0 +1,24 @@
+﻿<dx:ThemedWindow
+    x:Class="NewHistoricalLog.InfoWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    Title="Информация"
+    Height="auto"
+    Width="auto"
+    Icon="{dx:DXImage Image=Info_32x32.png}"
+    ResizeMode="NoResize"
+    KeyDown="ThemedWindow_KeyDown" 
+    Deactivated="ThemedWindow_Deactivated" 
+    SizeToContent="WidthAndHeight" 
+    WindowStartupLocation="CenterOwner"
+    >
+    <Grid>
+        <StackPanel>
+            <TextBlock  TextWrapping="Wrap" Margin="5,5,5,5">Программа предназначена для вывода истории сообщений.</TextBlock>
+            <TextBlock x:Name="Version" TextWrapping="Wrap" Margin="5,5,5,5"></TextBlock>
+            <TextBlock  TextWrapping="Wrap" Margin="5,5,5,5">Компания: АО НПО "Спецэлектромеханика".</TextBlock>
+            <Button HorizontalAlignment="Right" Content="Ок" Margin="5,5,5,5" Width="100" Click="Button_Click"/>
+        </StackPanel>
+    </Grid>
+</dx:ThemedWindow>

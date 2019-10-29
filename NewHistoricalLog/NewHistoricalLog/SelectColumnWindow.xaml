@@ -4,27 +4,46 @@
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     x:Class="NewHistoricalLog.SelectColumnWindow"
-    Title="Выбор полей" 
-    Height="300" Width="200" 
+    Title="Выбор данных" 
+    Height="auto" Width="auto" 
+    SizeToContent="WidthAndHeight"
     ShowInTaskbar="False" 
     ResizeMode="NoResize" 
     Icon="{dx:DXImage Image=MouseMode_32x32.png}"
     KeyDown="ThemedWindow_KeyDown"
     LocationChanged="ThemedWindow_LocationChanged"
+    WindowStartupLocation="CenterOwner"
     Topmost="True">
-
-    <StackPanel>
-
-        <dxe:CheckEdit x:Name="date" Width="150" Margin="5,5,5,5" Content="Дата" IsChecked="True" Checked="CheckedChange" Unchecked="CheckedChange"/>
-        <dxe:CheckEdit x:Name="priority" Width="150" Margin="5,5,5,5" Content="Приоритет" IsChecked="True" Checked="CheckedChange" Unchecked="CheckedChange"/>
-        <dxe:CheckEdit x:Name="kvit" Width="150" Margin="5,5,5,5" Content="Квитирование" IsChecked="True" Checked="CheckedChange" Unchecked="CheckedChange"/>
-        <dxe:CheckEdit x:Name="text" Width="150" Margin="5,5,5,5" Content="Сообщение" IsChecked="True" Checked="CheckedChange" Unchecked="CheckedChange"/>
-        <dxe:CheckEdit x:Name="user" Width="150" Margin="5,5,5,5" Content="Пользователь" IsChecked="True" Checked="CheckedChange" Unchecked="CheckedChange"/>
-        <dxe:CheckEdit x:Name="source" Width="150" Margin="5,5,5,5" Content="Источник" IsChecked="True" Checked="CheckedChange" Unchecked="CheckedChange"/>
-        <dxe:CheckEdit x:Name="value" Width="150" Margin="5,5,5,5" Content="Значение" IsChecked="True" Checked="CheckedChange" Unchecked="CheckedChange"/>
-        <StackPanel Orientation="Horizontal" Margin="0,10,0,0" HorizontalAlignment="Center">
-            <dx:SimpleButton Height="25"  Width="70" Content="Ок" Click="Confirm_Click"/>
-            <dx:SimpleButton Height="25" Margin="10,0,0,0" Width="70" Content="Отмена" Click="Cancel_Click"/>
-        </StackPanel>
-    </StackPanel>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <!--<TextBlock Text="Место сохранения: " Margin="5,5,5,5" HorizontalAlignment="Left"/>-->
+        <TextBlock x:Name="place" Margin="5,5,5,5" HorizontalAlignment="Left" MinWidth="400"/>
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <dxe:CheckEdit x:Name="date" Grid.Row="0" Grid.Column="0" Width="150" Margin="5,5,5,5" Content="Дата" IsChecked="True" Checked="CheckedChange" Unchecked="CheckedChange"/>
+            <dxe:CheckEdit x:Name="priority" Grid.Row="1" Grid.Column="0" Width="150" Margin="5,5,5,5" Content="Приоритет" IsChecked="True" Checked="CheckedChange" Unchecked="CheckedChange"/>
+            <dxe:CheckEdit x:Name="kvit" Width="150" Grid.Row="2" Grid.Column="0" Margin="5,5,5,5" Content="Квитирование" IsChecked="True" Checked="CheckedChange" Unchecked="CheckedChange"/>
+            <dxe:CheckEdit x:Name="text" Width="150" Grid.Row="3" Grid.Column="0" Margin="5,5,5,5" Content="Сообщение" IsChecked="True" Checked="CheckedChange" Unchecked="CheckedChange"/>
+            <dxe:CheckEdit x:Name="user" Width="150" Grid.Row="0" Grid.Column="1" Margin="5,5,5,5" Content="Пользователь" IsChecked="True" Checked="CheckedChange" Unchecked="CheckedChange"/>
+            <dxe:CheckEdit x:Name="source" Width="150" Grid.Row="1" Grid.Column="1" Margin="5,5,5,5" Content="Источник" IsChecked="True" Checked="CheckedChange" Unchecked="CheckedChange"/>
+            <dxe:CheckEdit x:Name="value" Width="150" Grid.Row="2" Grid.Column="1" Margin="5,5,5,5" Content="Значение" IsChecked="True" Checked="CheckedChange" Unchecked="CheckedChange"/>
+           
+        </Grid>
+        <dx:SimpleButton Height="25" Grid.Row="2"  Width="70" Content="Ок" Click="Confirm_Click" HorizontalAlignment="Right" Margin="5,5,85,5"/>
+        <dx:SimpleButton Height="25" Grid.Row="2" Margin="5,5,5,5" Width="70" Content="Отмена" Click="Cancel_Click" HorizontalAlignment="Right"/>
+    </Grid>
+    
 </dx:ThemedWindow>
