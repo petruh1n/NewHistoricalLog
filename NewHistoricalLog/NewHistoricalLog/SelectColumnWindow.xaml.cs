@@ -11,7 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using DevExpress.Xpf.Core;
-
+using System.Windows.Interop;
 
 namespace NewHistoricalLog
 {
@@ -25,19 +25,14 @@ namespace NewHistoricalLog
         public SelectColumnWindow()
         {
             InitializeComponent();
-            //if (Service.Monitor <= System.Windows.Forms.Screen.AllScreens.Length)
-            //{
-            //    Top = System.Windows.Forms.Screen.AllScreens[Service.Monitor].Bounds.Y + Service.Top + Math.Abs(Height - Service.Height) / 2;
-            //    Left = System.Windows.Forms.Screen.AllScreens[Service.Monitor].Bounds.X + Service.Left + Math.Abs(Width - Service.Width) / 2;
-            //}
-            //else
-            //{
-            //    Top = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Y + Service.Top + Math.Abs(Height - Service.Height) / 2;
-            //    Left = System.Windows.Forms.Screen.PrimaryScreen.Bounds.X + Service.Left + Math.Abs(Width - Service.Width) / 2;
-            //}
             this.Loaded += SelectColumnWindow_Loaded;            
         }
-
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            base.OnSourceInitialized(e);
+            HwndSource source = PresentationSource.FromVisual(this) as HwndSource;
+            source.AddHook(WINAPI.WndProc);
+        }
         private void SelectColumnWindow_Loaded(object sender, RoutedEventArgs e)
         {
             if (!string.IsNullOrEmpty(Path))
@@ -57,21 +52,6 @@ namespace NewHistoricalLog
                 Close();
             }
         }
-
-        private void ThemedWindow_LocationChanged(object sender, EventArgs e)
-        {
-            if (Service.Monitor <= System.Windows.Forms.Screen.AllScreens.Length)
-            {
-                Top = System.Windows.Forms.Screen.AllScreens[Service.Monitor].Bounds.Y + Service.Top + Math.Abs(Height - Service.Height) / 2;
-                Left = System.Windows.Forms.Screen.AllScreens[Service.Monitor].Bounds.X + Service.Left + Math.Abs(Width - Service.Width) / 2;
-            }
-            else
-            {
-                Top = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Y + Service.Top + Math.Abs(Height - Service.Height) / 2;
-                Left = System.Windows.Forms.Screen.PrimaryScreen.Bounds.X + Service.Left + Math.Abs(Width - Service.Width) / 2;
-            }
-        }
-
         private void Confirm_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = true;

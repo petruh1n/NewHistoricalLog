@@ -4,8 +4,9 @@
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     xmlns:dxpdf="http://schemas.devexpress.com/winfx/2008/xaml/pdf"
     x:Class="NewHistoricalLog.About"
+    WindowStartupLocation="CenterOwner"
     Title="О программе" Height="600" Width="700"
-    ResizeMode="NoResize" Icon="{dx:DXImage Image=Info_32x32.png}" LocationChanged="ThemedWindow_LocationChanged" KeyDown="ThemedWindow_KeyDown" Topmost="True">
+    ResizeMode="NoResize" Icon="{dx:DXImage Image=Info_32x32.png}" KeyDown="ThemedWindow_KeyDown" Topmost="True">
     <Grid>
 
         <dxpdf:PdfViewerControl x:Name="pdfViewer" CommandBarStyle="None" Grid.ColumnSpan="2" ShowStartScreen="False">

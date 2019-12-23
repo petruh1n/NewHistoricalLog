@@ -12,7 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Reflection;
 using DevExpress.Xpf.Core;
-
+using System.Windows.Interop;
 
 namespace NewHistoricalLog
 {
@@ -25,19 +25,14 @@ namespace NewHistoricalLog
         {
             InitializeComponent();
             Loaded += About_Loaded;
-            Width = Service.Width;
-            if (Service.Monitor <= System.Windows.Forms.Screen.AllScreens.Length)
-            {
-                Top = System.Windows.Forms.Screen.AllScreens[Service.Monitor].Bounds.Y + Service.Top + (Service.Height - Height) / 2;
-                Left = System.Windows.Forms.Screen.AllScreens[Service.Monitor].Bounds.X + Service.Left + (Service.Width - Width) / 2;
-            }
-            else
-            {
-                Top = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Y + Service.Top + (Service.Height-Height)/2;
-                Left = System.Windows.Forms.Screen.PrimaryScreen.Bounds.X + Service.Left + (Service.Width-Width)/2;
-            }
+            Width = Service.Width;            
         }
-
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            base.OnSourceInitialized(e);
+            HwndSource source = PresentationSource.FromVisual(this) as HwndSource;
+            source.AddHook(WINAPI.WndProc);
+        }
         private void About_Loaded(object sender, RoutedEventArgs e)
         {
             try
@@ -53,21 +48,6 @@ namespace NewHistoricalLog
                 MessageBox.Show("Ошибка при открытии файла помощи.", "Ошибка!", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-
-        private void ThemedWindow_LocationChanged(object sender, EventArgs e)
-        {
-            if (Service.Monitor <= System.Windows.Forms.Screen.AllScreens.Length)
-            {
-                Top = System.Windows.Forms.Screen.AllScreens[Service.Monitor].Bounds.Y + Service.Top + (Service.Height - Height) / 2;
-                Left = System.Windows.Forms.Screen.AllScreens[Service.Monitor].Bounds.X + Service.Left + (Service.Width - Width) / 2;
-            }
-            else
-            {
-                Top = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Y + Service.Top + (Service.Height - Height) / 2;
-                Left = System.Windows.Forms.Screen.PrimaryScreen.Bounds.X + Service.Left + (Service.Width - Width) / 2;
-            }
-        }
-
         private void ThemedWindow_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == System.Windows.Input.Key.Escape)

@@ -1096,7 +1096,7 @@
             this.button43.UseVisualStyleBackColor = true;
             this.button43.Click += new System.EventHandler(this.button43_Click);
             // 
-            // Onscreenkeyboard
+            // OnScreenKeyboard
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -1111,11 +1111,10 @@
             this.MaximizeBox = false;
             this.MaximumSize = new System.Drawing.Size(1015, 520);
             this.MinimizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(1015, 520);
-            this.Name = "Onscreenkeyboard";
+            this.MinimumSize = new System.Drawing.Size(1015, 519);
+            this.Name = "OnScreenKeyboard";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Экранная клавиатура";
-            this.Deactivate += new System.EventHandler(this.Onscreenkeyboard_Deactivate);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();

@@ -32,8 +32,6 @@ namespace NewHistoricalLog
             ObservableCollection<MessageGridContent> result = new ObservableCollection<MessageGridContent>();
             try
             {
-                //var connection = SQL.GetSqlConnection(Service.ConnectionString);
-                //connection.Open();
                 SqlConnection connection = new SqlConnection();
                 connection.ConnectionString = Service.SqlConnectionString;
                 string querry = string.Format("SELECT DTime, Message, UserName, Place, Value, Priority, DTimeAck FROM dbo.PLCMessage WHERE DTime>=CAST ('{0}' as datetime2) AND DTime<=CAST ('{1}' as datetime2) ORDER BY ID", starTime, finishTime);

@@ -10,7 +10,7 @@
         xmlns:Custom="http://schemas.devexpress.com/winfx/2008/xaml/charts/rangecontrolclient" 
         xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol" 
         xmlns:local="clr-namespace:NewHistoricalLog"  Closing="ThemedWindow_Closing"
-        x:Class="NewHistoricalLog.MainWindow" LocationChanged="WindowMoved" ResizeMode="NoResize" KeyDown="OnSpecialKeyPressed" Topmost="True" StateChanged="ThemedWindow_StateChanged"
+        x:Class="NewHistoricalLog.MainWindow" ResizeMode="NoResize" KeyDown="OnSpecialKeyPressed" Topmost="True" StateChanged="ThemedWindow_StateChanged"
         Title="Архив сообщений" Height="500" Width="800" MinHeight="500" MinWidth="800" Icon="pack://application:,,,/NewHistoricalLog;component/Images/Msg.ico" FontSize="14">
     
     <dx:ThemedWindow.Resources>

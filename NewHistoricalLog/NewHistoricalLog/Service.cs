@@ -156,25 +156,10 @@ namespace NewHistoricalLog
         public static string SavePath { get; set; } = String.Format("{0}\\SEMHistory\\Export", Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments));
 
         public static List<FilterClass> SubSystemsFiltersList { get; set; } = new List<FilterClass>();
+
+        public static string PrintTitle { get; set; } = "Заголовок печати и экспорта";
         #endregion
 
-        private static string GetDefaultPrinterName()
-        {
-            string default_printer = "";
-            foreach (string printer in PrinterSettings.InstalledPrinters)
-            {
-                if (new PrinterSettings() { PrinterName = printer }.IsDefaultPrinter)
-                {
-                    default_printer = printer;
-                    break;
-                }
-                else
-                {
-                    default_printer = null;
-                }
-            }
-            return default_printer;
-        }
 
         public static bool TestDefaultPrinterConnection()
         {
@@ -241,6 +226,7 @@ namespace NewHistoricalLog
             result.Add("Обозначние низкого приоритета", LowPrioriry);
             result.Add("Обозначние нормального приоритета", NormalPrioriry);
             result.Add("Путь для сохранения", SavePath);
+            result.Add("Заголовок печати и экспорта", PrintTitle);
             return result;
         }
         public static void ParseDictionary(Dictionary<string, object> dictionary)
@@ -265,6 +251,7 @@ namespace NewHistoricalLog
                 LowPrioriry = dictionary["Обозначние низкого приоритета"].ToString();
                 NormalPrioriry = dictionary["Обозначние нормального приоритета"].ToString();
                 SavePath = dictionary["Путь для сохранения"].ToString();
+                PrintTitle = dictionary["Заголовок печати и экспорта"].ToString();
             }
             catch (Exception ex)
             {

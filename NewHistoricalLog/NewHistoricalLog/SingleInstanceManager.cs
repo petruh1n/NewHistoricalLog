@@ -72,7 +72,7 @@ namespace NewHistoricalLog
 			{
 				// Subsequent launches
 				base.OnStartupNextInstance(eventArgs);
-                bool flag = false;
+                Service.ReadSettings();
                 if (eventArgs.CommandLine != null)
                 {
                     try
@@ -82,30 +82,17 @@ namespace NewHistoricalLog
                             if (eventArgs.CommandLine[i].ToUpper().Contains("MONITOR"))
                             {
                                 Service.Monitor = Convert.ToInt32(eventArgs.CommandLine[i].Remove(0, eventArgs.CommandLine[i].IndexOf("_") + 1));
-                            }
-                            if(eventArgs.CommandLine[i].ToUpper().Contains("USERGROUP"))
-                            {
-                                if (eventArgs.CommandLine[i].Remove(0, eventArgs.CommandLine[i].IndexOf("_") + 1).ToUpper() == "ADMIN")
-                                {
-                                    Service.IsAdminMode = true;
-                                }
-                                else
-                                {
-                                    Service.IsAdminMode = false;
-                                }
-                                flag = true;
-                            }
-                        }
-                        if (!flag)
-                            Service.IsAdminMode = false;
+                            }                            
+                        }                        
                     }
                     catch (Exception ex)
                     {
                         logger.Error(String.Format("Ошибка при чтении ключей: {0}", ex.Message));
                         Service.Monitor = 0;
-                        Service.IsAdminMode = false;
                     }
                 }
+                MainWindow.GetUser();
+                MainWindow.PosWindow();
                 app.MainWindow.Show();
                 app.MainWindow.WindowState = WindowState.Normal;
 

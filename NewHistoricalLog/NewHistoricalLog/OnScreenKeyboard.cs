@@ -1,13 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using DevExpress.XtraEditors;
 
 namespace NewHistoricalLog
 {
@@ -37,10 +29,6 @@ namespace NewHistoricalLog
 
         }
 
-        private void Onscreenkeyboard_Deactivate(object sender, EventArgs e)
-        {
-            //Close();           
-        }
 
         private void button29_Click(object sender, EventArgs e)
         {
@@ -228,10 +216,9 @@ namespace NewHistoricalLog
 
         private void button64_Click(object sender, EventArgs e)
         {
-            if (textBox1.Text.Length < maximumchars)
+            if (textBox1.Text.Length < maximumchars && textBox1.Text.Length > 0)
             {
-                if (textBox1.Text.Length > 0)
-                { textBox1.Text = textBox1.Text + " "; }
+                textBox1.Text = textBox1.Text + " "; 
             }
         }
 

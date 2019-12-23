@@ -10,7 +10,6 @@
     Width="auto" 
     SizeToContent="WidthAndHeight"
     WindowStartupLocation="CenterOwner"
-    LocationChanged="ThemedWindow_LocationChanged"
     FontSize="14" ResizeMode="NoResize" Topmost="True" ShowIcon="True" Icon="{dx:DXImage Image=Properties_32x32.png}"
     >
     <Grid>

@@ -12,7 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.IO;
 using DevExpress.Xpf.Core;
-
+using System.Windows.Interop;
 
 namespace NewHistoricalLog
 {
@@ -25,16 +25,6 @@ namespace NewHistoricalLog
         public ExpWindow()
         {
             InitializeComponent();
-            if (Service.Monitor <= System.Windows.Forms.Screen.AllScreens.Length)
-            {
-                Top = System.Windows.Forms.Screen.AllScreens[Service.Monitor].Bounds.Y + Service.Top + Math.Abs(Height- Service.Height) / 2;
-                Left = System.Windows.Forms.Screen.AllScreens[Service.Monitor].Bounds.X + Service.Left + Math.Abs( Width- Service.Width) / 2;
-            }
-            else
-            {
-                Top = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Y + Service.Top + Math.Abs(Height - Service.Height) / 2;
-                Left = System.Windows.Forms.Screen.PrimaryScreen.Bounds.X + Service.Left + Math.Abs(Width - Service.Width) / 2;
-            }
             this.Loaded += ExpWindow_Loaded;
         }
 
@@ -46,26 +36,21 @@ namespace NewHistoricalLog
                           select dev.RootDirectory);
             devisesBox.ItemsSource = Pathes;
         }
-
-        private void ThemedWindow_LocationChanged(object sender, EventArgs e)
+        protected override void OnSourceInitialized(EventArgs e)
         {
-            if (Service.Monitor <= System.Windows.Forms.Screen.AllScreens.Length)
-            {
-                Top = System.Windows.Forms.Screen.AllScreens[Service.Monitor].Bounds.Y + Service.Top + (Service.Height - Height) / 2;
-                Left = System.Windows.Forms.Screen.AllScreens[Service.Monitor].Bounds.X + Service.Left + (Service.Width - Width) / 2;
-            }
-            else
-            {
-                Top = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Y + Service.Top + (Service.Height - Height) / 2;
-                Left = System.Windows.Forms.Screen.PrimaryScreen.Bounds.X + Service.Left + (Service.Width - Width) / 2;
-            }
+            base.OnSourceInitialized(e);
+            HwndSource source = PresentationSource.FromVisual(this) as HwndSource;
+            source.AddHook(WINAPI.WndProc);
         }
 
         private void OkClick(object sender, RoutedEventArgs e)
         {
-            Path = devisesBox.EditValue.ToString() + "\\Экспортированные сообщения";
-            if(!Directory.Exists(Path))
-                Directory.CreateDirectory(Path);
+            if (devisesBox.EditValue!=null)
+            {
+                Path = devisesBox.EditValue.ToString() + "\\Экспортированные сообщения";
+                if (!Directory.Exists(Path))
+                    Directory.CreateDirectory(Path); 
+            }
             DialogResult = true;
             Close();
         }

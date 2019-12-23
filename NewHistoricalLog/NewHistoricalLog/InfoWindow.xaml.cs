@@ -11,7 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using DevExpress.Xpf.Core;
-
+using System.Windows.Interop;
 
 namespace NewHistoricalLog
 {
@@ -25,6 +25,12 @@ namespace NewHistoricalLog
             InitializeComponent();
             Closing += InfoWindow_Closing;
             Version.Text = string.Format("Версия сборки: {0}", System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString());
+        }
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            base.OnSourceInitialized(e);
+            HwndSource source = PresentationSource.FromVisual(this) as HwndSource;
+            source.AddHook(WINAPI.WndProc);
         }
 
         private void InfoWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)

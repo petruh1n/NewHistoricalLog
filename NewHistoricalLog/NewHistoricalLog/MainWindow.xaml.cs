@@ -19,6 +19,10 @@ using DevExpress.Xpf.Core;
 using DevExpress.Xpf.Bars;
 using DevExpress.Data.Filtering;
 using DatabaseToolBox;
+using System.Windows.Interop;
+using System.Data.SqlClient;
+using System.Windows.Data;
+using System.Globalization;
 
 namespace NewHistoricalLog
 {
@@ -29,15 +33,13 @@ namespace NewHistoricalLog
 	{
         #region Служебный переменные
         Logger logger = LogManager.GetCurrentClassLogger();
+        static Logger slogger = LogManager.GetCurrentClassLogger();
         System.Windows.Forms.NotifyIcon ni = new System.Windows.Forms.NotifyIcon();
         Thread LoadMessagesThread;
         Thread SaveMessagesThread;
         bool created = false;
         bool cleared = false;
-        static bool[] fileds;
         Thread hidePrintThread;
-        bool locker = false;
-        bool notNow = false;
         #endregion
 
         static MainWindow()
@@ -55,6 +57,7 @@ namespace NewHistoricalLog
             ni.DoubleClick +=
                 delegate (object sender, EventArgs args)
                 {
+                    GetUser();
                     this.Show();
                     this.WindowState = WindowState.Normal;
                 };
@@ -88,26 +91,35 @@ namespace NewHistoricalLog
             #endregion
 
             #region Позиционирование окна приложения
-            Width = Service.Width;
-            Height = Service.Height;
-
-            if (Service.Monitor <= System.Windows.Forms.Screen.AllScreens.Length)
-            {
-                this.Top = System.Windows.Forms.Screen.AllScreens[Service.Monitor].Bounds.Y + Service.Top;
-                this.Left = System.Windows.Forms.Screen.AllScreens[Service.Monitor].Bounds.X + Service.Left;
-            }
-            else
-            {
-                this.Top = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Y + Service.Top;
-                this.Left = System.Windows.Forms.Screen.PrimaryScreen.Bounds.X + Service.Left;
-            }
+            PosWindow();
 
             #endregion
 
             
             this.Loaded += OnLoad;
 		}
+        public static void PosWindow()
+        {
+            (SingleInstanceApplication.Current.MainWindow as MainWindow).Width = Service.Width;
+            (SingleInstanceApplication.Current.MainWindow as MainWindow).Height = Service.Height;
 
+            if (Service.Monitor <= System.Windows.Forms.Screen.AllScreens.Length)
+            {
+                (SingleInstanceApplication.Current.MainWindow as MainWindow).Top = System.Windows.Forms.Screen.AllScreens[Service.Monitor].Bounds.Y + Service.Top;
+                (SingleInstanceApplication.Current.MainWindow as MainWindow).Left = System.Windows.Forms.Screen.AllScreens[Service.Monitor].Bounds.X + Service.Left;
+            }
+            else
+            {
+                (SingleInstanceApplication.Current.MainWindow as MainWindow).Top = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Y + Service.Top;
+                (SingleInstanceApplication.Current.MainWindow as MainWindow).Left = System.Windows.Forms.Screen.PrimaryScreen.Bounds.X + Service.Left;
+            }
+        }
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            base.OnSourceInitialized(e);
+            HwndSource source = PresentationSource.FromVisual(this) as HwndSource;
+            source.AddHook(WINAPI.WndProc);
+        }
         private void OnLoad(object sender, RoutedEventArgs e)
         {
             //Скрыли панельку с текстовыми фильтрами
@@ -128,65 +140,44 @@ namespace NewHistoricalLog
                 sendToDmz.IsEnabled = true;
             var systems = ScanForSystems();
             treeView.ItemsSource = FillListView(systems);
-
-            if (Environment.GetCommandLineArgs().Length > 0)
-            {
-                for (int i = 0; i < Environment.GetCommandLineArgs().Length; i++)
-                {
-                    try
-                    {
-
-                        switch (Environment.GetCommandLineArgs()[i].Remove(Environment.GetCommandLineArgs()[i].IndexOf("_")).ToUpper())
-                        {
-                            case "USERGROUP":
-                                if (Environment.GetCommandLineArgs()[i].Remove(0, Environment.GetCommandLineArgs()[i].IndexOf("_") + 1).ToUpper() == "ADMIN")
-                                {
-                                    Service.IsAdminMode = true;
-                                }
-                                else
-                                {
-                                    Service.IsAdminMode = false;
-                                }
-                                break;
-                            case "MONITOR":
-                                try
-                                {
-                                    Service.Monitor = Convert.ToInt32(Environment.GetCommandLineArgs()[i].Remove(0, Environment.GetCommandLineArgs()[i].IndexOf("_") + 1));
-                                }
-                                catch (Exception ex)
-                                {
-                                    logger.Error(String.Format("Ошибка чтения ключа {0}: {1}", Environment.GetCommandLineArgs()[i], ex.Message));
-                                }
-                                break;
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.Error(String.Format("Ошибка чтения ключей: {0}", ex.Message));
-                    }
-
-                }
-            }
-
+            GetUser();            
             messageGrid.Columns["Date"].SortOrder = DevExpress.Data.ColumnSortOrder.Descending;
             LoadMessagesThread = new Thread(LoadMessagesMethod) { IsBackground = true };
-            //DXSplashScreen.Show<AwaitScreen>(WindowStartupLocation.CenterOwner, new SplashScreenOwner(this));
-            //DXSplashScreen.SetState(string.Format("Получение сообщений с {0} по {1}", Service.StartDate, Service.EndDate));
             LoadMessagesThread.Start();
             messageGrid.RefreshData();
             WindowState = WindowState.Minimized;
-            //messageGrid.ItemsSource = null;
-            //messageGrid.ItemsSource = messData;
         }
 
-        #region Обработчики событий контролов
-        
+        public static void GetUser()
+        {
+            try
+            {
+                SqlConnection connection = new SqlConnection();
+                connection.ConnectionString = Service.SqlConnectionString;
+                connection.Open();
+                SqlCommand command = connection.CreateCommand();
+                command.CommandText = string.Format(@"SELECT Accounts.GroupID FROM Accounts INNER JOIN CurrentUser ON CAST(Accounts.Login AS VARCHAR) = CAST(CurrentUser.Login AS VARCHAR)
+                                                    WHERE CurrentUser.Place = 'АРМ: {0}'", Environment.MachineName); 
+                SqlDataReader reader = command.ExecuteReader();
+                while(reader.Read())
+                {
+                    Service.IsAdminMode = Convert.ToInt32(reader["GroupId"]) == 1;
+                }
+                reader.Close();
+                connection.Close();
+            }
+            catch (Exception ex)
+            {
+                slogger.Error("Ошибка получения группы пользователя: {0}", ex.Message);
+                Service.IsAdminMode = false;
+            }
+        }
 
-        private async void PrintClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
+        #region Обработчики событий контролов       
+
+        private void PrintClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
         {
             var scheduler = TaskScheduler.FromCurrentSynchronizationContext();
-            //await Task.Factory.StartNew(() => { PrintMethod(); }, CancellationToken.None, TaskCreationOptions.None, scheduler);
-            //await Task.Factory.StartNew(() => { messageView.PrintDirect(); }, CancellationToken.None, TaskCreationOptions.None, scheduler);
             SelectColumnWindow wind = new SelectColumnWindow();
             if (wind.ShowDialog() != false)
             {
@@ -202,7 +193,6 @@ namespace NewHistoricalLog
                     Service.Fields = wind.Fields;
                     hidePrintThread = new Thread(PrintMethod);
                     hidePrintThread.SetApartmentState(ApartmentState.STA);
-                    //hidePrintThread.IsBackground = true;
                     hidePrintThread.Start();
                 }
                 else
@@ -300,6 +290,7 @@ namespace NewHistoricalLog
                     DXSplashScreen.SetState("Сохранение журнала");
                     DXSplashScreen.Progress(0);
                     SaveMessagesThread = new Thread(SaveMethod) { IsBackground = true };
+                    SaveMessagesThread.ApartmentState = ApartmentState.STA;
                     SaveMessagesThread.Start();
                 }                    
             }
@@ -328,21 +319,67 @@ namespace NewHistoricalLog
                 }
                 PrintableControlLink link = null;
                 Dispatcher.Invoke(() => link = new PrintableControlLink(messageGrid.View));
-                link.PrintingSystem.ExportOptions.Xls.TextExportMode = TextExportMode.Text;
+                Dispatcher.Invoke(() => link.PrintingSystem.ExportOptions.Xls.TextExportMode = TextExportMode.Text);
+                //((IPrintingSystem)link.PrintingSystem).AutoFitToPagesWidth = 1;
+                //link.PrintingSystem.ContinuousPageNumbering = true;
+
+                Dispatcher.Invoke(() =>
+                {
+                    //Формирование заголовка
+                    var templateHeader = new DataTemplate();
+                    var controlHeader = new FrameworkElementFactory(typeof(TextEdit));
+                    controlHeader.SetValue(TextEdit.HorizontalContentAlignmentProperty, HorizontalAlignment.Center);
+                    controlHeader.SetValue(TextEdit.FontSizeProperty, 25d);
+                    controlHeader.SetValue(TextEdit.MarginProperty, new Thickness(0));
+                    controlHeader.SetBinding(TextEdit.WidthProperty, new Binding("UsablePageWidth"));
+                    controlHeader.SetValue(TextEdit.EditValueProperty, Service.PrintTitle);
+
+                    //Формирование номеров страниц
+                    var templateFooter = new DataTemplate();
+                    var controlFooter = new FrameworkElementFactory(typeof(StackPanel));
+                    controlFooter.SetValue(StackPanel.OrientationProperty, Orientation.Horizontal);
+
+                    var edit1 = new FrameworkElementFactory(typeof(TextEdit));
+                    edit1.SetBinding(TextEdit.WidthProperty, new Binding("UsablePageWidth") { Converter = new MyConverter() });
+                    controlFooter.AppendChild(edit1);
+
+                    var edit2 = new FrameworkElementFactory(typeof(TextEdit));
+                    edit2.SetBinding(TextEdit.WidthProperty, new Binding("UsablePageWidth") { Converter = new MyConverter() });
+                    edit2.SetValue(TextEdit.HorizontalContentAlignmentProperty, HorizontalAlignment.Center);
+                    edit2.SetValue(ExportSettings.TargetTypeProperty, TargetType.PageNumber);
+                    edit2.SetValue(PageNumberExportSettings.FormatProperty, "Страница {0} из {1}");
+                    edit2.SetValue(PageNumberExportSettings.KindProperty, PageNumberKind.NumberOfTotal);
+                    controlFooter.AppendChild(edit2);
+
+                    var edit3 = new FrameworkElementFactory(typeof(TextEdit));
+                    edit3.SetBinding(TextEdit.WidthProperty, new Binding("UsablePageWidth") { Converter = new MyConverter() });
+                    edit3.SetValue(TextEdit.HorizontalContentAlignmentProperty, HorizontalAlignment.Right);
+                    edit3.SetValue(TextEdit.EditValueProperty, DateTime.Now);
+                    controlFooter.AppendChild(edit3);
+
+                    templateHeader.VisualTree = controlHeader;
+                    templateFooter.VisualTree = controlFooter;
+
+                    link.PageHeaderTemplate = templateHeader;
+                    link.PageFooterTemplate = templateFooter;
+                });
+                
+
                 try
                 {
-                    link.PrintingSystem.ProgressReflector.PositionChanged += ProgressReflector_PositionChanged; ;
+                    Dispatcher.Invoke(() => link.PrintingSystem.ProgressReflector.PositionChanged += ProgressReflector_PositionChanged);
                 }
                 finally
                 {
-                    link.PrintingSystem.ResetProgressReflector();
+                    Dispatcher.Invoke(() => link.PrintingSystem.ResetProgressReflector());
                 }
                 if (DXSplashScreen.IsActive)
                 {
                     DXSplashScreen.SetState("Создание файла");
                 }
-                Dispatcher.Invoke(() => link.CreateDocument(true));
-                Dispatcher.Invoke(() => link.CreateDocumentFinished += (o, ee) => {
+                SingleInstanceApplication.Current.Dispatcher.Invoke(() => link.CreateDocument(true));
+                SingleInstanceApplication.Current.Dispatcher.Invoke(() => link.CreateDocumentFinished += (o, ee) =>
+                {
                     link.PrintingSystem.ProgressReflector.MaximizeRange();
                     link.ExportToPdf(String.Format("{0}\\{1}", Service.SavePath, fileName));
                 });
@@ -423,9 +460,6 @@ namespace NewHistoricalLog
                     break;
             }
         }
-
-        
-
 		private void RefreshButtonClick(object sender, RoutedEventArgs e)
 		{
             if (Service.EndDate > Service.StartDate)
@@ -442,19 +476,6 @@ namespace NewHistoricalLog
             }
         }
 
-        private void WindowMoved(object sender, EventArgs e)
-        {
-            if (Service.Monitor <= System.Windows.Forms.Screen.AllScreens.Length)
-            {
-                this.Top = System.Windows.Forms.Screen.AllScreens[Service.Monitor].Bounds.Y + Service.Top;
-                this.Left = System.Windows.Forms.Screen.AllScreens[Service.Monitor].Bounds.X + Service.Left;
-            }
-            else
-            {
-                this.Top = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Y + Service.Top;
-                this.Left = System.Windows.Forms.Screen.PrimaryScreen.Bounds.X + Service.Left;
-            }
-        }
         private T GetVisualChild<T>(DependencyObject parent) where T : Visual
         {
             T child = null;
@@ -468,10 +489,10 @@ namespace NewHistoricalLog
             }
             return child;
         }
+
         private void StartSearchClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
         {
             messageView.ShowSearchPanel(true);
-            TextBox a = null;
             if(messageView.SearchControl==null)
             {
                 Dispatcher.BeginInvoke(new Action(() =>
@@ -499,35 +520,39 @@ namespace NewHistoricalLog
         private void SaveToClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
         {
             ExpWindow wind = new ExpWindow();
+            wind.Owner = this;
             if (wind.ShowDialog().Value)
             {
-                try
+                if (!string.IsNullOrEmpty(wind.Path))
                 {
-                    SelectColumnWindow wind1 = new SelectColumnWindow();
-                    wind1.Owner = this;
-                    wind1.Path = wind.Path;
-                    if (wind1.ShowDialog() != false)
+                    try
                     {
-                        messageGrid.Columns["Date"].AllowPrinting = wind1.Fields[0];
-                        messageGrid.Columns["Prior"].AllowPrinting = wind1.Fields[1];
-                        messageGrid.Columns["Kvited"].AllowPrinting = wind1.Fields[2];
-                        messageGrid.Columns["Text"].AllowPrinting = wind1.Fields[3];
-                        messageGrid.Columns["User"].AllowPrinting = wind1.Fields[4];
-                        messageGrid.Columns["Source"].AllowPrinting = wind1.Fields[5];
-                        messageGrid.Columns["Value"].AllowPrinting = wind1.Fields[6];
-                        DXSplashScreen.Show<AwaitScreen>(WindowStartupLocation.CenterOwner, new SplashScreenOwner(this));
-                        DXSplashScreen.SetState("Сохранение журнала");
-                        DXSplashScreen.Progress(0);
-                        SaveMessagesThread = new Thread(new ParameterizedThreadStart(SaveToMethod)) { IsBackground = true };
-                        SaveMessagesThread.Start(wind.Path);
-                    }                    
-                }
-                catch (Exception ex)
-                {
-                    if (DXSplashScreen.IsActive)
-                        DXSplashScreen.Close();
-                    Dispatcher.Invoke(() => DXMessageBox.Show("Файл сохранить не удалось. Для подробной информации см. лог приложения.", "Ошибка при сохранении файла!", MessageBoxButton.OK, MessageBoxImage.Error));
-                    logger.Error(String.Format("Ошибка при сохранении файла: {0}", ex.Message));
+                        SelectColumnWindow wind1 = new SelectColumnWindow();
+                        wind1.Owner = this;
+                        wind1.Path = wind.Path;
+                        if (wind1.ShowDialog() != false)
+                        {
+                            messageGrid.Columns["Date"].AllowPrinting = wind1.Fields[0];
+                            messageGrid.Columns["Prior"].AllowPrinting = wind1.Fields[1];
+                            messageGrid.Columns["Kvited"].AllowPrinting = wind1.Fields[2];
+                            messageGrid.Columns["Text"].AllowPrinting = wind1.Fields[3];
+                            messageGrid.Columns["User"].AllowPrinting = wind1.Fields[4];
+                            messageGrid.Columns["Source"].AllowPrinting = wind1.Fields[5];
+                            messageGrid.Columns["Value"].AllowPrinting = wind1.Fields[6];
+                            DXSplashScreen.Show<AwaitScreen>(WindowStartupLocation.CenterOwner, new SplashScreenOwner(this));
+                            DXSplashScreen.SetState("Сохранение журнала");
+                            DXSplashScreen.Progress(0);
+                            SaveMessagesThread = new Thread(new ParameterizedThreadStart(SaveToMethod)) { IsBackground = true };
+                            SaveMessagesThread.Start(wind.Path);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        if (DXSplashScreen.IsActive)
+                            DXSplashScreen.Close();
+                        Dispatcher.Invoke(() => DXMessageBox.Show("Файл сохранить не удалось. Для подробной информации см. лог приложения.", "Ошибка при сохранении файла!", MessageBoxButton.OK, MessageBoxImage.Error));
+                        logger.Error(String.Format("Ошибка при сохранении файла: {0}", ex.Message));
+                    } 
                 }
             }
         }
@@ -546,14 +571,59 @@ namespace NewHistoricalLog
                 }
                 PrintableControlLink link = null;
                 Dispatcher.Invoke(() => link = new PrintableControlLink(messageGrid.View));
-                link.PrintingSystem.ExportOptions.Xls.TextExportMode = TextExportMode.Text;
+                Dispatcher.Invoke(() => link.PrintingSystem.ExportOptions.Xls.TextExportMode = TextExportMode.Text);
+                //((IPrintingSystem)link.PrintingSystem).AutoFitToPagesWidth = 1;
+                //link.PrintingSystem.ContinuousPageNumbering = true;
+
+                Dispatcher.Invoke(() =>
+                {
+                    //Формирование заголовка
+                    var templateHeader = new DataTemplate();
+                    var controlHeader = new FrameworkElementFactory(typeof(TextEdit));
+                    controlHeader.SetValue(TextEdit.HorizontalContentAlignmentProperty, HorizontalAlignment.Center);
+                    controlHeader.SetValue(TextEdit.FontSizeProperty, 25d);
+                    controlHeader.SetValue(TextEdit.MarginProperty, new Thickness(0));
+                    controlHeader.SetBinding(TextEdit.WidthProperty, new Binding("UsablePageWidth"));
+                    controlHeader.SetValue(TextEdit.EditValueProperty, Service.PrintTitle);
+
+                    //Формирование номеров страниц
+                    var templateFooter = new DataTemplate();
+                    var controlFooter = new FrameworkElementFactory(typeof(StackPanel));
+                    controlFooter.SetValue(StackPanel.OrientationProperty, Orientation.Horizontal);
+
+                    var edit1 = new FrameworkElementFactory(typeof(TextEdit));
+                    edit1.SetBinding(TextEdit.WidthProperty, new Binding("UsablePageWidth") { Converter = new MyConverter() });
+                    controlFooter.AppendChild(edit1);
+
+                    var edit2 = new FrameworkElementFactory(typeof(TextEdit));
+                    edit2.SetBinding(TextEdit.WidthProperty, new Binding("UsablePageWidth") { Converter = new MyConverter() });
+                    edit2.SetValue(TextEdit.HorizontalContentAlignmentProperty, HorizontalAlignment.Center);
+                    edit2.SetValue(ExportSettings.TargetTypeProperty, TargetType.PageNumber);
+                    edit2.SetValue(PageNumberExportSettings.FormatProperty, "Страница {0} из {1}");
+                    edit2.SetValue(PageNumberExportSettings.KindProperty, PageNumberKind.NumberOfTotal);
+                    controlFooter.AppendChild(edit2);
+
+                    var edit3 = new FrameworkElementFactory(typeof(TextEdit));
+                    edit3.SetBinding(TextEdit.WidthProperty, new Binding("UsablePageWidth") { Converter = new MyConverter() });
+                    edit3.SetValue(TextEdit.HorizontalContentAlignmentProperty, HorizontalAlignment.Right);
+                    edit3.SetValue(TextEdit.EditValueProperty, DateTime.Now);
+                    controlFooter.AppendChild(edit3);
+
+                    templateHeader.VisualTree = controlHeader;
+                    templateFooter.VisualTree = controlFooter;
+
+                    link.PageHeaderTemplate = templateHeader;
+                    link.PageFooterTemplate = templateFooter;
+                });
+
+
                 try
                 {
-                    link.PrintingSystem.ProgressReflector.PositionChanged += ProgressReflector_PositionChanged; ;
+                    Dispatcher.Invoke(() => link.PrintingSystem.ProgressReflector.PositionChanged += ProgressReflector_PositionChanged);
                 }
                 finally
                 {
-                    link.PrintingSystem.ResetProgressReflector();
+                    Dispatcher.Invoke(() => link.PrintingSystem.ResetProgressReflector());
                 }
                 if (DXSplashScreen.IsActive)
                 {
@@ -578,6 +648,7 @@ namespace NewHistoricalLog
         private void AboutClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
         {
             About wind = new About();
+            wind.Owner = this;
             wind.Show();
         }
 
@@ -634,16 +705,59 @@ namespace NewHistoricalLog
                 }
                 PrintableControlLink link = null;
                 Dispatcher.Invoke(() => link = new PrintableControlLink(messageGrid.View));
-                link.PrintingSystem.ExportOptions.Xls.TextExportMode = TextExportMode.Text;
-                //var xlsExportOptions = new XlsExportOptions();
-                //xlsExportOptions.ExportMode = XlsExportMode.SingleFile;
+                Dispatcher.Invoke(() => link.PrintingSystem.ExportOptions.Xls.TextExportMode = TextExportMode.Text);
+                //((IPrintingSystem)link.PrintingSystem).AutoFitToPagesWidth = 1;
+                //link.PrintingSystem.ContinuousPageNumbering = true;
+
+                Dispatcher.Invoke(() =>
+                {
+                    //Формирование заголовка
+                    var templateHeader = new DataTemplate();
+                    var controlHeader = new FrameworkElementFactory(typeof(TextEdit));
+                    controlHeader.SetValue(TextEdit.HorizontalContentAlignmentProperty, HorizontalAlignment.Center);
+                    controlHeader.SetValue(TextEdit.FontSizeProperty, 25d);
+                    controlHeader.SetValue(TextEdit.MarginProperty, new Thickness(0));
+                    controlHeader.SetBinding(TextEdit.WidthProperty, new Binding("UsablePageWidth"));
+                    controlHeader.SetValue(TextEdit.EditValueProperty, Service.PrintTitle);
+
+                    //Формирование номеров страниц
+                    var templateFooter = new DataTemplate();
+                    var controlFooter = new FrameworkElementFactory(typeof(StackPanel));
+                    controlFooter.SetValue(StackPanel.OrientationProperty, Orientation.Horizontal);
+
+                    var edit1 = new FrameworkElementFactory(typeof(TextEdit));
+                    edit1.SetBinding(TextEdit.WidthProperty, new Binding("UsablePageWidth") { Converter = new MyConverter() });
+                    controlFooter.AppendChild(edit1);
+
+                    var edit2 = new FrameworkElementFactory(typeof(TextEdit));
+                    edit2.SetBinding(TextEdit.WidthProperty, new Binding("UsablePageWidth") { Converter = new MyConverter() });
+                    edit2.SetValue(TextEdit.HorizontalContentAlignmentProperty, HorizontalAlignment.Center);
+                    edit2.SetValue(ExportSettings.TargetTypeProperty, TargetType.PageNumber);
+                    edit2.SetValue(PageNumberExportSettings.FormatProperty, "Страница {0} из {1}");
+                    edit2.SetValue(PageNumberExportSettings.KindProperty, PageNumberKind.NumberOfTotal);
+                    controlFooter.AppendChild(edit2);
+
+                    var edit3 = new FrameworkElementFactory(typeof(TextEdit));
+                    edit3.SetBinding(TextEdit.WidthProperty, new Binding("UsablePageWidth") { Converter = new MyConverter() });
+                    edit3.SetValue(TextEdit.HorizontalContentAlignmentProperty, HorizontalAlignment.Right);
+                    edit3.SetValue(TextEdit.EditValueProperty, DateTime.Now);
+                    controlFooter.AppendChild(edit3);
+
+                    templateHeader.VisualTree = controlHeader;
+                    templateFooter.VisualTree = controlFooter;
+
+                    link.PageHeaderTemplate = templateHeader;
+                    link.PageFooterTemplate = templateFooter;
+                });
+
+
                 try
                 {
-                    link.PrintingSystem.ProgressReflector.PositionChanged += ProgressReflector_PositionChanged; ;
+                    Dispatcher.Invoke(() => link.PrintingSystem.ProgressReflector.PositionChanged += ProgressReflector_PositionChanged);
                 }
                 finally
                 {
-                    link.PrintingSystem.ResetProgressReflector();
+                    Dispatcher.Invoke(() => link.PrintingSystem.ResetProgressReflector());
                 }
                 if (DXSplashScreen.IsActive)
                 {
@@ -651,15 +765,31 @@ namespace NewHistoricalLog
                 }
                 Dispatcher.Invoke(() => link.CreateDocument(true));
                 Dispatcher.Invoke(() => link.CreateDocumentFinished += (o, ee) => {
-                    link.PrintingSystem.ProgressReflector.MaximizeRange();
-                    link.ExportToPdf(String.Format("{0}\\{1}", Service.DmzPath, fileName));
+                    try
+                    {
+                        link.PrintingSystem.ProgressReflector.MaximizeRange();
+                        link.ExportToPdf(String.Format("{0}\\{1}", Service.DmzPath, fileName));
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.Error("Ошибка экспорта на ДМЗ: {0}", ex.Message);
+                        if (DXSplashScreen.IsActive)
+                        {
+                            DXSplashScreen.Close();
+                        }
+                        Dispatcher.Invoke(() => DXMessageBox.Show("Файл сохранить не удалось. Для подробной информации см. лог приложения.", "Ошибка при сохранении файла!", MessageBoxButton.OK, MessageBoxImage.Error));
+                        Service.IsOperating = true;
+                    }
                 });
+                Service.IsOperating = true;
             }
             catch(Exception ex)
             {
+                Service.IsOperating = true;
                 Dispatcher.Invoke(() => DXMessageBox.Show("Файл сохранить не удалось. Для подробной информации см. лог приложения.", "Ошибка при сохранении файла!", MessageBoxButton.OK, MessageBoxImage.Error));
                 logger.Error(String.Format("Ошибка при сохранении файла: {0}", ex.Message));
             }
+            
         }
 
         private void filterText_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -676,16 +806,16 @@ namespace NewHistoricalLog
             }
         }
 
-        private void OnSettingsApply(object sender, EventArgs e)
-        {
-            if (Service.GridTextWrapping)
-                messageGrid.Columns["Text"].EditSettings = new TextEditSettings() { TextWrapping = TextWrapping.Wrap };
-            else
-            {
-                messageGrid.Columns["Text"].EditSettings = new TextEditSettings() { TextWrapping = TextWrapping.NoWrap };
-            }
-            messageView.PageSize = Service.CountLines;
-        }
+        //private void OnSettingsApply(object sender, EventArgs e)
+        //{
+        //    if (Service.GridTextWrapping)
+        //        messageGrid.Columns["Text"].EditSettings = new TextEditSettings() { TextWrapping = TextWrapping.Wrap };
+        //    else
+        //    {
+        //        messageGrid.Columns["Text"].EditSettings = new TextEditSettings() { TextWrapping = TextWrapping.NoWrap };
+        //    }
+        //    messageView.PageSize = Service.CountLines;
+        //}
 
         private void FilterPriorityChanged(object sender, RoutedEventArgs e)
         {
@@ -960,17 +1090,6 @@ namespace NewHistoricalLog
             Service.IsOperating = true;
         }
 
-        private void messageView_ShowingEditor(object sender, ShowingEditorEventArgs e)
-        {
-
-        }
-
-        void SortGrid(GridColumn sortColumn)
-        {
-            var a = messageGrid.SortInfo;
-            
-        }
-
         //private async void messageGrid_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         //{
         //    var info = messageView.CalcHitInfo(e.GetPosition(messageView));
@@ -1050,7 +1169,6 @@ namespace NewHistoricalLog
         List<SystemsItems> children = new List<SystemsItems>();
 
         public string Name { get; set; } = "";
-        //public string Description { get; set; } = "";
         public bool Selected { get; set; } = true;
         public List<SystemsItems> Children
         {
@@ -1073,9 +1191,17 @@ namespace NewHistoricalLog
             get { return hasChildren; }
         }
 
-        //public SystemsItems()
-        //{
-        //    Children.
-        //}
+    }
+    public class MyConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return ((double)value) / 3;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

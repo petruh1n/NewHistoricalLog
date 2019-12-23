@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace NewHistoricalLog
 {
-    public class MainWindowViewModel
-	{
-        public ObservableCollection<MessageGridContent> MessageCollection { get; set; }
+ //   public class MainWindowViewModel
+	//{
+ //       public ObservableCollection<MessageGridContent> MessageCollection { get; set; }
 
-        public MainWindowViewModel()
-        {
-            MessageCollection = new ObservableCollection<MessageGridContent>();
-        }
-	}
+ //       public MainWindowViewModel()
+ //       {
+ //           MessageCollection = new ObservableCollection<MessageGridContent>();
+ //       }
+	//}
 }
