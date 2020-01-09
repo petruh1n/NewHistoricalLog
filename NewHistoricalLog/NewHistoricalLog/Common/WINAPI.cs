@@ -14,6 +14,12 @@ namespace NewHistoricalLog
         const int WM_NCLBUTTONDOWN = 0x00A1;
         const int WM_NCHITTEST = 0x0084;
         const int HTCAPTION = 2;
+        public const int GWL_STYLE = -16; //WPF's Message code for Title Bar's Style 
+        public const int WS_SYSMENU = 0x80000; //WPF's Message code for System Menu
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+        [DllImport("user32.dll")]
+        public static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
         [DllImport("User32.dll")]
         static extern int SendMessage(IntPtr hWnd,
         int Msg, IntPtr wParam, IntPtr lParam);
@@ -35,5 +41,12 @@ namespace NewHistoricalLog
             }
             return IntPtr.Zero;
         }
+        [DllImport("user32.dll")]
+        public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+
+        public static readonly IntPtr HWND_BOTTOM = new IntPtr(1);
+        public const UInt32 SWP_NOSIZE = 0x0001;
+        public const UInt32 SWP_NOMOVE = 0x0002;
+        public const UInt32 SWP_NOACTIVATE = 0x0010;
     }
 }

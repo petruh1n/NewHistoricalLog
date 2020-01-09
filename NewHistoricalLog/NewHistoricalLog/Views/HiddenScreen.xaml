@@ -1,0 +1,55 @@
+﻿<dx:ThemedWindow
+    x:Class="NewHistoricalLog.Views.HiddenScreen"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    xmlns:vm ="clr-namespace:NewHistoricalLog.ViewModels"
+    xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
+    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+    xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+    xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm" 
+    xmlns:model="clr-namespace:NewHistoricalLog.Models"
+    Title="HiddenScreen" Height="auto" Width="200" Topmost="False" ShowIcon="False" 
+    SizeToContent="WidthAndHeight" ResizeMode="NoResize" WindowStyle="None" ShowInTaskbar="False" WindowStartupLocation="CenterOwner"
+    >
+    <dx:ThemedWindow.DataContext>
+        <vm:HiddenScreenViewModel/>
+    </dx:ThemedWindow.DataContext>
+    <Grid>
+        <dxg:GridControl AutoGenerateColumns="None" Grid.Column="1" EnableSmartColumnsGeneration="True" x:Name="messageGrid"
+                         Margin="5" Grid.Row="3" ItemsSource="{Binding Messages}" FilterCriteria="{Binding Filter}">
+            <dxg:GridControl.View>
+                <dxg:TableView AllowPerPixelScrolling="True" SearchPanelAllowFilter="False" 
+                               ShowGroupPanel="False" AllowEditing="False" AllowGrouping="False" ShowFilterPanelMode="Never" AllowPaging="True"
+                               AllowDateTimeGroupIntervalMenu="False" IsRowCellMenuEnabled="False" IsGroupPanelMenuEnabled="False"
+                               IsColumnMenuEnabled="False" IsGroupRowMenuEnabled="False" IsGroupFooterMenuEnabled="False" IsTotalSummaryMenuEnabled="False" 
+                               PageSize="50" NavigationStyle="Row" AllowColumnMoving="False" 
+                               AllowSorting="True">
+                    <dxg:TableView.FormatConditions>
+                        <dxg:FormatCondition ApplyToRow="True" Expression="[Priority] = 'Normal'" FieldName="Priority">
+                            <dx:Format Background="White" Foreground="Black" TextDecorations="{x:Null}"/>
+                        </dxg:FormatCondition>
+                        <dxg:FormatCondition ApplyToRow="True" Expression="[Priority] = 'Low'" FieldName="Priority">
+                            <dx:Format Background="Green" Foreground="Black" TextDecorations="{x:Null}"/>
+                        </dxg:FormatCondition>
+                        <dxg:FormatCondition ApplyToRow="True" Expression="[Priority] = 'Middle'" FieldName="Priority">
+                            <dx:Format Background="Yellow" Foreground="Black" TextDecorations="{x:Null}"/>
+                        </dxg:FormatCondition>
+                        <dxg:FormatCondition ApplyToRow="True" Expression="[Priority] = 'High'" FieldName="Priority">
+                            <dx:Format Background="Red" Foreground="Black" TextDecorations="{x:Null}"/>
+                        </dxg:FormatCondition>
+                    </dxg:TableView.FormatConditions>
+                </dxg:TableView>
+            </dxg:GridControl.View>
+            <dxg:GridColumn FieldName="Id" IsSmart="True" Visible="False"/>
+            <dxg:GridColumn FieldName="Date" IsSmart="True" Header="Дата"/>
+            <dxg:GridColumn FieldName="Priority" IsSmart="True" Header="Приоритет"/>
+            <dxg:GridColumn FieldName="Text" IsSmart="True" Header="Текст сообщения" Width="*"/>
+            <dxg:GridColumn FieldName="Kvited" IsSmart="True" Header="Квитирование"/>
+            <dxg:GridColumn FieldName="MessageValue" IsSmart="True" Header="Значение"/>
+            <dxg:GridColumn FieldName="Source" IsSmart="True" Header="Источник"/>
+            <dxg:GridColumn FieldName="User" IsSmart="True" Header="Пользователь"/>
+        </dxg:GridControl>
+    </Grid>
+</dx:ThemedWindow>

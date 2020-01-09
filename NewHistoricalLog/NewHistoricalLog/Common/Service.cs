@@ -15,6 +15,8 @@ using System.IO;
 using Microsoft.Win32;
 using System.Windows.Data;
 using System.Windows.Markup;
+using DevExpress.Xpf.Editors;
+using System.Windows;
 
 namespace NewHistoricalLog
 {
@@ -24,7 +26,7 @@ namespace NewHistoricalLog
         static bool isAdminMode = false;
         static bool printing = false;
         public static event EventHandler<PropertyChangedEventArgs> StaticPropertyChanged;
-        private static void NotifyStaticPropertyChanged(string propertyName)
+        private static void OnStaticPropertyChanged(string propertyName)
         {
             if (StaticPropertyChanged != null)
                 StaticPropertyChanged(null, new PropertyChangedEventArgs(propertyName));
@@ -35,7 +37,7 @@ namespace NewHistoricalLog
         public static bool IsOperating
         {
             get { return isOperating; }
-            set { isOperating = value; NotifyStaticPropertyChanged("IsOperating"); }
+            set { isOperating = value; OnStaticPropertyChanged("IsOperating"); }
         }
         /// <summary>
         /// Глобальная коллекция сообщений
@@ -50,18 +52,72 @@ namespace NewHistoricalLog
         /// </summary>
         public static DateTime EndDate { get; set; } = new DateTime(2017, 3, 7, 20, 0, 0, 0, DateTimeKind.Local);
 
-        public static string SqlServer { get; set; } = "";
 
-        public static string SqlDb { get; set; } = "";
-
-        public static string SqlUser { get; set; } = "";
-
-        public static string SqlPassword { get; set; } = "";
-
-        public static string SqlConnectionString
+        static string server="";
+        /// <summary>
+        /// Адрес сервера SQL
+        /// </summary>
+        public static string Server
         {
-            get { return string.Format("Data Source={0};Integrated Security=False; User = {2}; Password = {3}; Initial Catalog = {1}; Connection Timeout = 3;", SqlServer, SqlDb, SqlUser, SqlPassword); }
+            get { return server; }
+            set
+            {
+                server = value;
+                OnStaticPropertyChanged("Server");
+            }
         }
+        static string database="";
+        /// <summary>
+        /// Имя БД
+        /// </summary>
+        public static string Database
+        {
+            get { return database; }
+            set
+            {
+                database = value;
+                OnStaticPropertyChanged("Database");
+            }
+        }
+        static string user="";
+        /// <summary>
+        /// Имя пользователя БД
+        /// </summary>
+        public static string User
+        {
+            get { return user; }
+            set
+            {
+                user = value;
+                OnStaticPropertyChanged("User");
+            }
+        }
+        static string password="";
+        /// <summary>
+        /// Пароль пользователя БД
+        /// </summary>
+        public static string Password
+        {
+            get { return password; }
+            set
+            {
+                password = value;
+                OnStaticPropertyChanged("Password");
+            }
+        }       
+        static TextWrapping wraptext = TextWrapping.Wrap;
+        /// <summary>
+        /// Переносить текст в сообщении
+        /// </summary>
+        public static TextWrapping WrapText
+        {
+            get { return wraptext; }
+            set
+            {
+                wraptext = value;
+                OnStaticPropertyChanged("WrapText");
+            }
+        } 
         /// <summary>
          /// Столбец, по которому осуществляется текстовая фильтрация
          /// </summary>
@@ -98,22 +154,61 @@ namespace NewHistoricalLog
         /// Высота окна
         /// </summary>
         public static double Height { get; set; }
+        static int countLines = 50;
         /// <summary>
         /// Число строк в гриде
         /// </summary>
-        public static int CountLines { get; set; } = 50;
+        public static int CountLines
+        {
+            get { return countLines; }
+            set
+            {
+                countLines = value;
+                OnStaticPropertyChanged("CountLines");
+            }
+        }
+        static List<bool> columnVisibilityList = new List<bool>() { true, true, true, true, true };
+        public static List<bool> ColumnVisibilityList
+        {
+            get { return columnVisibilityList; }
+            set
+            {
+                columnVisibilityList = value;
+                OnStaticPropertyChanged("ColumnVisibilityList");
+            }
+        }
         /// <summary>
         /// Монитор, на котором будет открыто окно приложения
         /// </summary>
         public static int Monitor { get; set; } = 0;
+
+        static string dmzPath;
         /// <summary>
-        /// Путь на ДМЗ
+        /// Путь к ДМЗ
         /// </summary>
-        public static string DmzPath { get; set; } = "";
+        public static string DmzPath
+        {
+            get { return dmzPath; }
+            set
+            {
+                dmzPath = value;
+                OnStaticPropertyChanged("DmzPath");
+            }
+        }
+
+        static bool keyboardneeded;
         /// <summary>
-        /// Нужно ли использовать экранную клавиатуру
+        /// Флаг необходимсоти экранной клавиатуры
         /// </summary>
-        public static bool KeyboardNeeded { get; set; } = false;
+        public static bool KeyboardNeeded
+        {
+            get { return keyboardneeded; }
+            set
+            {
+                keyboardneeded = value;
+                OnStaticPropertyChanged("KeyboardNeeded");
+            }
+        }
         /// <summary>
         /// Нужно ли переносить текст в гриде на новую строку
         /// </summary>
@@ -122,14 +217,26 @@ namespace NewHistoricalLog
         /// Список таблиц, в которых находятся подситемы
         /// </summary>
         public static string TabsForScan { get; set; } = "ZDV-Задвижки;VS-Вспомсистемы;";
-
+        /// <summary>
+        /// Имя высокого приоритета
+        /// </summary>
         public static string HighPrioriry { get; set; } = "Высокий";
-
+        /// <summary>
+        /// Имя среднего приоритета
+        /// </summary>
         public static string MiddlePrioriry { get; set; } = "Средний";
-
+        /// <summary>
+        /// Имя низкого приоритета
+        /// </summary>
         public static string LowPrioriry { get; set; } = "Низкий";
-
+        /// <summary>
+        /// Имя нормального приоритета
+        /// </summary>
         public static string NormalPrioriry { get; set; } = "Нормальный";
+        /// <summary>
+        /// Идентификатор группы администратора
+        /// </summary>
+        public static int AdminUserGroup { get; set; } = 1;
 
         public static bool IsAdminMode
         {
@@ -137,7 +244,7 @@ namespace NewHistoricalLog
             set
             {
                 isAdminMode = value;
-                NotifyStaticPropertyChanged("IsAdminMode");
+                OnStaticPropertyChanged("IsAdminMode");
             }
         }
 
@@ -147,7 +254,7 @@ namespace NewHistoricalLog
             set
             {
                 printing = value;
-                NotifyStaticPropertyChanged("Printing");
+                OnStaticPropertyChanged("Printing");
             }
         }
 
@@ -202,7 +309,25 @@ namespace NewHistoricalLog
             }
         }
 
-
+        public static string GetStringFromBoolList(List<bool> list)
+        {
+            string str = "";
+            for(int i=0;i<list.Count;i++)
+            {
+                str += string.Format("{0};", list[i]);
+            }
+            return str;
+        }
+        public static List<bool> GetBoolListFromString(string str)
+        {
+            List<bool> result = new List<bool>();
+            var sStr = str.Split(new char[] { ';' });
+            for(int i=0;i<sStr.Length;i++)
+            {
+                result.Add(Convert.ToBoolean(sStr[i]));
+            }
+            return result;
+        }
         #region Settings
 
         public static Dictionary<string, object> GetSettingsDictionary()
@@ -212,21 +337,18 @@ namespace NewHistoricalLog
             result.Add("Отступ слева", Left);
             result.Add("Ширина", Width);
             result.Add("Высота", Height);
-            result.Add("Адрес сервера", SqlServer);
-            result.Add("Имя БД", SqlDb);
-            result.Add("Имя пользователя БД", SqlUser);
-            result.Add("Пароль пользователя БД", ServiceLib.EncryptingFunctions.Encrypt(SqlPassword));
+            result.Add("Адрес сервера", Server);
+            result.Add("Имя БД", Database);
+            result.Add("Имя пользователя БД", User);
+            result.Add("Пароль пользователя БД", ServiceLib.EncryptingFunctions.Encrypt(Password));
             result.Add("Количество строк", CountLines);
             result.Add("Путь к ДМЗ", DmzPath);
             result.Add("Использовать экранную клавиатуру", KeyboardNeeded);
-            result.Add("Переносить текст в таблице", GridTextWrapping);
-            result.Add("Таблицы для массива подсистем", TabsForScan);
-            result.Add("Обозначние высокого приоритета", HighPrioriry);
-            result.Add("Обозначние среднего приоритета", MiddlePrioriry);
-            result.Add("Обозначние низкого приоритета", LowPrioriry);
-            result.Add("Обозначние нормального приоритета", NormalPrioriry);
+            result.Add("Переносить текст в таблице", WrapText==TextWrapping.Wrap);            
             result.Add("Путь для сохранения", SavePath);
             result.Add("Заголовок печати и экспорта", PrintTitle);
+            result.Add("Идентификатор группы администратора",AdminUserGroup);
+            result.Add("Видимость колонок", GetStringFromBoolList(ColumnVisibilityList));
             return result;
         }
         public static void ParseDictionary(Dictionary<string, object> dictionary)
@@ -237,21 +359,18 @@ namespace NewHistoricalLog
                 Left = Convert.ToDouble(dictionary["Отступ слева"]);
                 Width = Convert.ToDouble(dictionary["Ширина"]);
                 Height = Convert.ToDouble(dictionary["Высота"]);
-                SqlServer = (dictionary["Адрес сервера"]).ToString();
-                SqlDb = (dictionary["Имя БД"]).ToString();
-                SqlUser = (dictionary["Имя пользователя БД"]).ToString();
-                SqlPassword = ServiceLib.EncryptingFunctions.Decrypt((dictionary["Пароль пользователя БД"]).ToString());
+                Server = (dictionary["Адрес сервера"]).ToString();
+                Database = (dictionary["Имя БД"]).ToString();
+                User = (dictionary["Имя пользователя БД"]).ToString();
+                Password = ServiceLib.EncryptingFunctions.Decrypt((dictionary["Пароль пользователя БД"]).ToString());
                 CountLines = Convert.ToInt32(dictionary["Количество строк"]);
                 DmzPath = dictionary["Путь к ДМЗ"].ToString();
                 KeyboardNeeded = Convert.ToBoolean(dictionary["Использовать экранную клавиатуру"]);
-                GridTextWrapping = Convert.ToBoolean(dictionary["Переносить текст в таблице"]);
-                TabsForScan = dictionary["Таблицы для массива подсистем"].ToString();
-                HighPrioriry = dictionary["Обозначние высокого приоритета"].ToString();
-                MiddlePrioriry = dictionary["Обозначние среднего приоритета"].ToString();
-                LowPrioriry = dictionary["Обозначние низкого приоритета"].ToString();
-                NormalPrioriry = dictionary["Обозначние нормального приоритета"].ToString();
+                WrapText = Convert.ToBoolean(dictionary["Переносить текст в таблице"])?TextWrapping.Wrap:TextWrapping.NoWrap;                
                 SavePath = dictionary["Путь для сохранения"].ToString();
                 PrintTitle = dictionary["Заголовок печати и экспорта"].ToString();
+                AdminUserGroup = Convert.ToInt32(dictionary["Идентификатор группы администратора"]);
+                ColumnVisibilityList = GetBoolListFromString(dictionary["Видимость колонок"].ToString());
             }
             catch (Exception ex)
             {
@@ -334,10 +453,10 @@ namespace NewHistoricalLog
             {
                 RegistryKey usersKey = Registry.Users.OpenSubKey(".Default");
                 RegistryKey settingsKey = usersKey.OpenSubKey("SEMSettings");
-                SqlServer = settingsKey.GetValue("SQL server").ToString();
-                SqlDb = settingsKey.GetValue("SQL database").ToString();
-                SqlUser = settingsKey.GetValue("SQL user").ToString();
-                SqlPassword = ServiceLib.EncryptingFunctions.Decrypt(settingsKey.GetValue("SQL password").ToString());
+                Server = settingsKey.GetValue("SQL server").ToString();
+                Database = settingsKey.GetValue("SQL database").ToString();
+                User = settingsKey.GetValue("SQL user").ToString();
+                Password = ServiceLib.EncryptingFunctions.Decrypt(settingsKey.GetValue("SQL password").ToString());
                 settingsKey.Close();
                 usersKey.Close();                
                 return true;

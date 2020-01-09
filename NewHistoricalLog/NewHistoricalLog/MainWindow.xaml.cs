@@ -153,7 +153,7 @@ namespace NewHistoricalLog
             try
             {
                 SqlConnection connection = new SqlConnection();
-                connection.ConnectionString = Service.SqlConnectionString;
+                //connection.ConnectionString = Service.SqlConnectionString;
                 connection.Open();
                 SqlCommand command = connection.CreateCommand();
                 command.CommandText = string.Format(@"SELECT Accounts.GroupID FROM Accounts INNER JOIN CurrentUser ON CAST(Accounts.Login AS VARCHAR) = CAST(CurrentUser.Login AS VARCHAR)
@@ -500,7 +500,6 @@ namespace NewHistoricalLog
                     GetVisualChild<TextBox>(messageView.SearchControl).PreviewMouseLeftButtonDown += MainWindow_PreviewMouseLeftButtonDown; ;
                 }), DispatcherPriority.Loaded);
             }
-            
         }
 
         private void MainWindow_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -977,7 +976,7 @@ namespace NewHistoricalLog
                     SystemsItems item = new SystemsItems();
                     var splitNote = note.Split(new char[] { '-' });
                     item.Name = splitNote[1].Trim();
-                    var connection = SQL.GetSqlConnection(Service.SqlConnectionString);
+                    var connection = SQL.GetSqlConnection(/*Service.SqlConnectionString*/"");
                     connection.Open();
                     var data = SQL.GetDataList(connection,
                         string.Format("SELECT ParamName FROM dbo.{0} ", splitNote[0]));

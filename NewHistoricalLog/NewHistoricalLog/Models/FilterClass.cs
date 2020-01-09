@@ -52,7 +52,7 @@ namespace NewHistoricalLog
         {
             Name = name;
             Selected = false;
-            expression = string.Format("Contains([Text], '{0} ') Or Contains([Text], '{0}.')", name);
+            expression = string.Format("(Contains([Text], '{0} ') Or Contains([Text], '{0}.'))", name);
         }
         /// <summary>
         /// Получить строку фильтрации по подсистемам

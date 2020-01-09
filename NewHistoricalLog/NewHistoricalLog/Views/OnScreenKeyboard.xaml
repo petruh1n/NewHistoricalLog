@@ -1,0 +1,13 @@
+﻿<dx:ThemedWindow
+    x:Class="NewHistoricalLog.Views.OnScreenKeyboard"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    xmlns:keyboard="clr-namespace:ScreenKeyboard;assembly=ScreenKeyboard"
+    Title="Клавиатура" Height="auto" Width="auto" Topmost="True"
+    SizeToContent="WidthAndHeight" ResizeMode="NoResize" Icon="{dx:DXImage Image=EditName_32x32.png}" WindowStartupLocation="CenterOwner"
+    >
+    <Grid>
+        <keyboard:Keyboard x:Name="keyboard"/>
+    </Grid>
+</dx:ThemedWindow>

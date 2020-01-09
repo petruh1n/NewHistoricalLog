@@ -14,7 +14,7 @@
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
-	<Deterministic>True</Deterministic>
+    <Deterministic>True</Deterministic>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -22,7 +22,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>bin\Debug\MVVM\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -32,7 +32,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>bin\Release\MVVM\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -44,6 +44,10 @@
     <ApplicationIcon>Images\Msg.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CommonServiceLocator, Version=2.0.2.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
+      <HintPath>..\packages\CommonServiceLocator.2.0.2\lib\net45\CommonServiceLocator.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="DatabaseToolBox, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Framework 4.0\DatabaseToolBox.dll</HintPath>
@@ -52,12 +56,10 @@
     <Reference Include="DevExpress.Images.v18.1, Version=18.1.2.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
       <Private>True</Private>
     </Reference>
-    <Reference Include="DevExpress.Mvvm.v17.2, Version=17.2.13.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <Private>True</Private>
-    </Reference>
     <Reference Include="DevExpress.Pdf.v18.1.Core, Version=18.1.2.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
     <Reference Include="DevExpress.Pdf.v18.1.Drawing, Version=18.1.2.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
     <Reference Include="DevExpress.Utils.v18.1, Version=18.1.2.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Xpf.Accordion.v18.1, Version=18.1.2.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
     <Reference Include="DevExpress.Xpf.Charts.v18.1, Version=18.1.2.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
     <Reference Include="DevExpress.Xpf.Controls.v18.1, Version=18.1.2.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
     <Reference Include="DevExpress.Xpf.Core.v18.1" />
@@ -77,10 +79,26 @@
     <Reference Include="DevExpress.Xpf.Themes.Office2016White.v18.1" />
     <Reference Include="DevExpress.XtraEditors.v18.1, Version=18.1.2.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
     <Reference Include="DevExpress.XtraScheduler.v18.1.Core, Version=18.1.2.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="GalaSoft.MvvmLight, Version=5.4.1.0, Culture=neutral, PublicKeyToken=e7570ab207bcb616, processorArchitecture=MSIL">
+      <HintPath>..\packages\MvvmLightLibs.5.4.1.1\lib\net45\GalaSoft.MvvmLight.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="GalaSoft.MvvmLight.Extras, Version=5.4.1.0, Culture=neutral, PublicKeyToken=669f0b5e8f868abf, processorArchitecture=MSIL">
+      <HintPath>..\packages\MvvmLightLibs.5.4.1.1\lib\net45\GalaSoft.MvvmLight.Extras.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="GalaSoft.MvvmLight.Platform, Version=5.4.1.0, Culture=neutral, PublicKeyToken=5f873c45e98af8a1, processorArchitecture=MSIL">
+      <HintPath>..\packages\MvvmLightLibs.5.4.1.1\lib\net45\GalaSoft.MvvmLight.Platform.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
       <HintPath>..\packages\NLog.4.5.6\lib\net40-client\NLog.dll</HintPath>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="ScreenKeyboard, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Dll\ScreenKeyboard.dll</HintPath>
     </Reference>
     <Reference Include="ServiceLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -97,6 +115,10 @@
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Transactions" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\MvvmLightLibs.5.4.1.1\lib\net45\System.Windows.Interactivity.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -115,20 +137,27 @@
     <Compile Include="About.xaml.cs">
       <DependentUpon>About.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Common\DbHelper.cs" />
+    <Compile Include="Common\Helper.cs" />
     <Compile Include="DXSplashScreen\AwaitScreen.xaml.cs">
       <DependentUpon>AwaitScreen.xaml</DependentUpon>
     </Compile>
     <Compile Include="ExpWindow.xaml.cs">
       <DependentUpon>ExpWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="FilterClass.cs" />
+    <Compile Include="Models\Device.cs" />
+    <Compile Include="Models\FilterClass.cs" />
     <Compile Include="HiddenPrintWindow.xaml.cs">
       <DependentUpon>HiddenPrintWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="InfoWindow.xaml.cs">
+    <Compile Include="Views\InfoWindow.xaml.cs">
       <DependentUpon>InfoWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="MessageGridContent.cs" />
+    <Compile Include="Models\MainModel.cs" />
+    <Compile Include="Models\MessageClass.cs" />
+    <Compile Include="Models\MessagePriorityEnum.cs" />
+    <Compile Include="Models\SubSystem.cs" />
     <Compile Include="OnScreenKeyboard.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -138,12 +167,34 @@
     <Compile Include="SelectColumnWindow.xaml.cs">
       <DependentUpon>SelectColumnWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Service.cs" />
+    <Compile Include="Common\Service.cs" />
     <Compile Include="Settings.xaml.cs">
       <DependentUpon>Settings.xaml</DependentUpon>
     </Compile>
-    <Compile Include="SingleInstanceManager.cs" />
-    <Compile Include="WINAPI.cs" />
+    <Compile Include="Common\SingleInstanceManager.cs" />
+    <Compile Include="Common\WINAPI.cs" />
+    <Compile Include="ViewModels\ExportViewModel.cs" />
+    <Compile Include="ViewModels\HiddenScreenViewModel.cs" />
+    <Compile Include="ViewModels\MainWindowViewModel.cs" />
+    <Compile Include="ViewModels\SettingsScreenViewModel.cs" />
+    <Compile Include="Views\ExportScreen.xaml.cs">
+      <DependentUpon>ExportScreen.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\HiddenScreen.xaml.cs">
+      <DependentUpon>HiddenScreen.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\MainScreen.xaml.cs">
+      <DependentUpon>MainScreen.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\OnScreenKeyboard.xaml.cs">
+      <DependentUpon>OnScreenKeyboard.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\PrintWindow.xaml.cs">
+      <DependentUpon>PrintWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SettingsScreen.xaml.cs">
+      <DependentUpon>SettingsScreen.xaml</DependentUpon>
+    </Compile>
     <Page Include="About.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -160,7 +211,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="InfoWindow.xaml">
+    <Page Include="Views\InfoWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -181,6 +232,30 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Settings.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ExportScreen.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\HiddenScreen.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\MainScreen.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\OnScreenKeyboard.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\PrintWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\SettingsScreen.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -234,11 +309,10 @@
   <ItemGroup />
   <ItemGroup>
     <Content Include="Dll\DatabaseToolBox.dll" />
+    <Content Include="Dll\ScreenKeyboard.dll" />
     <Resource Include="ChangeLog.txt" />
     <Resource Include="DXSplashScreen\Image.png" />
     <Resource Include="DXSplashScreen\Logo.png" />
-    <Content Include="Framework 4.0\DatabaseToolBox.dll" />
-    <Resource Include="Framework 4.0\DatabaseToolBox.xml" />
     <Resource Include="Images\w512h5121380984608delete copy.png" />
     <Resource Include="Images\Msg.ico" />
     <Resource Include="Dll\DatabaseToolBox.xml" />

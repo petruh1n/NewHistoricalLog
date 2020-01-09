@@ -113,8 +113,8 @@ namespace NewHistoricalLog
 			{
 				base.OnStartup(e);
 				// Create and show the application's main window
-				MainWindow window = new MainWindow();
-				window.Show();
+                Current.MainWindow = new Views.MainScreen();
+                Current.MainWindow.Show();
 			}
 			catch (Exception ex)
 			{
