@@ -14,8 +14,13 @@
     xmlns:command="http://www.galasoft.ch/mvvmlight"
     x:Class="NewHistoricalLog.Views.MainScreen"
     Title="Журнал исторических сообщений" Height="600" Width="1200"
-    ResizeMode="NoResize" Icon="pack://application:,,,/NewHistoricalLog;component/Images/Msg.ico"
+    ResizeMode="NoResize" Icon="pack://siteoforigin:,,,/Images/Msg.ico"
     >
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Closing">
+            <command:EventToCommand Command="{Binding DataContext.ClosingCommand,RelativeSource={RelativeSource AncestorType=Window}}" PassEventArgsToCommand="True"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
     <dx:ThemedWindow.Resources>
         <dxmvvm:DefaultBooleanToBooleanConverter x:Key="BoolConverter"/>
         <dxmvvm:BooleanToVisibilityConverter x:Key="BoolVisibleConverter"/>
@@ -44,13 +49,13 @@
         <dxb:MainMenuControl Margin="5" Grid.ColumnSpan="2">
             <dxb:BarSubItem Content="Действия" ContentTemplate="{StaticResource BarItemTextTemplate}" BarItemDisplayMode="ContentAndGlyph"
                             LargeGlyph="{dx:DXImage Image=SelectTool_32x32.png}" Glyph="{dx:DXImage Image=SelectTool_16x16.png}" 
-                            IsEnabled="{DXBinding '!NeedProgressBar'}">
+                            >
                 <dxb:BarButtonItem Content="Обновить" Glyph="{dx:DXImage Image=Recurrence_32x32.png}" LargeGlyph="{dx:DXImage Image=Recurrence_32x32.png}" 
                                    ContentTemplate="{StaticResource BarItemTextTemplate}" Command="{Binding LoadMessagesCommand}"/>
                 <dxb:BarButtonItem Content="Экспорт" Glyph="{dx:DXImage Image=SaveTo_32x32.png}" LargeGlyph="{dx:DXImage Image=SaveTo_32x32.png}" 
-                                   ContentTemplate="{StaticResource BarItemTextTemplate}" Command="{Binding SaveCommand}"/>
+                                   ContentTemplate="{StaticResource BarItemTextTemplate}" Command="{Binding SaveCommand}" IsEnabled="{DXBinding '!NeedProgressBar'}"/>
                 <dxb:BarButtonItem Content="Печать" Glyph="{dx:DXImage Image=Print_32x32.png}" LargeGlyph="{dx:DXImage Image=Print_32x32.png}" 
-                                   ContentTemplate="{StaticResource BarItemTextTemplate}" Command="{Binding PrintCommand}"/>
+                                   ContentTemplate="{StaticResource BarItemTextTemplate}" Command="{Binding PrintCommand}" IsEnabled="{DXBinding '!NeedProgressBar'}"/>
                 <dxb:BarButtonItem Content="Настройки" LargeGlyph="{dx:DXImage Image=Properties_32x32.png}" Glyph="{dx:DXImage Image=Properties_16x16.png}" 
                                    ContentTemplate="{StaticResource BarItemTextTemplate}" IsVisible="{Binding AdminMode}" Command="{Binding ShowSettingsCommand}"/>
                 <dxb:BarButtonItem Content="О программе" ContentTemplate="{StaticResource BarItemTextTemplate}" BarItemDisplayMode="ContentAndGlyph"
@@ -66,33 +71,33 @@
                                CommandParameter="{Binding ElementName=gridControl, Mode=OneWay}"/>
             <dxb:BarButtonItem Content="Очистить фильтр" Command="{Binding ClearFilterCommand}" ContentTemplate="{StaticResource BarItemTextTemplate}"
                                LargeGlyph="{dx:DXImage Image=IgnoreMasterFilter_32x32.png}" Glyph="{dx:DXImage Image=IgnoreMasterFilter_16x16.png}"
-                               BarItemDisplayMode="ContentAndGlyph" IsEnabled="{DXBinding '!NeedProgressBar'}"  />
+                               BarItemDisplayMode="ContentAndGlyph"  />
 
         </dxb:MainMenuControl>
         <dxe:CheckEdit Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="5" Grid.Row="1" VerticalAlignment="Center" Width="50"
-                       EditValue="{Binding White, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{DXBinding '!NeedProgressBar'}"
+                       EditValue="{Binding White, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                        Visibility="{Binding FilterVisible, Converter={StaticResource BoolVisibleConverter}}">
             <Image Source="/NewHistoricalLog;component/Images/flag-grey-32.png" />
         </dxe:CheckEdit>
         <dxe:CheckEdit Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="65,5,5,5" Grid.Row="1" VerticalAlignment="Center" Width="50"
-                       EditValue="{Binding Green, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{DXBinding '!NeedProgressBar'}"
+                       EditValue="{Binding Green, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                        Visibility="{Binding FilterVisible, Converter={StaticResource BoolVisibleConverter}}">
             <Image Source="/NewHistoricalLog;component/Images/flag-green-32.png" />
         </dxe:CheckEdit>
         <dxe:CheckEdit Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="125,5,5,5" Grid.Row="1" VerticalAlignment="Center" Width="50"
-                       EditValue="{Binding Yellow, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{DXBinding '!NeedProgressBar'}"
+                       EditValue="{Binding Yellow, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                        Visibility="{Binding FilterVisible, Converter={StaticResource BoolVisibleConverter}}">
             <Image Source="/NewHistoricalLog;component/Images/flag-yellow-32.png" />
         </dxe:CheckEdit>
         <dxe:CheckEdit Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="185,5,5,5" Grid.Row="1" VerticalAlignment="Center" Width="50"
-                       EditValue="{Binding Red, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{DXBinding '!NeedProgressBar'}"
+                       EditValue="{Binding Red, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                        Visibility="{Binding FilterVisible, Converter={StaticResource BoolVisibleConverter}}">
             <Image Source="/NewHistoricalLog;component/Images/flag-red-32.png" />
         </dxe:CheckEdit>
         <TextBlock Text="Текстовый фильтр" Grid.Row="1" Grid.ColumnSpan="2" Margin="260,5,135,5" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="16"
-                   Visibility="{Binding FilterVisible, Converter={StaticResource BoolVisibleConverter}}"/>
+                   Foreground="Black" Visibility="{Binding FilterVisible, Converter={StaticResource BoolVisibleConverter}}"/>
         <dxe:TextEdit x:Name="filterText" Grid.Row="1" Grid.ColumnSpan="2" Margin="410,5,315,5" FontSize="16" 
-                      EditValue="{Binding TextFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{DXBinding '!NeedProgressBar'}"
+                      EditValue="{Binding TextFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                       Visibility="{Binding FilterVisible, Converter={StaticResource BoolVisibleConverter}}">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="PreviewMouseDown">
@@ -102,24 +107,24 @@
         </dxe:TextEdit>
         <dxe:ComboBoxEdit x:Name="filterBox"   Margin="5,5,185,5" Width="120" Grid.Column="2" HorizontalAlignment="Right" IsTextEditable="False" 
                           Grid.Row="1" FontSize="16" Visibility="{Binding FilterVisible, Converter={StaticResource BoolVisibleConverter}}"
-                          EditValue="{Binding FilterColumnName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsEnabled="{DXBinding '!NeedProgressBar'}">
+                          EditValue="{Binding FilterColumnName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" >
             <dxe:ComboBoxEditItem Content="Сообщение" FontSize="16"/>
             <dxe:ComboBoxEditItem Content="Источник" FontSize="16"/>
             <dxe:ComboBoxEditItem Content="Пользователь" FontSize="16"/>
             <dxe:ComboBoxEditItem Content="Значение" FontSize="16"/>
         </dxe:ComboBoxEdit>
-        <dx:SimpleButton Grid.Row="1" Grid.ColumnSpan="2" Margin="5" Width="170" HorizontalAlignment="Right" Content="Применить фильтр" FontSize="16" IsEnabled="{DXBinding '!NeedProgressBar'}"
+        <dx:SimpleButton Grid.Row="1" Grid.ColumnSpan="2" Margin="5" Width="170" HorizontalAlignment="Right" Content="Применить фильтр" FontSize="16" 
                          Visibility="{Binding FilterVisible, Converter={StaticResource BoolVisibleConverter}}" Command="{Binding LaunchTextFilterCommand}"/>
         <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Orientation="Horizontal">
-            <TextBlock Margin="5" Text="Начальная дата выборки: " FontSize="16" VerticalAlignment="Center"/>
+            <TextBlock Margin="5" Text="Начальная дата выборки: " FontSize="16" VerticalAlignment="Center" Foreground="Black"/>
             <dxe:DateEdit Margin="5" FontSize="16" Width="180" EditValue="{Binding StartTime,UpdateSourceTrigger=LostFocus,Mode=TwoWay}" 
-                          MaskType="DateTime" Mask="G" MaskUseAsDisplayFormat="True" IsEnabled="{DXBinding '!NeedProgressBar'}"/>
-            <TextBlock Margin="5" Text="Конечная дата выборки: " FontSize="16" VerticalAlignment="Center"/>
+                          MaskType="DateTime" Mask="G" MaskUseAsDisplayFormat="True" />
+            <TextBlock Margin="5" Text="Конечная дата выборки: " FontSize="16" VerticalAlignment="Center" Foreground="Black"/>
             <dxe:DateEdit Margin="5" FontSize="16" Width="180" EditValue="{Binding EndTime,UpdateSourceTrigger=LostFocus,Mode=TwoWay}" 
-                          MaskType="DateTime" Mask="G" MaskUseAsDisplayFormat="True" IsEnabled="{DXBinding '!NeedProgressBar'}"/>
+                          MaskType="DateTime" Mask="G" MaskUseAsDisplayFormat="True" />
         </StackPanel>
         <dx:SimpleButton Grid.Row="2" Grid.ColumnSpan="2" HorizontalAlignment="Right" Width="170" Content="Обновить" FontSize="16" Margin="5"
-                         Command="{Binding LoadMessagesCommand}" IsEnabled="{DXBinding '!NeedProgressBar'}"/>
+                         Command="{Binding LoadMessagesCommand}" />
         <dxg:GridControl x:Name="gridControl" AutoGenerateColumns="None" Grid.Column="1" EnableSmartColumnsGeneration="True" FontSize="16"
                          Margin="5" Grid.Row="3" ItemsSource="{Binding Messages}" FilterCriteria="{Binding Filter}" AllowMRUFilterList="False" AllowColumnMRUFilterList="False">
             <dxg:GridControl.View>
@@ -151,7 +156,8 @@
                     <dxe:TextEditSettings MaskUseAsDisplayFormat="True" MaskType="DateTime" Mask="dd.MM.yyyy HH:mm:ss.fff"/>
                 </dxg:GridColumn.EditSettings>
             </dxg:GridColumn>
-            <dxg:GridColumn FieldName="Priority" IsSmart="True" Header="Приоритет" Visible="{Binding DataContext.ColumnVisibilities[0], RelativeSource={RelativeSource AncestorType=Window}}">
+            <dxg:GridColumn FieldName="Priority" IsSmart="True" Header="Приоритет" Width="150"
+                            Visible="{Binding DataContext.ColumnVisibilities[0], RelativeSource={RelativeSource AncestorType=Window}}">
                 <dxg:GridColumn.CellTemplate>
                     <DataTemplate>
                         <dxe:TextEdit EditValue="{Binding RowData.Row.Priority, Converter={StaticResource enumDescriptionConverter}}" IsReadOnly="True" ShowBorder="False"/>
@@ -163,14 +169,19 @@
                     <dxe:TextEditSettings PrintTextWrapping="{Binding DataContext.WrapTextInGrid, RelativeSource={RelativeSource AncestorType=Window}}" TextWrapping="{Binding DataContext.WrapTextInGrid, RelativeSource={RelativeSource AncestorType=Window}}"/>
                 </dxg:GridColumn.EditSettings>
             </dxg:GridColumn>
-            <dxg:GridColumn FieldName="Kvited" IsSmart="True" Header="Квитирование" Visible="{Binding DataContext.ColumnVisibilities[1], RelativeSource={RelativeSource AncestorType=Window}}"/>
-            <dxg:GridColumn FieldName="MessageValue" IsSmart="True" Header="Значение" Visible="{Binding DataContext.ColumnVisibilities[2], RelativeSource={RelativeSource AncestorType=Window}}"/>
-            <dxg:GridColumn FieldName="Source" IsSmart="True" Header="Источник" Visible="{Binding DataContext.ColumnVisibilities[3], RelativeSource={RelativeSource AncestorType=Window}}"/>
-            <dxg:GridColumn FieldName="User" IsSmart="True" Header="Пользователь" Visible="{Binding DataContext.ColumnVisibilities[4], RelativeSource={RelativeSource AncestorType=Window}}"/>
+            <dxg:GridColumn FieldName="Kvited" IsSmart="True" Header="Квитирование" Width="150"
+                            Visible="{Binding DataContext.ColumnVisibilities[1], RelativeSource={RelativeSource AncestorType=Window}}"/>
+            <dxg:GridColumn FieldName="MessageValue" IsSmart="True" Header="Значение" Width="100"
+                            Visible="{Binding DataContext.ColumnVisibilities[2], RelativeSource={RelativeSource AncestorType=Window}}"/>
+            <dxg:GridColumn FieldName="Source" IsSmart="True" Header="Источник" Width="140"
+                            Visible="{Binding DataContext.ColumnVisibilities[3], RelativeSource={RelativeSource AncestorType=Window}}"/>
+            <dxg:GridColumn FieldName="User" IsSmart="True" Header="Пользователь" Width="150"
+                            Visible="{Binding DataContext.ColumnVisibilities[4], RelativeSource={RelativeSource AncestorType=Window}}"/>
         </dxg:GridControl>
 
-        <dxlc:GroupBox Header="Фильтр по подсистемам"  Grid.Row="3" Margin="5" Visibility="{Binding FilterVisible, Converter={StaticResource BoolVisibleConverter}}">
-            <dxa:AccordionControl ItemsSource="{Binding SubSystems, Mode=TwoWay}" Width="320" IsEnabled="{DXBinding '!NeedProgressBar'}">
+        <dxlc:GroupBox Header="Фильтр по подсистемам"  Grid.Row="3" Margin="5" Foreground="Black"
+                       Visibility="{Binding FilterVisible, Converter={StaticResource BoolVisibleConverter}}">
+            <dxa:AccordionControl ItemsSource="{Binding SubSystems, Mode=TwoWay}" Width="320" >
                 <dxa:AccordionControl.ItemTemplate>
                     <HierarchicalDataTemplate DataType="model:SubSystem" ItemsSource="{Binding Devices}">
                         <TextBlock Text="{Binding Description}"/>
@@ -183,6 +194,16 @@
                 </dxa:AccordionControl.ItemTemplate>
             </dxa:AccordionControl>
         </dxlc:GroupBox>
-
+        
+        <!--Отображение прогресса с конкретными значениями-->
+        <dxe:ProgressBarEdit Grid.ColumnSpan="2"  Margin="5" Grid.Row="4" EditValue="{Binding Progress}" Minimum="0" ContentDisplayMode="Content" Content="{Binding Status}"
+                             Visibility="{DXBinding 'NeedProgressBar and !Indeterminant', Converter={StaticResource BoolVisibleConverter}}"/>
+        <!--Отображение прогресса без конкретных значений-->
+        <dxe:ProgressBarEdit Grid.ColumnSpan="2"  Margin="5" Grid.Row="4" ContentDisplayMode="Content" Content="{Binding Status}"
+                             Visibility="{DXBinding 'NeedProgressBar and Indeterminant', Converter={StaticResource BoolVisibleConverter}}">
+            <dxe:ProgressBarEdit.StyleSettings>
+                <dxe:ProgressBarMarqueeStyleSettings/>
+            </dxe:ProgressBarEdit.StyleSettings>
+        </dxe:ProgressBarEdit>
     </Grid>
 </dx:ThemedWindow>

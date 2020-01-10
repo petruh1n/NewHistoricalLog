@@ -48,14 +48,14 @@
                     <ColumnDefinition/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                <dxe:CheckEdit Grid.Row="0" Grid.Column="0" Content="Приоритет" Margin="5" EditValue="{Binding PriorityVisible}"/>
-                <dxe:CheckEdit Grid.Row="1" Grid.Column="0" Content="Квитирование" Margin="5" EditValue="{Binding KvitVisible}"/>
-                <dxe:CheckEdit Grid.Row="2" Grid.Column="0" Content="Значение" Margin="5" EditValue="{Binding ValueVisible}"/>
-                <dxe:CheckEdit Grid.Row="0" Grid.Column="1" Content="Источник" Margin="5" EditValue="{Binding SourceVisible}"/>
-                <dxe:CheckEdit Grid.Row="1" Grid.Column="1" Content="Пользователь" Margin="5" EditValue="{Binding UserVisible}"/>
+                <dxe:CheckEdit Grid.Row="0" Grid.Column="0" Content="Приоритет" Margin="5" EditValue="{Binding PriorityVisible}" Foreground="Black"/>
+                <dxe:CheckEdit Grid.Row="1" Grid.Column="0" Content="Квитирование" Margin="5" EditValue="{Binding KvitVisible}" Foreground="Black"/>
+                <dxe:CheckEdit Grid.Row="2" Grid.Column="0" Content="Значение" Margin="5" EditValue="{Binding ValueVisible}" Foreground="Black"/>
+                <dxe:CheckEdit Grid.Row="0" Grid.Column="1" Content="Источник" Margin="5" EditValue="{Binding SourceVisible}" Foreground="Black"/>
+                <dxe:CheckEdit Grid.Row="1" Grid.Column="1" Content="Пользователь" Margin="5" EditValue="{Binding UserVisible}" Foreground="Black"/>
             </Grid>
         </GroupBox>
-        <TextBlock Text="Количество строк на странице" Margin="5" HorizontalAlignment="Left" Grid.Row="1"/>
+        <TextBlock Text="Количество строк на странице" Margin="5" HorizontalAlignment="Left" Grid.Row="1" Foreground="Black"/>
         <dxe:TextEdit Margin="5" Grid.Row="1"  Grid.Column="1" Width="300" EditValue="{Binding PageSize}" MaskType="Numeric">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="PreviewMouseDown">
@@ -63,7 +63,7 @@
                 </i:EventTrigger>
             </i:Interaction.Triggers>
         </dxe:TextEdit>
-        <TextBlock Text="Путь для экспорта" Margin="5" HorizontalAlignment="Left" Grid.Row="2"/>
+        <TextBlock Text="Путь для экспорта" Margin="5" HorizontalAlignment="Left" Grid.Row="2" Foreground="Black"/>
         <dxe:TextEdit Margin="5" Grid.Row="2"  Grid.Column="1" Width="300" EditValue="{Binding ExportPath, UpdateSourceTrigger=PropertyChanged}">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="PreviewMouseDown">
@@ -71,8 +71,10 @@
                 </i:EventTrigger>
             </i:Interaction.Triggers>
         </dxe:TextEdit>
-        <dxe:CheckEdit Content="Переносить текст в строке сообщений" Grid.ColumnSpan="2" Grid.Row="3" Margin="5" EditValue="{Binding Wrap, UpdateSourceTrigger=PropertyChanged}"/>
-        <dxe:CheckEdit Content="Использовать экранную клавиатуру" Grid.ColumnSpan="2" Grid.Row="4" Margin="5" EditValue="{Binding NeedKeyboard, UpdateSourceTrigger=PropertyChanged}"/>
+        <dxe:CheckEdit Content="Переносить текст в строке сообщений" Grid.ColumnSpan="2" Grid.Row="3" Margin="5" Foreground="Black"
+                       EditValue="{Binding Wrap, UpdateSourceTrigger=PropertyChanged}"/>
+        <dxe:CheckEdit Content="Использовать экранную клавиатуру" Grid.ColumnSpan="2" Grid.Row="4" Margin="5" Foreground="Black"
+                       EditValue="{Binding NeedKeyboard, UpdateSourceTrigger=PropertyChanged}"/>
         <dx:SimpleButton Grid.ColumnSpan="2" Grid.Row="5" Margin="5,5,135,5" HorizontalAlignment="Right" Content="Ок" Width="120" Command="{Binding ConfirmCommand}"/>
         <dx:SimpleButton Grid.ColumnSpan="2" Grid.Row="5" Margin="5" HorizontalAlignment="Right" Content="Отмена" Width="120" Command="{Binding DiscardCommand}"/>
     </Grid>

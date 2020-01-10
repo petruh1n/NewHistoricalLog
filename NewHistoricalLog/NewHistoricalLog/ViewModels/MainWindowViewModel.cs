@@ -12,6 +12,7 @@ using NewHistoricalLog.Models;
 using DevExpress.Data.Filtering;
 using System.Windows.Controls;
 using DevExpress.Xpf.Editors;
+using System.ComponentModel;
 
 namespace NewHistoricalLog.ViewModels
 {
@@ -33,6 +34,11 @@ namespace NewHistoricalLog.ViewModels
         private ObservableCollection<MessageClass> messages = new ObservableCollection<MessageClass>();
         private ObservableCollection<SubSystem> subsytems = new ObservableCollection<SubSystem>();
         private int pagesize;
+        private System.Windows.TextWrapping wrapTextInGrid = System.Windows.TextWrapping.Wrap;
+        private List<bool> columnVisibilities = new List<bool>() { true, true, true, true, true };
+        private int progress;
+        private int maxProgress;
+        private string status;
 
         /// <summary>
         /// Коллекция сообщений
@@ -262,7 +268,9 @@ namespace NewHistoricalLog.ViewModels
                 RaisePropertyChanged("PageSize");
             }
         }
-        private System.Windows.TextWrapping wrapTextInGrid = System.Windows.TextWrapping.Wrap;
+        /// <summary>
+        /// Переносить текст сообщения
+        /// </summary>
         public System.Windows.TextWrapping WrapTextInGrid
         {
             get { return wrapTextInGrid; }
@@ -272,7 +280,9 @@ namespace NewHistoricalLog.ViewModels
                 RaisePropertyChanged("WrapTextInGrid");
             }
         }
-        private List<bool> columnVisibilities = new List<bool>() { true, true, true, true, true };
+        /// <summary>
+        /// Видимость колонок
+        /// </summary>
         public List<bool> ColumnVisibilities
         {
             get { return columnVisibilities; }
@@ -280,6 +290,42 @@ namespace NewHistoricalLog.ViewModels
             {
                 columnVisibilities = value;
                 RaisePropertyChanged("ColumnVisibilities");
+            }
+        }
+        /// <summary>
+        /// Максимальный значение прогресса
+        /// </summary>
+        public int MaxProgress
+        {
+            get { return maxProgress; }
+            set
+            {
+                maxProgress = value;
+                RaisePropertyChanged("MaxProgress");
+            }
+        }
+        /// <summary>
+        /// Текущее значение прогресса
+        /// </summary>
+        public int Progress
+        {
+            get { return progress; }
+            set
+            {
+                progress = value;
+                RaisePropertyChanged("Progress");
+            }
+        }
+        /// <summary>
+        /// Сообщение в прогресс-баре
+        /// </summary>
+        public string Status
+        {
+            get { return status; }
+            set
+            {
+                status = value;
+                RaisePropertyChanged("Status");
             }
         }
 
@@ -319,6 +365,9 @@ namespace NewHistoricalLog.ViewModels
             PageSize = Service.CountLines;
             WrapTextInGrid = Service.WrapText;
             ColumnVisibilities = Service.ColumnVisibilityList;
+            MaxProgress = MainModel.MaxProgress;
+            Progress = MainModel.Progress;
+            Status = MainModel.Status;
         }
 
 
@@ -434,6 +483,18 @@ namespace NewHistoricalLog.ViewModels
             InfoWindow window = new InfoWindow();
             window.Owner = SingleInstanceApplication.Current.MainWindow;
             window.ShowDialog();
+        }
+
+        public ICommand ClosingCommand
+        {
+            get { return new RelayCommand<object>(ExecuteClosing); }
+        }
+
+        private void ExecuteClosing(object args)
+        {
+            (args as CancelEventArgs).Cancel = true;
+            MainModel.ni.Visible = true;
+            SingleInstanceApplication.Current.MainWindow.Hide();
         }
     }
 }

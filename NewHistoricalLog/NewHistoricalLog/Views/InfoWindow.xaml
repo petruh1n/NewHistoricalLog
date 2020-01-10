@@ -15,10 +15,10 @@
     >
     <Grid>
         <StackPanel>
-            <TextBlock  TextWrapping="Wrap" Margin="5,5,5,5">Программа предназначена для вывода истории сообщений.</TextBlock>
-            <TextBlock x:Name="Version" TextWrapping="Wrap" Margin="5,5,5,5"></TextBlock>
-            <TextBlock  TextWrapping="Wrap" Margin="5,5,5,5">Компания: АО НПО "Спецэлектромеханика".</TextBlock>
-            <Button HorizontalAlignment="Right" Content="Ок" Margin="5,5,5,5" Width="100" Click="Button_Click"/>
+            <TextBlock  TextWrapping="Wrap" Margin="5,5,5,5" Foreground="Black">Программа предназначена для вывода истории сообщений.</TextBlock>
+            <TextBlock x:Name="Version" TextWrapping="Wrap" Margin="5,5,5,5" Foreground="Black"></TextBlock>
+            <TextBlock  TextWrapping="Wrap" Margin="5,5,5,5" Foreground="Black">Компания: АО НПО "Спецэлектромеханика".</TextBlock>
+            <dx:SimpleButton HorizontalAlignment="Right" Content="Ок" Margin="5,5,5,5" Width="100" Click="Button_Click" Foreground="Black"/>
         </StackPanel>
     </Grid>
 </dx:ThemedWindow>

@@ -7,25 +7,93 @@
     xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+    xmlns:dxp="http://schemas.devexpress.com/winfx/2008/xaml/printing"
+    xmlns:dxgt="clr-namespace:DevExpress.Xpf.Grid.Themes;assembly=DevExpress.Xpf.Grid.v18.1"
     xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
     xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm" 
     xmlns:model="clr-namespace:NewHistoricalLog.Models"
-    Title="HiddenScreen" Height="auto" Width="200" Topmost="False" ShowIcon="False" 
+    xmlns:common="clr-namespace:NewHistoricalLog.Common"
+    xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+    xmlns:command="http://www.galasoft.ch/mvvmlight"
+    Title="HiddenScreen" Height="auto" Width="200" Topmost="False" ShowIcon="False" WindowState="Minimized"
     SizeToContent="WidthAndHeight" ResizeMode="NoResize" WindowStyle="None" ShowInTaskbar="False" WindowStartupLocation="CenterOwner"
     >
     <dx:ThemedWindow.DataContext>
         <vm:HiddenScreenViewModel/>
     </dx:ThemedWindow.DataContext>
+    <dx:ThemedWindow.Resources>
+        <dxmvvm:DefaultBooleanToBooleanConverter x:Key="BoolConverter"/>
+        <dxmvvm:BooleanToVisibilityConverter x:Key="BoolVisibleConverter"/>
+        <common:EnumDescriptionConverter x:Key="enumDescriptionConverter"/>        
+        <Style x:Key="TextColumnPrintingStyle" 
+           TargetType="{x:Type dxe:TextEdit}"
+           BasedOn="{StaticResource {dxgt:TableViewThemeKey ResourceKey=DefaultPrintCellStyle}}">
+            <Setter Property="dxp:ExportSettings.TargetType" Value="Panel" />
+            <Setter Property="DisplayTemplate">
+                <Setter.Value>
+                    <ControlTemplate TargetType="dxe:TextEdit">
+                        <dxe:TextEdit Text="{Binding Value}"
+                                          TextWrapping="Wrap"
+                                          IsPrintingMode="True"
+                                          FontSize="10"
+                                          Margin="2,0,0,0"
+                                          VerticalContentAlignment="Center"
+                                          />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="PriorColumnPrintingStyle" 
+           TargetType="{x:Type dxe:TextEdit}"
+           BasedOn="{StaticResource {dxgt:TableViewThemeKey ResourceKey=DefaultPrintCellStyle}}">
+            <Setter Property="dxp:ExportSettings.TargetType" Value="Panel" />
+            <Setter Property="DisplayTemplate">
+                <Setter.Value>
+                    <ControlTemplate TargetType="dxe:TextEdit">
+                        <dxe:TextEdit Text="{Binding Value, Converter={StaticResource enumDescriptionConverter}}"
+                                          TextWrapping="Wrap"
+                                          IsPrintingMode="True"
+                                          FontSize="10"
+                                          Margin="2,0,0,0"
+                                          VerticalContentAlignment="Center"
+                                          />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="DateColumnPrintingStyle" 
+           TargetType="{x:Type dxe:TextEdit}"
+           BasedOn="{StaticResource {dxgt:TableViewThemeKey ResourceKey=DefaultPrintCellStyle}}">
+            <Setter Property="dxp:ExportSettings.TargetType" Value="Panel" />
+            <Setter Property="DisplayTemplate">
+                <Setter.Value>
+                    <ControlTemplate TargetType="dxe:TextEdit">
+                        <dxe:TextEdit Text="{Binding Value}"
+                                          TextWrapping="Wrap"
+                                          IsPrintingMode="True"
+                                          FontSize="10"
+                                          Margin="2,0,0,0"
+                                          MaskType="DateTime"
+                                          Mask="dd.MM.yyyy HH:mm:ss.fff"
+                                          MaskUseAsDisplayFormat="True"
+                                          VerticalContentAlignment="Center"
+                                          />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </dx:ThemedWindow.Resources>
     <Grid>
-        <dxg:GridControl AutoGenerateColumns="None" Grid.Column="1" EnableSmartColumnsGeneration="True" x:Name="messageGrid"
-                         Margin="5" Grid.Row="3" ItemsSource="{Binding Messages}" FilterCriteria="{Binding Filter}">
+        <dxg:GridControl x:Name="gridControl" AutoGenerateColumns="None" Grid.Column="1" EnableSmartColumnsGeneration="True" FontSize="16"
+                         Margin="5" Grid.Row="3" ItemsSource="{Binding Messages}" FilterCriteria="{Binding Filter}" AllowMRUFilterList="False" AllowColumnMRUFilterList="False">
             <dxg:GridControl.View>
                 <dxg:TableView AllowPerPixelScrolling="True" SearchPanelAllowFilter="False" 
                                ShowGroupPanel="False" AllowEditing="False" AllowGrouping="False" ShowFilterPanelMode="Never" AllowPaging="True"
                                AllowDateTimeGroupIntervalMenu="False" IsRowCellMenuEnabled="False" IsGroupPanelMenuEnabled="False"
                                IsColumnMenuEnabled="False" IsGroupRowMenuEnabled="False" IsGroupFooterMenuEnabled="False" IsTotalSummaryMenuEnabled="False" 
-                               PageSize="50" NavigationStyle="Row" AllowColumnMoving="False" 
-                               AllowSorting="True">
+                               PageSize="{Binding PageSize}" CustomRowAppearance="TableView_CustomRowAppearance" NavigationStyle="Row" AllowColumnMoving="False" 
+                               AllowSorting="True" AllowColumnFiltering="False" AllowFilterEditor="False" PrintAutoWidth="True" 
+                               PrintFixedTotalSummary="False" PrintTotalSummary="False" >
                     <dxg:TableView.FormatConditions>
                         <dxg:FormatCondition ApplyToRow="True" Expression="[Priority] = 'Normal'" FieldName="Priority">
                             <dx:Format Background="White" Foreground="Black" TextDecorations="{x:Null}"/>
@@ -42,14 +110,33 @@
                     </dxg:TableView.FormatConditions>
                 </dxg:TableView>
             </dxg:GridControl.View>
-            <dxg:GridColumn FieldName="Id" IsSmart="True" Visible="False"/>
-            <dxg:GridColumn FieldName="Date" IsSmart="True" Header="Дата"/>
-            <dxg:GridColumn FieldName="Priority" IsSmart="True" Header="Приоритет"/>
-            <dxg:GridColumn FieldName="Text" IsSmart="True" Header="Текст сообщения" Width="*"/>
-            <dxg:GridColumn FieldName="Kvited" IsSmart="True" Header="Квитирование"/>
-            <dxg:GridColumn FieldName="MessageValue" IsSmart="True" Header="Значение"/>
-            <dxg:GridColumn FieldName="Source" IsSmart="True" Header="Источник"/>
-            <dxg:GridColumn FieldName="User" IsSmart="True" Header="Пользователь"/>
+            <dxg:GridColumn FieldName="Id" IsSmart="True" Visible="False" AllowPrinting="False"/>
+            <dxg:GridColumn FieldName="Date" IsSmart="True" Header="Дата" Width="180" PrintCellStyle="{StaticResource DateColumnPrintingStyle}">
+                <dxg:GridColumn.EditSettings>
+                    <dxe:TextEditSettings MaskUseAsDisplayFormat="True" MaskType="DateTime" Mask="dd.MM.yyyy HH:mm:ss.fff"/>
+                </dxg:GridColumn.EditSettings>
+            </dxg:GridColumn>
+            <dxg:GridColumn FieldName="Priority" Width="150" IsSmart="True" Header="Приоритет" PrintCellStyle="{StaticResource PriorColumnPrintingStyle}"                            
+                            Visible="{Binding DataContext.ColumnVisibilities[0], RelativeSource={RelativeSource AncestorType=Window}}">
+                <dxg:GridColumn.CellTemplate>
+                    <DataTemplate>
+                        <dxe:TextEdit EditValue="{Binding RowData.Row.Priority, Converter={StaticResource enumDescriptionConverter}}" IsReadOnly="True" ShowBorder="False"/>
+                    </DataTemplate>
+                </dxg:GridColumn.CellTemplate>
+            </dxg:GridColumn>
+            <dxg:GridColumn FieldName="Text" IsSmart="True" Header="Текст сообщения" Width="*"  PrintCellStyle="{StaticResource TextColumnPrintingStyle}">
+                <dxg:GridColumn.EditSettings>
+                    <dxe:TextEditSettings PrintTextWrapping="{Binding DataContext.WrapTextInGrid, RelativeSource={RelativeSource AncestorType=Window}}" TextWrapping="{Binding DataContext.WrapTextInGrid, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                </dxg:GridColumn.EditSettings>
+            </dxg:GridColumn>
+            <dxg:GridColumn FieldName="Kvited" IsSmart="True" Header="Квитирование" PrintCellStyle="{StaticResource TextColumnPrintingStyle}" Width="150"                            
+                            Visible="{Binding DataContext.ColumnVisibilities[1], RelativeSource={RelativeSource AncestorType=Window}}"/>
+            <dxg:GridColumn FieldName="MessageValue" IsSmart="True" Header="Значение" PrintCellStyle="{StaticResource TextColumnPrintingStyle}" Width="100"                            
+                            Visible="{Binding DataContext.ColumnVisibilities[2], RelativeSource={RelativeSource AncestorType=Window}}"/>
+            <dxg:GridColumn FieldName="Source" IsSmart="True" Header="Источник" PrintCellStyle="{StaticResource TextColumnPrintingStyle}" Width="140"                            
+                            Visible="{Binding DataContext.ColumnVisibilities[3], RelativeSource={RelativeSource AncestorType=Window}}"/>
+            <dxg:GridColumn FieldName="User" IsSmart="True" Header="Пользователь" PrintCellStyle="{StaticResource TextColumnPrintingStyle}" Width="150"                            
+                            Visible="{Binding DataContext.ColumnVisibilities[4], RelativeSource={RelativeSource AncestorType=Window}}"/>
         </dxg:GridControl>
     </Grid>
 </dx:ThemedWindow>

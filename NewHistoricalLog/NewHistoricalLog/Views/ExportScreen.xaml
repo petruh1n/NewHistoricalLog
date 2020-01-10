@@ -42,22 +42,25 @@
                     <ColumnDefinition/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                <dxe:CheckEdit Grid.Row="0" Grid.Column="0" Content="Приоритет" Margin="5" EditValue="{Binding PriorityVisible}"/>
-                <dxe:CheckEdit Grid.Row="1" Grid.Column="0" Content="Квитирование" Margin="5" EditValue="{Binding KvitVisible}"/>
-                <dxe:CheckEdit Grid.Row="2" Grid.Column="0" Content="Значение" Margin="5" EditValue="{Binding ValueVisible}"/>
-                <dxe:CheckEdit Grid.Row="0" Grid.Column="1" Content="Источник" Margin="5" EditValue="{Binding SourceVisible}"/>
-                <dxe:CheckEdit Grid.Row="1" Grid.Column="1" Content="Пользователь" Margin="5" EditValue="{Binding UserVisible}"/>
+                <dxe:CheckEdit Grid.Row="0" Grid.Column="0" Content="Приоритет" Margin="5" EditValue="{Binding PriorityVisible}" Foreground="Black"/>
+                <dxe:CheckEdit Grid.Row="1" Grid.Column="0" Content="Квитирование" Margin="5" EditValue="{Binding KvitVisible}" Foreground="Black"/>
+                <dxe:CheckEdit Grid.Row="2" Grid.Column="0" Content="Значение" Margin="5" EditValue="{Binding ValueVisible}" Foreground="Black"/>
+                <dxe:CheckEdit Grid.Row="0" Grid.Column="1" Content="Источник" Margin="5" EditValue="{Binding SourceVisible}" Foreground="Black"/>
+                <dxe:CheckEdit Grid.Row="1" Grid.Column="1" Content="Пользователь" Margin="5" EditValue="{Binding UserVisible}" Foreground="Black"/>
             </Grid>
         </GroupBox>
-        <dxe:CheckEdit Grid.Row="1" Content="Отправить в директорию по умолчанию" Margin="5" EditValue="{Binding SendToDefaultDir}"/>
-        <dxe:TextEdit Grid.Row="2" EditValue="{Binding DefaultDir}" Margin="5" IsEnabled="{Binding IsAdmin}"/>
-        <dxe:CheckEdit Grid.Row="3" Content="Отправить на сервер ДМЗ" Margin="5" EditValue="{Binding SendToDmz}"/>
-        <dxe:CheckEdit x:Name="checkEdit" Grid.Row="4" Content="Отправить на съемный носитель" Margin="5" EditValue="{Binding SendToStorage}"/>
-        <StackPanel Grid.Row="5" Orientation="Horizontal" Visibility="{Binding EditValue, ElementName=checkEdit, Converter={StaticResource BoolVisibleConverter}}" >
-            <dxe:ComboBoxEdit Width="220" Margin="5" ItemsSource="{Binding Devices}" EditValue="{Binding Path}"/>
+        <dxe:CheckEdit Grid.Row="1" Content="Отправить в директорию по умолчанию" Margin="5" EditValue="{Binding SendToDefaultDir}" Foreground="Black"/>
+        <dxe:TextEdit Grid.Row="2" EditValue="{Binding DefaultDir}" Margin="5" IsEnabled="{Binding IsAdmin}" Foreground="Black"/>
+        <dxe:CheckEdit Grid.Row="3" Content="Отправить на сервер ДМЗ" Margin="5" EditValue="{Binding SendToDmz}" Foreground="Black"/>
+        <dxe:CheckEdit x:Name="checkEdit" Grid.Row="4" Content="Отправить на съемный носитель" Margin="5" EditValue="{Binding SendToStorage}" Foreground="Black"/>
+        <StackPanel Grid.Row="5" Orientation="Horizontal" 
+                    Visibility="{Binding EditValue, ElementName=checkEdit, Converter={StaticResource BoolVisibleConverter}}" >
+            <dxe:ComboBoxEdit Width="220" Margin="5" ItemsSource="{Binding Devices}" EditValue="{Binding Path}" Foreground="Black"/>
             <dx:SimpleButton Width="40" Margin="15,5,5,5" Glyph="{dx:DXImage Image=Refresh_16x16.png}" Command="{Binding RefreshCommand}"/>
         </StackPanel>
-        <dx:SimpleButton Grid.ColumnSpan="2" Grid.Row="6" Margin="5,5,135,5" HorizontalAlignment="Right" Content="Ок" Width="120" Command="{Binding ConfirmCommand}"/>
-        <dx:SimpleButton Grid.ColumnSpan="2" Grid.Row="6" Margin="5" HorizontalAlignment="Right" Content="Отмена" Width="120" Command="{Binding DiscardCommand}"/>
+        <dx:SimpleButton Grid.ColumnSpan="2" Grid.Row="6" Margin="5,5,135,5" HorizontalAlignment="Right" Content="Ок" Width="120" Foreground="Black"
+                         Command="{Binding ConfirmCommand}"/>
+        <dx:SimpleButton Grid.ColumnSpan="2" Grid.Row="6" Margin="5" HorizontalAlignment="Right" Content="Отмена" Width="120" Foreground="Black"
+                         Command="{Binding DiscardCommand}"/>
     </Grid>
 </dx:ThemedWindow>

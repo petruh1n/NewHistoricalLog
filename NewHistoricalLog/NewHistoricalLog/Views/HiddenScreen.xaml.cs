@@ -1,21 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using DevExpress.Xpf.Core;
-using DevExpress.Xpf.Grid;
 using DevExpress.Xpf.Printing;
 using DevExpress.Xpf.Editors;
 using NLog;
 using DevExpress.XtraPrinting;
+using System.IO;
 
 namespace NewHistoricalLog.Views
 {
@@ -37,18 +30,21 @@ namespace NewHistoricalLog.Views
             Loaded += HiddenScreen_Loaded;
         }
 
-        private void messageView_CustomRowAppearance(object sender, CustomRowAppearanceEventArgs e)
+        private void TableView_CustomRowAppearance(object sender, DevExpress.Xpf.Grid.CustomRowAppearanceEventArgs e)
         {
             e.Result = e.ConditionalValue;
             e.Handled = true;
         }
 
-        private void HiddenScreen_Loaded(object sender, RoutedEventArgs e)
+    private void HiddenScreen_Loaded(object sender, RoutedEventArgs e)
         {
             try
             {
                 WINAPI.SetWindowPos(new System.Windows.Interop.WindowInteropHelper(this).Handle, WINAPI.HWND_BOTTOM, 0, 0, 0, 0, WINAPI.SWP_NOMOVE | WINAPI.SWP_NOSIZE | WINAPI.SWP_NOACTIVATE);
-                Work();
+                Models.MainModel.NeedProgressBar = true;
+                Models.MainModel.Status = "Подготовка документа с сообщениями.";
+                Models.MainModel.Progress = 0;
+                Work();                
             }
             catch
             {
@@ -60,12 +56,9 @@ namespace NewHistoricalLog.Views
         {
             try
             {
-                PrintableControlLink link = null;
-                link = new PrintableControlLink(messageGrid.View);
+                PrintableControlLink link = new PrintableControlLink(gridControl.View);
                 link.PrintingSystem.ExportOptions.Xls.TextExportMode = TextExportMode.Text;
-                //((IPrintingSystem)link.PrintingSystem).AutoFitToPagesWidth = 1;
-                //link.PrintingSystem.ContinuousPageNumbering = true;
-
+                link.Landscape = true;
                 //Формирование заголовка
                 var templateHeader = new DataTemplate();
                 var controlHeader = new FrameworkElementFactory(typeof(TextEdit));
@@ -104,28 +97,78 @@ namespace NewHistoricalLog.Views
                 link.PageHeaderTemplate = templateHeader;
                 link.PageFooterTemplate = templateFooter;
 
+                link.PrintingSystem.ProgressReflector.PositionChanged += ProgressReflector_PositionChanged;
                 link.CreateDocument(true);
-                link.CreateDocumentFinished += (o, ee) => {
+                link.CreateDocumentFinished += (o, ee) => 
+                {
                     try
                     {
                         //link.PrintingSystem.ProgressReflector.MaximizeRange();
-                        link.PrintDirect();
-                        Service.Printing = false;
+                        if (Print)
+                        {
+                            try
+                            {
+                                Models.MainModel.Status = "Печать документа с сообщениями";
+                                Models.MainModel.Indeterminant = true;
+                                link.PrintDirect();
+                                Models.MainModel.Indeterminant = false;
+                            }
+                            catch (Exception ex)
+                            {
+                                Models.MainModel.Indeterminant = false;
+                                logger.Error("Ошибка печати: {0}", ex.Message);
+                            }
+                        }
+                        else
+                        {
+                            Models.MainModel.Indeterminant = true;
+                            foreach (var path in SavePath)
+                            {
+                                try
+                                {
+                                    if (!Directory.Exists(path))
+                                        Directory.CreateDirectory(path);
+                                    string fileName = String.Format("Сообщения с {0} по {1}.pdf", Models.MainModel.StartTime.ToString().Replace(":", "_"), Models.MainModel.EndTime.ToString().Replace(":", "_"));
+                                    int counter = 1;
+                                    while (File.Exists(String.Format("{0}\\{1}", path, fileName)))
+                                    {
+                                        fileName = String.Format("Сообщения с {0} по {1}_{2}.pdf", Models.MainModel.StartTime.ToString().Replace(":", "_"), Models.MainModel.EndTime.ToString().Replace(":", "_"), counter);
+                                        counter++;
+                                    }
+                                    Models.MainModel.Status = string.Format("Экспорт в {0}", String.Format("{0}\\{1}", path, fileName));
+                                    link.ExportToPdf(String.Format("{0}\\{1}", path, fileName));
+                                }
+                                catch (Exception ex)
+                                {
+                                    logger.Error("Ошибка экспорта в {0}: {1}", path, ex.Message);
+                                }
+                            }
+                            Models.MainModel.Indeterminant = false;
+                        }
                         Close();
                     }
                     catch (Exception ex)
                     {
-                        logger.Error("Ошибка печати ссылки: {0}", ex.Message);                        
-                        Service.Printing = false;
+                        logger.Error("Ошибка создания документа для экспорта: {0}", ex.Message);  
                         Close();
                     }
                 };
             }
             catch (Exception ex)
             {
-                logger.Error("Ошибка печати inside: {0}", ex.Message);
+                logger.Error("Ошибка глобального экспорта: {0}", ex.Message);
                 Close();
             }
+        }
+        /// <summary>
+        /// Обработка статуса создания документа для печати/экспорта
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ProgressReflector_PositionChanged(object sender, EventArgs e)
+        {
+            Models.MainModel.MaxProgress = (sender as ProgressReflector).Maximum;
+            Models.MainModel.Progress = (sender as ProgressReflector).Position;
         }
     }
 }

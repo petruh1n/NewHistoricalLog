@@ -63,36 +63,20 @@ namespace NewHistoricalLog
                     window.Close();
                 }
             }
-            app.MainWindow.WindowState = WindowState.Minimized;
+            app.MainWindow.Close();
         }
 
-		protected override void OnStartupNextInstance(StartupNextInstanceEventArgs eventArgs)
+		protected async override void OnStartupNextInstance(StartupNextInstanceEventArgs eventArgs)
 		{
 			try
 			{
 				// Subsequent launches
 				base.OnStartupNextInstance(eventArgs);
                 Service.ReadSettings();
-                if (eventArgs.CommandLine != null)
-                {
-                    try
-                    {
-                        for (int i = 0; i < eventArgs.CommandLine.Count; i++)
-                        {
-                            if (eventArgs.CommandLine[i].ToUpper().Contains("MONITOR"))
-                            {
-                                Service.Monitor = Convert.ToInt32(eventArgs.CommandLine[i].Remove(0, eventArgs.CommandLine[i].IndexOf("_") + 1));
-                            }                            
-                        }                        
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.Error(String.Format("Ошибка при чтении ключей: {0}", ex.Message));
-                        Service.Monitor = 0;
-                    }
-                }
-                MainWindow.GetUser();
-                MainWindow.PosWindow();
+                Models.MainModel.ReadArgs(eventArgs.CommandLine.ToArray());
+                await Common.DbHelper.GetUserData();
+                Models.MainModel.SubSystems = await Common.DbHelper.GetSubSystemInfo();
+                await Models.MainModel.GetMessagesAsync();
                 app.MainWindow.Show();
                 app.MainWindow.WindowState = WindowState.Normal;
 

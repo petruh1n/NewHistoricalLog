@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,8 +23,9 @@ namespace NewHistoricalLog.Models
         {
             StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(name));
         }
-        static Logger logger = LogManager.GetCurrentClassLogger();
 
+        static Logger logger = LogManager.GetCurrentClassLogger();
+        public static System.Windows.Forms.NotifyIcon ni = new System.Windows.Forms.NotifyIcon();
         static DateTime startDate = DateTime.Now.AddHours(-1);
 
        
@@ -218,6 +220,22 @@ namespace NewHistoricalLog.Models
             }
         }
 
+        static MainModel()
+        {
+            ni.Icon = new System.Drawing.Icon(Path.Combine(Directory.GetCurrentDirectory(), "Images\\Msg.ico"));
+            ni.Visible = false;
+            ni.Text = "Журнал исторических сообщений";
+            ni.DoubleClick +=
+                async delegate (object sender, EventArgs args)
+                {
+                    await DbHelper.GetUserData();
+                    SubSystems = await DbHelper.GetSubSystemInfo();
+                    await GetMessagesAsync();
+                    SingleInstanceApplication.Current.MainWindow.Show();
+                    SingleInstanceApplication.Current.MainWindow.WindowState = WindowState.Normal;
+                };
+        }
+
         /// <summary>
         /// Стартовый метод приложения
         /// </summary>
@@ -229,7 +247,7 @@ namespace NewHistoricalLog.Models
             await DbHelper.GetUserData();
             SubSystems = await DbHelper.GetSubSystemInfo();
             await GetMessagesAsync();
-            //SingleInstanceApplication.Current.MainWindow.Close();
+            SingleInstanceApplication.Current.MainWindow.Close();
         }
         /// <summary>
         /// Получить сообщения
@@ -239,7 +257,9 @@ namespace NewHistoricalLog.Models
         {
             Status = string.Format("Получение сообщений за период с {0} по {1}", StartTime, EndTime);
             NeedProgressBar = true;
+            Indeterminant = true;
             Messages = await DbHelper.GetMessages(StartTime, EndTime);
+            Indeterminant = false;
             NeedProgressBar = false;
         } 
         /// <summary>
@@ -363,6 +383,12 @@ namespace NewHistoricalLog.Models
                     return "Text";
             }
         }
+        /// <summary>
+        /// Получение наследников по разметке
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="parent"></param>
+        /// <returns></returns>
         private static T GetVisualChild<T>(DependencyObject parent) where T : Visual
         {
             T child = null;
@@ -376,6 +402,10 @@ namespace NewHistoricalLog.Models
             }
             return child;
         }
+        /// <summary>
+        /// Открытие панели поиска с возможностью отображения экранной клавиатуры
+        /// </summary>
+        /// <param name="grid"></param>
         internal static void ShowSearchPanel(object grid)
         {
             try
@@ -423,10 +453,12 @@ namespace NewHistoricalLog.Models
             System.Threading.Thread printThread = new System.Threading.Thread(delegate() 
             {
                 Views.HiddenScreen window = new Views.HiddenScreen();
-                window.Owner = SingleInstanceApplication.Current.MainWindow;
+                //window.Owner = SingleInstanceApplication.Current.MainWindow;
                 window.Print = print;
                 window.SavePath = ExpAddresses;
                 window.ShowDialog();
+                Progress = 0;
+                NeedProgressBar = false;
             });
             printThread.SetApartmentState(System.Threading.ApartmentState.STA);
             printThread.Start();

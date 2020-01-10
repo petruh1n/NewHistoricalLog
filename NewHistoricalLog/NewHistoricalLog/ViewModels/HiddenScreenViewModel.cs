@@ -30,6 +30,9 @@ namespace NewHistoricalLog.ViewModels
         private bool needProgressBar;
         private ObservableCollection<MessageClass> messages = new ObservableCollection<MessageClass>();
         private ObservableCollection<SubSystem> subsytems = new ObservableCollection<SubSystem>();
+        private List<bool> columnVisibilities = new List<bool>() { true, true, true, true, true };
+        private int pagesize;
+        private System.Windows.TextWrapping wrapTextInGrid = System.Windows.TextWrapping.Wrap;
 
         /// <summary>
         /// Коллекция сообщений
@@ -247,6 +250,43 @@ namespace NewHistoricalLog.ViewModels
                 RaisePropertyChanged("SubSystems");
             }
         }
+        /// <summary>
+        /// Видимость колонок таблицы
+        /// </summary>
+        public List<bool> ColumnVisibilities
+        {
+            get { return columnVisibilities; }
+            set
+            {
+                columnVisibilities = value;
+                RaisePropertyChanged("ColumnVisibilities");
+            }
+        }
+        /// <summary>
+        /// Число строк на странице
+        /// </summary>
+        public int PageSize
+        {
+            get { return pagesize; }
+            set
+            {
+                pagesize = value;
+                RaisePropertyChanged("PageSize");
+            }
+        }
+        /// <summary>
+        /// Перенос текста по словам
+        /// </summary>
+        public System.Windows.TextWrapping WrapTextInGrid
+        {
+            get { return wrapTextInGrid; }
+            set
+            {
+                wrapTextInGrid = value;
+                RaisePropertyChanged("WrapTextInGrid");
+            }
+        }
+
         public HiddenScreenViewModel()
         {
             SubSystems = MainModel.SubSystems;
@@ -261,6 +301,9 @@ namespace NewHistoricalLog.ViewModels
             Indeterminant = MainModel.Indeterminant;
             AdminMode = MainModel.AdminMode;
             Filter = CriteriaOperator.TryParse(MainModel.Filter);
+            PageSize = Service.CountLines;
+            WrapTextInGrid = Service.WrapText;
+            ColumnVisibilities = MainModel.ExportColumns;
         }
     }
 }
