@@ -13,6 +13,20 @@ namespace NewHistoricalLog.ViewModels
     public class ExportViewModel:ViewModelBase
     {
         private bool? dialogResult;
+        private bool prior;
+        private bool kvit;
+        private bool val;
+        private bool source;
+        private bool user;
+        private string path = "";
+        private List<string> devices = new List<string>();
+        private bool sendToDmz = false;
+        private bool sendToDefaultDir;
+        private string defaultDir = "";
+        private bool isAdmin;
+        private bool sendToStorage;
+
+
         public bool? DialogResult
         {
             get { return dialogResult; }
@@ -22,8 +36,9 @@ namespace NewHistoricalLog.ViewModels
                 RaisePropertyChanged("DialogResult");
             }
         }
-
-        private bool prior;
+        /// <summary>
+        /// Флаг видимости колонки Приоритет
+        /// </summary>
         public bool PriorityVisible
         {
             get { return prior; }
@@ -33,7 +48,9 @@ namespace NewHistoricalLog.ViewModels
                 RaisePropertyChanged("PriorityVisible");
             }
         }
-        private bool kvit;
+        /// <summary>
+        /// Флаг видимости колонки Квитирование
+        /// </summary>
         public bool KvitVisible
         {
             get { return kvit; }
@@ -43,7 +60,9 @@ namespace NewHistoricalLog.ViewModels
                 RaisePropertyChanged("KvitVisible");
             }
         }
-        private bool val;
+        /// <summary>
+        /// Флаг видимости колонки Значение
+        /// </summary>
         public bool ValueVisible
         {
             get { return val; }
@@ -53,7 +72,9 @@ namespace NewHistoricalLog.ViewModels
                 RaisePropertyChanged("ValueVisible");
             }
         }
-        private bool source;
+        /// <summary>
+        /// Флаг видимости колонки Источник
+        /// </summary>
         public bool SourceVisible
         {
             get { return source; }
@@ -63,7 +84,9 @@ namespace NewHistoricalLog.ViewModels
                 RaisePropertyChanged("SourceVisible");
             }
         }
-        private bool user;
+        /// <summary>
+        /// Флаг видимости колонки Пользователь
+        /// </summary>
         public bool UserVisible
         {
             get { return user; }
@@ -73,7 +96,9 @@ namespace NewHistoricalLog.ViewModels
                 RaisePropertyChanged("UserVisible");
             }
         }
-        private string path="";
+        /// <summary>
+        /// Путь по умолчанию для экспорта
+        /// </summary>
         public string Path
         {
             get { return path; }
@@ -83,7 +108,9 @@ namespace NewHistoricalLog.ViewModels
                 RaisePropertyChanged("Path");
             }
         }
-        private List<string> devices = new List<string>();
+        /// <summary>
+        /// Список съемных устройств
+        /// </summary>
         public List<string> Devices
         {
             get { return devices; }
@@ -93,7 +120,9 @@ namespace NewHistoricalLog.ViewModels
                 RaisePropertyChanged("Devices");
             }
         }
-        private bool sendToDmz=false;
+        /// <summary>
+        /// Флаг отправки на ДМЗ
+        /// </summary>
         public bool SendToDmz
         {
             get { return sendToDmz; }
@@ -103,7 +132,9 @@ namespace NewHistoricalLog.ViewModels
                 RaisePropertyChanged("SendToDmz");
             }
         }
-        private bool sendToDefaultDir;
+        /// <summary>
+        /// Флаг отправки в директорию по умолчанию
+        /// </summary>
         public bool SendToDefaultDir
         {
             get { return sendToDefaultDir; }
@@ -113,7 +144,9 @@ namespace NewHistoricalLog.ViewModels
                 RaisePropertyChanged("SendToDefaultDir");
             }
         }
-        private string defaultDir="";
+        /// <summary>
+        /// Директория по умолчанию
+        /// </summary>
         public string DefaultDir
         {
             get { return defaultDir; }
@@ -123,7 +156,9 @@ namespace NewHistoricalLog.ViewModels
                 RaisePropertyChanged("DefaultDir");
             }
         }
-        private bool isAdmin;
+        /// <summary>
+        /// Флаг администратора
+        /// </summary>
         public bool IsAdmin
         {
             get { return isAdmin; }
@@ -133,7 +168,9 @@ namespace NewHistoricalLog.ViewModels
                 RaisePropertyChanged("IsAdmin");
             }
         }
-        private bool sendToStorage;
+        /// <summary>
+        /// Флаг отправки на съемный носитель
+        /// </summary>
         public bool SendToStorage
         {
             get { return sendToStorage; }
@@ -155,6 +192,7 @@ namespace NewHistoricalLog.ViewModels
             SourceVisible = Service.ColumnVisibilityList[3];
             UserVisible = Service.ColumnVisibilityList[4];
         }
+
         public List<string> GetDevices()
         {
             List<string> result = new List<string>();

@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using NLog;
 using System.Windows;
 using Microsoft.VisualBasic.ApplicationServices;
@@ -78,6 +75,8 @@ namespace NewHistoricalLog
                 await Common.DbHelper.GetUserData();
                 Models.MainModel.SubSystems = await Common.DbHelper.GetSubSystemInfo();
                 await Models.MainModel.GetMessagesAsync();
+                app.MainWindow.ShowActivated = true;
+                app.MainWindow.Topmost = true;
                 app.MainWindow.Show();
                 app.MainWindow.WindowState = WindowState.Normal;
 

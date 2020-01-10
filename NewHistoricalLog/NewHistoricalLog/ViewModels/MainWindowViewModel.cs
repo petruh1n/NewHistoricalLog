@@ -4,10 +4,6 @@ using GalaSoft.MvvmLight.Command;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using NewHistoricalLog.Common;
 using NewHistoricalLog.Models;
 using DevExpress.Data.Filtering;
 using System.Windows.Controls;
@@ -348,7 +344,7 @@ namespace NewHistoricalLog.ViewModels
             Messages = MainModel.Messages;
         }
 
-        private void GlobalPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void GlobalPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             SubSystems = MainModel.SubSystems;
             Messages = MainModel.Messages;
@@ -430,8 +426,7 @@ namespace NewHistoricalLog.ViewModels
 
         private void ExecutePrint()
         {
-            Views.PrintWindow window = new Views.PrintWindow();
-            window.Owner = SingleInstanceApplication.Current.MainWindow;
+            Views.PrintWindow window = new Views.PrintWindow() { Owner = SingleInstanceApplication.Current.MainWindow };
             if (window.ShowDialog() == true)
                 MainModel.GlobalExport(true);
         }
@@ -443,9 +438,8 @@ namespace NewHistoricalLog.ViewModels
 
         private void ExecuteSave(object destination)
         {
-            Views.ExportScreen window = new Views.ExportScreen();
-            window.Owner = SingleInstanceApplication.Current.MainWindow;
-            if(window.ShowDialog()==true)
+            Views.ExportScreen window = new Views.ExportScreen() { Owner = SingleInstanceApplication.Current.MainWindow };
+            if (window.ShowDialog()==true && MainModel.ExpAddresses.Count>0)
             {
                 MainModel.GlobalExport(false);
             }
@@ -468,8 +462,7 @@ namespace NewHistoricalLog.ViewModels
 
         private void ExecuteShowSettings()
         {
-            Views.SettingsScreen window = new Views.SettingsScreen();
-            window.Owner = SingleInstanceApplication.Current.MainWindow;
+            Views.SettingsScreen window = new Views.SettingsScreen() { Owner = SingleInstanceApplication.Current.MainWindow };
             window.ShowDialog();
         }
 
@@ -480,8 +473,7 @@ namespace NewHistoricalLog.ViewModels
 
         private void ExecuteShowAbout()
         {
-            InfoWindow window = new InfoWindow();
-            window.Owner = SingleInstanceApplication.Current.MainWindow;
+            InfoWindow window = new InfoWindow() { Owner = SingleInstanceApplication.Current.MainWindow };
             window.ShowDialog();
         }
 

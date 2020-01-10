@@ -17,6 +17,17 @@ namespace NewHistoricalLog.Models
         }
 
         private int id;
+        private string text;
+        private DateTime date;
+        private string kvited;
+        private MessagePriorityEnum priority;
+        private string messageValue;
+        private string source;
+        private string user;
+
+        /// <summary>
+        /// Идентификатор сообщений
+        /// </summary>
         public int Id
         {
             get { return id; }
@@ -26,7 +37,9 @@ namespace NewHistoricalLog.Models
                 OnPropertyChanged("Id");
             }
         }
-        private string text;
+        /// <summary>
+        /// Текст сообщений
+        /// </summary>
         public string Text
         {
             get { return text; }
@@ -36,7 +49,9 @@ namespace NewHistoricalLog.Models
                 OnPropertyChanged("Text");
             }
         }
-        private DateTime date;
+        /// <summary>
+        /// Дата сообщения
+        /// </summary>
         public DateTime Date
         {
             get { return date; }
@@ -46,7 +61,9 @@ namespace NewHistoricalLog.Models
                 OnPropertyChanged("Date");
             }
         }
-        private string kvited;
+        /// <summary>
+        /// Отметка квитирования
+        /// </summary>
         public string Kvited
         {
             get { return kvited; }
@@ -56,7 +73,9 @@ namespace NewHistoricalLog.Models
                 OnPropertyChanged("Kvited");
             }
         }
-        private MessagePriorityEnum priority;
+        /// <summary>
+        /// Приоритет сообщения
+        /// </summary>
         public MessagePriorityEnum Priority
         {
             get { return priority; }
@@ -66,7 +85,9 @@ namespace NewHistoricalLog.Models
                 OnPropertyChanged("Priority");
             }
         }
-        private string messageValue;
+        /// <summary>
+        /// Значение в сообщении
+        /// </summary>
         public string MessageValue
         {
             get { return messageValue; }
@@ -76,7 +97,9 @@ namespace NewHistoricalLog.Models
                 OnPropertyChanged("MessageValue");
             }
         }
-        private string source;
+        /// <summary>
+        /// Источник сообщения
+        /// </summary>
         public string Source
         {
             get { return source; }
@@ -86,7 +109,9 @@ namespace NewHistoricalLog.Models
                 OnPropertyChanged("Source");
             }
         }
-        private string user;
+        /// <summary>
+        /// Пользователь, создавший сообщение
+        /// </summary>
         public string User
         {
             get { return user; }

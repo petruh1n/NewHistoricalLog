@@ -78,22 +78,5 @@ namespace NewHistoricalLog
             }
             return result;
         }
-        /// <summary>
-        /// получить фильтр по его имени
-        /// </summary>
-        /// <param name="collection"></param>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public static FilterClass GetByName(IEnumerable<FilterClass> collection, string name)
-        {
-            foreach(var fc in collection)
-            {
-                if(fc.Name==name)
-                {
-                    return fc;
-                }
-            }
-            return null;
-        }
     }
 }

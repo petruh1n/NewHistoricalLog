@@ -1,21 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using System.Text;
-using System.Drawing.Printing;
-using System.Threading.Tasks;
-using System.Printing;
-using System.Management;
 using System.ComponentModel;
 using NLog;
 using System.Xml.Linq;
 using System.Xml;
 using System.IO;
 using Microsoft.Win32;
-using System.Windows.Data;
-using System.Windows.Markup;
-using DevExpress.Xpf.Editors;
 using System.Windows;
 
 namespace NewHistoricalLog
@@ -190,49 +181,6 @@ namespace NewHistoricalLog
         /// </summary>
         public static string PrintTitle { get; set; } = "Заголовок печати и экспорта";
         #endregion
-
-
-        public static bool TestDefaultPrinterConnection()
-        {
-            try
-            {
-                //// Set management scope 
-                //ManagementScope scope = new ManagementScope("\\root\\cimv2");
-                //scope.Connect();
-
-                ////// Select Printers from WMI Object Collections 
-                //ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT * FROM Win32_Printer");
-                //string printerName = "";
-                //foreach (ManagementObject printer in searcher.Get())
-                //{
-                //    printerName = printer["Name"].ToString().ToLower();
-                //    if (printerName.ToUpper() == GetDefaultPrinterName().ToUpper())
-                //    {
-                //        int state = Int32.Parse(printer["ExtendedPrinterStatus"].ToString());
-
-                //        if ((state == 1) || //Other
-                //            (state == 2) || //Unknown
-                //            (state == 7) || //Offline
-                //            (state == 9) || //error
-                //            (state == 11) //Not Available
-                //            )
-                //        {
-                //            return true;
-                //        }
-                //    }
-                //}
-                //return false;
-                var server = new LocalPrintServer();
-                PrintQueue queue = server.DefaultPrintQueue;
-                return !(queue.IsBusy | queue.IsOffline);
-            }
-            catch(Exception ex)
-            {
-                logger.Error("Ошибка при проверке доступности принтера: {0}", ex.Message);
-                return false;
-            }
-        }
-
         public static string GetStringFromBoolList(List<bool> list)
         {
             string str = "";
@@ -429,56 +377,5 @@ namespace NewHistoricalLog
         }
 
         #endregion
-    }
-    public class BoolToVisibleConverter : MarkupExtension, IValueConverter
-    {
-        public override object ProvideValue(IServiceProvider serviceProvider)
-        {
-            return this;
-        }
-
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            if (value == null || !(value is Boolean))
-            {
-                return null;
-            }
-            else
-            {
-                if ((bool)value)
-                    return System.Windows.Visibility.Visible;
-                else
-                    return System.Windows.Visibility.Collapsed;
-            }
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
-    public class BackBoolConverter : MarkupExtension, IValueConverter
-    {
-        public override object ProvideValue(IServiceProvider serviceProvider)
-        {
-            return this;
-        }
-
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            if (value == null || !(value is Boolean))
-            {
-                return null;
-            }
-            else
-            {
-                return !(bool)value;
-            }
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
+    }   
 }

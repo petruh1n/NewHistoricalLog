@@ -5,8 +5,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -27,9 +25,28 @@ namespace NewHistoricalLog.Models
         static Logger logger = LogManager.GetCurrentClassLogger();
         public static System.Windows.Forms.NotifyIcon ni = new System.Windows.Forms.NotifyIcon();
         static DateTime startDate = DateTime.Now.AddHours(-1);
+        static DateTime endTime = DateTime.Now;
+        static string filter="";
+        static ObservableCollection<MessageClass> messages = new ObservableCollection<MessageClass>();
+        static ObservableCollection<SubSystem> subsystems = new ObservableCollection<SubSystem>();
+        static bool needProgressBar = false;
+        static string status="";
+        static bool whiteMessages = true;
+        static bool greenMessages = true;
+        static bool yellowMessages = true;
+        static bool redMessages = true;
+        static bool indeterminant = false;
+        static int progress=0;
+        static int maxProgress=100;
+        static bool adminMode = false;
+        static string textFilterString;
+        static string filterColumnName = "Сообщение";
+        static List<bool> exportColumns = Service.ColumnVisibilityList;
+        static List<string> expAddresses = new List<string>();
 
-       
-
+        /// <summary>
+        /// Стартовая дата выборки
+        /// </summary>
         public static DateTime StartTime
         {
             get { return startDate; }
@@ -39,7 +56,9 @@ namespace NewHistoricalLog.Models
                 OnStaticPropertyChanged("StartTime");
             }
         }
-        static DateTime endTime = DateTime.Now;
+        /// <summary>
+        /// Конечная дата выборки
+        /// </summary>
         public static DateTime EndTime
         {
             get { return endTime; }
@@ -49,7 +68,9 @@ namespace NewHistoricalLog.Models
                 OnStaticPropertyChanged("EndTime");
             }
         }
-        static string filter;
+        /// <summary>
+        /// Строковый фильтр
+        /// </summary>
         public static string Filter
         {
             get { return filter; }
@@ -59,7 +80,9 @@ namespace NewHistoricalLog.Models
                 OnStaticPropertyChanged("Filter");
             }
         }
-        static ObservableCollection<MessageClass> messages = new ObservableCollection<MessageClass>();
+        /// <summary>
+        /// Коллекция сообщений
+        /// </summary>
         public static ObservableCollection<MessageClass> Messages
         {
             get { return messages; }
@@ -69,7 +92,9 @@ namespace NewHistoricalLog.Models
                 OnStaticPropertyChanged("Messages");
             }
         }  
-        static ObservableCollection<SubSystem> subsystems = new ObservableCollection<SubSystem>();
+        /// <summary>
+        /// коллекция подсистем для фильтрации
+        /// </summary>
         public static ObservableCollection<SubSystem> SubSystems
         {
             get { return subsystems; }
@@ -79,7 +104,9 @@ namespace NewHistoricalLog.Models
                 OnStaticPropertyChanged("SubSystems");
             }
         }
-        static bool needProgressBar=false;
+        /// <summary>
+        /// Флаг отображения прогресса
+        /// </summary>
         public static bool NeedProgressBar
         {
             get { return needProgressBar; }
@@ -89,7 +116,9 @@ namespace NewHistoricalLog.Models
                 OnStaticPropertyChanged("NeedProgressBar");
             }
         }
-        static string status;
+        /// <summary>
+        /// Статус
+        /// </summary>
         public static string Status
         {
             get { return status; }
@@ -99,7 +128,9 @@ namespace NewHistoricalLog.Models
                 OnStaticPropertyChanged("Status");
             }
         }
-        static bool whiteMessages=true;
+        /// <summary>
+        /// Флаг отображения сообщений с нормальнм приоритетом
+        /// </summary>
         public static bool WhiteMessages
         {
             get { return whiteMessages; }
@@ -109,7 +140,9 @@ namespace NewHistoricalLog.Models
                 OnStaticPropertyChanged("WhiteMessages");
             }
         }
-        static bool greenMessages=true;
+        /// <summary>
+        /// Флаг отображения сообщений с низким приоритетом
+        /// </summary>
         public static bool GreenMessages
         {
             get { return greenMessages; }
@@ -119,7 +152,9 @@ namespace NewHistoricalLog.Models
                 OnStaticPropertyChanged("GreenMessages");
             }
         }
-        static bool yellowMessages = true;
+        /// <summary>
+        /// Флаг отображения сообщений со средним приоритетом
+        /// </summary>
         public static bool YellowMessages
         {
             get { return yellowMessages; }
@@ -129,7 +164,9 @@ namespace NewHistoricalLog.Models
                 OnStaticPropertyChanged("YellowMessages");
             }
         }
-        static bool redMessages = true;
+        /// <summary>
+        /// Флаг отображения сообщений с высоким приоритетом
+        /// </summary>
         public static bool RedMessages
         {
             get { return redMessages; }
@@ -139,7 +176,9 @@ namespace NewHistoricalLog.Models
                 OnStaticPropertyChanged("RedMessages");
             }
         }
-        static bool indeterminant=false;
+        /// <summary>
+        /// Флаг отображения прогресс-бара без конкретных значений
+        /// </summary>
         public static bool Indeterminant
         {
             get { return indeterminant; }
@@ -149,7 +188,9 @@ namespace NewHistoricalLog.Models
                 OnStaticPropertyChanged("Indeterminant");
             }
         }
-        static int progress;
+        /// <summary>
+        /// Прогресс длительной операции
+        /// </summary>
         public static int Progress
         {
             get { return progress; }
@@ -159,7 +200,9 @@ namespace NewHistoricalLog.Models
                 OnStaticPropertyChanged("Progress");
             }
         }
-        static int maxProgress;
+        /// <summary>
+        /// Максимальное значние прогресса
+        /// </summary>
         public static int MaxProgress
         {
             get { return maxProgress; }
@@ -169,7 +212,9 @@ namespace NewHistoricalLog.Models
                 OnStaticPropertyChanged("MaxProgress");
             }
         }
-        static bool adminMode=false;
+        /// <summary>
+        /// Приложение в режиме администратора
+        /// </summary>
         public static bool AdminMode
         {
             get { return adminMode; }
@@ -179,7 +224,9 @@ namespace NewHistoricalLog.Models
                 OnStaticPropertyChanged("AdminMode");
             }
         }
-        static string textFilterString;
+        /// <summary>
+        /// Строка текстового фильтра
+        /// </summary>
         public static string TextFilterString
         {
             get { return textFilterString; }
@@ -189,7 +236,9 @@ namespace NewHistoricalLog.Models
                 OnStaticPropertyChanged("TextFilterString");
             }
         }
-        static string filterColumnName = "Сообщение";
+        /// <summary>
+        /// Заголовок колонки для фильтра
+        /// </summary>
         public static string FilterColumnName
         {
             get { return filterColumnName; }
@@ -199,7 +248,9 @@ namespace NewHistoricalLog.Models
                 OnStaticPropertyChanged("FilterColumnName");
             }
         }       
-        static List<bool> exportColumns = Service.ColumnVisibilityList;
+        /// <summary>
+        /// Видимость колонок для экспортируемого документа
+        /// </summary>
         public static List<bool> ExportColumns
         {
             get { return exportColumns; }
@@ -209,7 +260,9 @@ namespace NewHistoricalLog.Models
                 OnStaticPropertyChanged("ExportColumns");
             }
         }
-        static List<string> expAddresses = new List<string>();
+        /// <summary>
+        /// Список адресов для экспорта
+        /// </summary>
         public static List<string> ExpAddresses
         {
             get { return expAddresses; }
@@ -231,8 +284,9 @@ namespace NewHistoricalLog.Models
                     await DbHelper.GetUserData();
                     SubSystems = await DbHelper.GetSubSystemInfo();
                     await GetMessagesAsync();
+                    SingleInstanceApplication.Current.MainWindow.ShowActivated = true;
                     SingleInstanceApplication.Current.MainWindow.Show();
-                    SingleInstanceApplication.Current.MainWindow.WindowState = WindowState.Normal;
+                    SingleInstanceApplication.Current.MainWindow.Topmost =true;
                 };
         }
 
@@ -452,10 +506,7 @@ namespace NewHistoricalLog.Models
         {
             System.Threading.Thread printThread = new System.Threading.Thread(delegate() 
             {
-                Views.HiddenScreen window = new Views.HiddenScreen();
-                //window.Owner = SingleInstanceApplication.Current.MainWindow;
-                window.Print = print;
-                window.SavePath = ExpAddresses;
+                Views.HiddenScreen window = new Views.HiddenScreen() { Print = print, SavePath = ExpAddresses };
                 window.ShowDialog();
                 Progress = 0;
                 NeedProgressBar = false;

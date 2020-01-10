@@ -18,6 +18,12 @@ namespace NewHistoricalLog.Models
         }
 
         private string tablename;
+        private string description;
+        private ObservableCollection<Device> devices = new ObservableCollection<Device>();
+
+        /// <summary>
+        /// Имя таблицы
+        /// </summary>
         public string TableName
         {
             get { return tablename; }
@@ -27,7 +33,9 @@ namespace NewHistoricalLog.Models
                 OnPropertyChanged("TableName");
             }
         }
-        private string description;
+        /// <summary>
+        /// Описание подсистемы
+        /// </summary>
         public string Description
         {
             get { return description; }
@@ -37,7 +45,9 @@ namespace NewHistoricalLog.Models
                 OnPropertyChanged("Description");
             }
         }
-        private ObservableCollection<Device> devices = new ObservableCollection<Device>();
+        /// <summary>
+        /// Список устройств в подсистеме
+        /// </summary>
         public ObservableCollection<Device> Devices
         {
             get { return devices; }

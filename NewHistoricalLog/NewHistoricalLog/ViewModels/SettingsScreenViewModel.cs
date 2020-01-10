@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using GalaSoft.MvvmLight;
 using System.Windows.Input;
 using GalaSoft.MvvmLight.Command;
@@ -14,8 +11,20 @@ namespace NewHistoricalLog.ViewModels
 {
     public class SettingsScreenViewModel:ViewModelBase
     {
-
+        private string exportpath;
         private int pageSize;
+        private bool wrap;
+        private bool needKeyboard;
+        private bool? dialogResult;
+        private bool prior;
+        private bool kvit;
+        private bool val;
+        private bool source;
+        private bool user;
+
+        /// <summary>
+        /// Число строк на странице грида
+        /// </summary>
         public int PageSize
         {
             get { return pageSize; }
@@ -25,7 +34,9 @@ namespace NewHistoricalLog.ViewModels
                 RaisePropertyChanged("PageSize");
             }
         }
-        private string exportpath;
+        /// <summary>
+        /// Путь для экспорта по умолчанию
+        /// </summary>
         public string ExportPath
         {
             get { return exportpath; }
@@ -35,7 +46,9 @@ namespace NewHistoricalLog.ViewModels
                 RaisePropertyChanged("ExportPath");
             }
         }
-        private bool wrap;
+        /// <summary>
+        /// Переносить строки в гриде
+        /// </summary>
         public bool Wrap
         {
             get { return wrap; }
@@ -45,7 +58,9 @@ namespace NewHistoricalLog.ViewModels
                 RaisePropertyChanged("Wrap");
             }
         }
-        private bool needKeyboard;
+        /// <summary>
+        /// Нужна экранная клавиатура
+        /// </summary>
         public bool NeedKeyboard
         {
             get { return needKeyboard; }
@@ -55,7 +70,9 @@ namespace NewHistoricalLog.ViewModels
                 RaisePropertyChanged("NeedKeyboard");
             }
         }
-        private bool? dialogResult;
+        /// <summary>
+        /// Результат работы окна
+        /// </summary>
         public bool? DialogResult
         {
             get { return dialogResult; }
@@ -65,8 +82,9 @@ namespace NewHistoricalLog.ViewModels
                 RaisePropertyChanged("DialogResult");
             }
         }
-
-        private bool prior;
+        /// <summary>
+        /// Флаг видимости колонки Приоритет
+        /// </summary>
         public bool PriorityVisible
         {
             get { return prior; }
@@ -76,7 +94,9 @@ namespace NewHistoricalLog.ViewModels
                 RaisePropertyChanged("PriorityVisible");
             }
         }
-        private bool kvit;
+        /// <summary>
+        /// Флаг видимости колонки Квитирование
+        /// </summary>
         public bool KvitVisible
         {
             get { return kvit; }
@@ -86,7 +106,9 @@ namespace NewHistoricalLog.ViewModels
                 RaisePropertyChanged("KvitVisible");
             }
         }
-        private bool val;
+        /// <summary>
+        /// Флаг видимости колонки Значение
+        /// </summary>
         public bool ValueVisible
         {
             get { return val; }
@@ -96,7 +118,9 @@ namespace NewHistoricalLog.ViewModels
                 RaisePropertyChanged("ValueVisible");
             }
         }
-        private bool source;
+        /// <summary>
+        /// Флаг видимости колонки Источник
+        /// </summary>
         public bool SourceVisible
         {
             get { return source; }
@@ -106,7 +130,9 @@ namespace NewHistoricalLog.ViewModels
                 RaisePropertyChanged("SourceVisible");
             }
         }
-        private bool user;
+        /// <summary>
+        /// Флаг видимости колонки Пользователь
+        /// </summary>
         public bool UserVisible
         {
             get { return user; }
