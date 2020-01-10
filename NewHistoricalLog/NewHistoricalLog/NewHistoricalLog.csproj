@@ -135,43 +135,18 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="About.xaml.cs">
-      <DependentUpon>About.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Common\DbHelper.cs" />
     <Compile Include="Common\Helper.cs" />
-    <Compile Include="DXSplashScreen\AwaitScreen.xaml.cs">
-      <DependentUpon>AwaitScreen.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ExpWindow.xaml.cs">
-      <DependentUpon>ExpWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Models\Device.cs" />
     <Compile Include="Models\FilterClass.cs" />
-    <Compile Include="HiddenPrintWindow.xaml.cs">
-      <DependentUpon>HiddenPrintWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\InfoWindow.xaml.cs">
       <DependentUpon>InfoWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="MessageGridContent.cs" />
     <Compile Include="Models\MainModel.cs" />
     <Compile Include="Models\MessageClass.cs" />
     <Compile Include="Models\MessagePriorityEnum.cs" />
     <Compile Include="Models\SubSystem.cs" />
-    <Compile Include="OnScreenKeyboard.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="OnScreenKeyboard.Designer.cs">
-      <DependentUpon>OnScreenKeyboard.cs</DependentUpon>
-    </Compile>
-    <Compile Include="SelectColumnWindow.xaml.cs">
-      <DependentUpon>SelectColumnWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Common\Service.cs" />
-    <Compile Include="Settings.xaml.cs">
-      <DependentUpon>Settings.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Common\SingleInstanceManager.cs" />
     <Compile Include="Common\WINAPI.cs" />
     <Compile Include="ViewModels\ExportViewModel.cs" />
@@ -196,43 +171,7 @@
     <Compile Include="Views\SettingsScreen.xaml.cs">
       <DependentUpon>SettingsScreen.xaml</DependentUpon>
     </Compile>
-    <Page Include="About.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="DXSplashScreen\AwaitScreen.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="ExpWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="HiddenPrintWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Views\InfoWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="MainWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Compile Include="MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Page Include="PrintDictionary.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="SelectColumnWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Settings.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -262,7 +201,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MainWindowViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -276,9 +214,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <EmbeddedResource Include="OnScreenKeyboard.resx">
-      <DependentUpon>OnScreenKeyboard.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Licenses.licx" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -312,8 +247,6 @@
     <Content Include="Dll\DatabaseToolBox.dll" />
     <Content Include="Dll\ScreenKeyboard.dll" />
     <Resource Include="ChangeLog.txt" />
-    <Resource Include="DXSplashScreen\Image.png" />
-    <Resource Include="DXSplashScreen\Logo.png" />
     <Resource Include="Images\w512h5121380984608delete copy.png" />
     <None Include="Images\Msg.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

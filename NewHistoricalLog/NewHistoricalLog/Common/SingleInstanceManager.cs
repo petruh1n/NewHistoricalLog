@@ -58,12 +58,13 @@ namespace NewHistoricalLog
         {
             foreach (Window window in app.Windows)
             {
-                if (window != app.MainWindow & !(window is HiddenPrintWindow))
+                if (window != app.MainWindow & !(window is Views.HiddenScreen))
                 {
                     window.Close();
                 }
             }
-            app.MainWindow.Close();
+            Models.MainModel.ni.Visible = true;
+            SingleInstanceApplication.Current.MainWindow.Hide();
         }
 
 		protected async override void OnStartupNextInstance(StartupNextInstanceEventArgs eventArgs)

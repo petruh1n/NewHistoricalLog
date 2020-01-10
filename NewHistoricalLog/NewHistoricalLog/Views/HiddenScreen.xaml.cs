@@ -74,11 +74,11 @@ namespace NewHistoricalLog.Views
                 controlFooter.SetValue(StackPanel.OrientationProperty, Orientation.Horizontal);
 
                 var edit1 = new FrameworkElementFactory(typeof(TextEdit));
-                edit1.SetBinding(TextEdit.WidthProperty, new Binding("UsablePageWidth") { Converter = new MyConverter() });
+                edit1.SetBinding(TextEdit.WidthProperty, new Binding("UsablePageWidth") { Converter = new Common.MyConverter() });
                 controlFooter.AppendChild(edit1);
 
                 var edit2 = new FrameworkElementFactory(typeof(TextEdit));
-                edit2.SetBinding(TextEdit.WidthProperty, new Binding("UsablePageWidth") { Converter = new MyConverter() });
+                edit2.SetBinding(TextEdit.WidthProperty, new Binding("UsablePageWidth") { Converter = new Common.MyConverter() });
                 edit2.SetValue(TextEdit.HorizontalContentAlignmentProperty, HorizontalAlignment.Center);
                 edit2.SetValue(ExportSettings.TargetTypeProperty, TargetType.PageNumber);
                 edit2.SetValue(PageNumberExportSettings.FormatProperty, "Страница {0} из {1}");
@@ -86,7 +86,7 @@ namespace NewHistoricalLog.Views
                 controlFooter.AppendChild(edit2);
 
                 var edit3 = new FrameworkElementFactory(typeof(TextEdit));
-                edit3.SetBinding(TextEdit.WidthProperty, new Binding("UsablePageWidth") { Converter = new MyConverter() });
+                edit3.SetBinding(TextEdit.WidthProperty, new Binding("UsablePageWidth") { Converter = new Common.MyConverter() });
                 edit3.SetValue(TextEdit.HorizontalContentAlignmentProperty, HorizontalAlignment.Right);
                 edit3.SetValue(TextEdit.EditValueProperty, DateTime.Now);
                 controlFooter.AppendChild(edit3);

@@ -23,37 +23,24 @@ namespace NewHistoricalLog
 	public class Service
 	{
         static Logger logger = LogManager.GetCurrentClassLogger();
-        static bool isAdminMode = false;
-        static bool printing = false;
         public static event EventHandler<PropertyChangedEventArgs> StaticPropertyChanged;
         private static void OnStaticPropertyChanged(string propertyName)
         {
             if (StaticPropertyChanged != null)
                 StaticPropertyChanged(null, new PropertyChangedEventArgs(propertyName));
         }
-        static bool isOperating = true;
+        static string dmzPath="";
+        static string server = "";
+        static string database = "";
+        static string user = "";
+        static string password = "";
+        static TextWrapping wraptext = TextWrapping.Wrap;
+        static int countLines = 50;
+        static List<bool> columnVisibilityList = new List<bool>() { true, true, true, true, true };
+        static bool keyboardneeded=false;
 
-        #region Global properties
-        public static bool IsOperating
-        {
-            get { return isOperating; }
-            set { isOperating = value; OnStaticPropertyChanged("IsOperating"); }
-        }
-        /// <summary>
-        /// Глобальная коллекция сообщений
-        /// </summary>
-        public static ObservableCollection<MessageGridContent> Messages { get; set; } = new ObservableCollection<MessageGridContent>();
-        /// <summary>
-        /// Стартовая дата выборки
-        /// </summary>
-        public static DateTime StartDate { get; set; } = new DateTime(2017,3,7,10,0,0,0,DateTimeKind.Local);
-        /// <summary>
-        /// Конечная дата выборки
-        /// </summary>
-        public static DateTime EndDate { get; set; } = new DateTime(2017, 3, 7, 20, 0, 0, 0, DateTimeKind.Local);
+        #region Global properties  
 
-
-        static string server="";
         /// <summary>
         /// Адрес сервера SQL
         /// </summary>
@@ -65,8 +52,7 @@ namespace NewHistoricalLog
                 server = value;
                 OnStaticPropertyChanged("Server");
             }
-        }
-        static string database="";
+        }        
         /// <summary>
         /// Имя БД
         /// </summary>
@@ -78,8 +64,7 @@ namespace NewHistoricalLog
                 database = value;
                 OnStaticPropertyChanged("Database");
             }
-        }
-        static string user="";
+        }        
         /// <summary>
         /// Имя пользователя БД
         /// </summary>
@@ -91,8 +76,7 @@ namespace NewHistoricalLog
                 user = value;
                 OnStaticPropertyChanged("User");
             }
-        }
-        static string password="";
+        }        
         /// <summary>
         /// Пароль пользователя БД
         /// </summary>
@@ -104,8 +88,7 @@ namespace NewHistoricalLog
                 password = value;
                 OnStaticPropertyChanged("Password");
             }
-        }       
-        static TextWrapping wraptext = TextWrapping.Wrap;
+        }              
         /// <summary>
         /// Переносить текст в сообщении
         /// </summary>
@@ -117,27 +100,7 @@ namespace NewHistoricalLog
                 wraptext = value;
                 OnStaticPropertyChanged("WrapText");
             }
-        } 
-        /// <summary>
-         /// Столбец, по которому осуществляется текстовая фильтрация
-         /// </summary>
-        public static string FilterField { get; set; } = "Text";
-        /// <summary>
-        /// Фраза для текстового фильтра
-        /// </summary>
-        public static string TextFilterPhrase { get; set; } = "";
-        /// <summary>
-        /// Фраза для фильтра по подсистемам
-        /// </summary>
-        public static string SystemsFilterPhrase { get; set; } = "";
-        /// <summary>
-        /// Фраза для фильтра по приоритетам
-        /// </summary>
-        public static string PriorityFilterPhrase { get; set; } = "";
-        /// <summary>
-        /// Массив приоритетов сообщений
-        /// </summary>
-        public static bool[] Priorities { get; set; } = new bool[] { true, true, true, true };
+        }         
         /// <summary>
         /// Верхний левый угол экрана. Отступ сверху. 
         /// </summary>
@@ -153,8 +116,7 @@ namespace NewHistoricalLog
         /// <summary>
         /// Высота окна
         /// </summary>
-        public static double Height { get; set; }
-        static int countLines = 50;
+        public static double Height { get; set; }        
         /// <summary>
         /// Число строк в гриде
         /// </summary>
@@ -167,7 +129,9 @@ namespace NewHistoricalLog
                 OnStaticPropertyChanged("CountLines");
             }
         }
-        static List<bool> columnVisibilityList = new List<bool>() { true, true, true, true, true };
+        /// <summary>
+        /// Видимость колонок в основном гриде
+        /// </summary>
         public static List<bool> ColumnVisibilityList
         {
             get { return columnVisibilityList; }
@@ -181,8 +145,6 @@ namespace NewHistoricalLog
         /// Монитор, на котором будет открыто окно приложения
         /// </summary>
         public static int Monitor { get; set; } = 0;
-
-        static string dmzPath;
         /// <summary>
         /// Путь к ДМЗ
         /// </summary>
@@ -195,8 +157,6 @@ namespace NewHistoricalLog
                 OnStaticPropertyChanged("DmzPath");
             }
         }
-
-        static bool keyboardneeded;
         /// <summary>
         /// Флаг необходимсоти экранной клавиатуры
         /// </summary>
@@ -216,54 +176,18 @@ namespace NewHistoricalLog
         /// <summary>
         /// Список таблиц, в которых находятся подситемы
         /// </summary>
-        public static string TabsForScan { get; set; } = "ZDV-Задвижки;VS-Вспомсистемы;";
-        /// <summary>
-        /// Имя высокого приоритета
-        /// </summary>
-        public static string HighPrioriry { get; set; } = "Высокий";
-        /// <summary>
-        /// Имя среднего приоритета
-        /// </summary>
-        public static string MiddlePrioriry { get; set; } = "Средний";
-        /// <summary>
-        /// Имя низкого приоритета
-        /// </summary>
-        public static string LowPrioriry { get; set; } = "Низкий";
-        /// <summary>
-        /// Имя нормального приоритета
-        /// </summary>
-        public static string NormalPrioriry { get; set; } = "Нормальный";
+        public static string TabsForScan { get; set; } = "ZDV-Задвижки;VS-Вспомсистемы;";        
         /// <summary>
         /// Идентификатор группы администратора
         /// </summary>
         public static int AdminUserGroup { get; set; } = 1;
-
-        public static bool IsAdminMode
-        {
-            get { return isAdminMode; }
-            set
-            {
-                isAdminMode = value;
-                OnStaticPropertyChanged("IsAdminMode");
-            }
-        }
-
-        public static bool Printing
-        {
-            get { return printing; }
-            set
-            {
-                printing = value;
-                OnStaticPropertyChanged("Printing");
-            }
-        }
-
-        public static bool[] Fields { get; set; }
-
+        /// <summary>
+        /// Путь для сохранения по умолчанию
+        /// </summary>
         public static string SavePath { get; set; } = String.Format("{0}\\SEMHistory\\Export", Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments));
-
-        public static List<FilterClass> SubSystemsFiltersList { get; set; } = new List<FilterClass>();
-
+        /// <summary>
+        /// Заоголовок для печати и экспорта
+        /// </summary>
         public static string PrintTitle { get; set; } = "Заголовок печати и экспорта";
         #endregion
 

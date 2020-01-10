@@ -493,6 +493,8 @@ namespace NewHistoricalLog.ViewModels
         private void ExecuteClosing(object args)
         {
             (args as CancelEventArgs).Cancel = true;
+            MainModel.StartTime = DateTime.Now.AddHours(-1);
+            MainModel.EndTime = DateTime.Now;
             MainModel.ni.Visible = true;
             SingleInstanceApplication.Current.MainWindow.Hide();
         }

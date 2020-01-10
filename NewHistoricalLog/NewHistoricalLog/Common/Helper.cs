@@ -12,6 +12,18 @@ using System.Windows.Markup;
 
 namespace NewHistoricalLog.Common
 {
+    public class MyConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return ((double)value) / 3;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
     public class EnumDescriptionConverter : IValueConverter
     {
         private string GetEnumDescription(Enum enumObj)

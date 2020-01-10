@@ -15,21 +15,12 @@ namespace NewHistoricalLog.ViewModels
 {
     public class HiddenScreenViewModel:ViewModelBase
     {
-        private string filterColumnName = "Сообщение";
-        private bool filterVisible = false;
         private CriteriaOperator filter;
-        private string textFilter;
-        private bool adminMode = false;
         private bool red;
         private bool yellow;
         private bool green;
-        private bool white;
-        private bool indeterminant;
-        private DateTime endTime;
-        private DateTime startTime;
-        private bool needProgressBar;
+        private bool white;        
         private ObservableCollection<MessageClass> messages = new ObservableCollection<MessageClass>();
-        private ObservableCollection<SubSystem> subsytems = new ObservableCollection<SubSystem>();
         private List<bool> columnVisibilities = new List<bool>() { true, true, true, true, true };
         private int pagesize;
         private System.Windows.TextWrapping wrapTextInGrid = System.Windows.TextWrapping.Wrap;
@@ -45,63 +36,7 @@ namespace NewHistoricalLog.ViewModels
                 messages = value;
                 RaisePropertyChanged("Messages");
             }
-        }
-        /// <summary>
-        /// Флаг необходимости прогресс-бара
-        /// </summary>
-        public bool NeedProgressBar
-        {
-            get { return needProgressBar; }
-            set
-            {
-                needProgressBar = value;
-                RaisePropertyChanged("NeedProgressBar");
-            }
-        }
-        /// <summary>
-        /// Стартовая дата выборки
-        /// </summary>
-        public DateTime StartTime
-        {
-            get { return startTime; }
-            set
-            {
-                if (value != startTime)
-                {
-                    startTime = value;
-                    MainModel.StartTime = value;
-                    RaisePropertyChanged("StartTime");
-                }
-            }
-        }
-        /// <summary>
-        /// Конечная дата выборки
-        /// </summary>
-        public DateTime EndTime
-        {
-            get { return endTime; }
-            set
-            {
-                if (value != endTime)
-                {
-                    endTime = value;
-                    MainModel.EndTime = value;
-                    RaisePropertyChanged("EndTime");
-                }
-            }
-        }
-        /// <summary>
-        /// Прогресс-бар без значений
-        /// </summary>
-        public bool Indeterminant
-        {
-            get { return indeterminant; }
-            set
-            {
-                indeterminant = value;
-                RaisePropertyChanged("Indeterminant");
-            }
-        }
+        }        
         /// <summary>
         /// Показывать белые сообщения
         /// </summary>
@@ -171,34 +106,6 @@ namespace NewHistoricalLog.ViewModels
             }
         }
         /// <summary>
-        /// Режим админа
-        /// </summary>
-        public bool AdminMode
-        {
-            get { return adminMode; }
-            set
-            {
-                adminMode = value;
-                RaisePropertyChanged("AdminMode");
-            }
-        }
-        /// <summary>
-        /// Текстовый фильтр
-        /// </summary>
-        public string TextFilter
-        {
-            get { return textFilter; }
-            set
-            {
-                if (value != textFilter)
-                {
-                    textFilter = value;
-                    MainModel.TextFilterString = value;
-                    RaisePropertyChanged("TextFilter");
-                }
-            }
-        }
-        /// <summary>
         /// Фильтр сообщений
         /// </summary>
         public CriteriaOperator Filter
@@ -208,46 +115,6 @@ namespace NewHistoricalLog.ViewModels
             {
                 filter = value;
                 RaisePropertyChanged("Filter");
-            }
-        }
-        /// <summary>
-        /// Видимость фильтра
-        /// </summary>
-        public bool FilterVisible
-        {
-            get { return filterVisible; }
-            set
-            {
-                filterVisible = value;
-                RaisePropertyChanged("FilterVisible");
-            }
-        }
-        /// <summary>
-        /// Имя колонки фильтра
-        /// </summary>
-        public string FilterColumnName
-        {
-            get { return filterColumnName; }
-            set
-            {
-                if (value != filterColumnName)
-                {
-                    filterColumnName = value;
-                    MainModel.FilterColumnName = value;
-                    RaisePropertyChanged("FilterColumnName");
-                }
-            }
-        }
-        /// <summary>
-        /// Подсистемы для фильтрации
-        /// </summary>
-        public ObservableCollection<SubSystem> SubSystems
-        {
-            get { return subsytems; }
-            set
-            {
-                subsytems = value;
-                RaisePropertyChanged("SubSystems");
             }
         }
         /// <summary>
@@ -289,17 +156,11 @@ namespace NewHistoricalLog.ViewModels
 
         public HiddenScreenViewModel()
         {
-            SubSystems = MainModel.SubSystems;
             Messages = MainModel.Messages;
-            EndTime = MainModel.EndTime;
-            StartTime = MainModel.StartTime;
-            NeedProgressBar = MainModel.NeedProgressBar;
             White = MainModel.WhiteMessages;
             Green = MainModel.GreenMessages;
             Yellow = MainModel.YellowMessages;
             Red = MainModel.RedMessages;
-            Indeterminant = MainModel.Indeterminant;
-            AdminMode = MainModel.AdminMode;
             Filter = CriteriaOperator.TryParse(MainModel.Filter);
             PageSize = Service.CountLines;
             WrapTextInGrid = Service.WrapText;
