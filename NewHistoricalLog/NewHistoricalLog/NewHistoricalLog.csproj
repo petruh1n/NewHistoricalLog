@@ -97,9 +97,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Dll\ScreenKeyboard.dll</HintPath>
     </Reference>
-    <Reference Include="ServiceLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="ServiceLib, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\РЕЛИЗ\ServiceLib\4.5\ServiceLib.dll</HintPath>
+      <HintPath>Dll\ServiceLib.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -242,6 +242,7 @@
   <ItemGroup />
   <ItemGroup>
     <Content Include="Dll\ScreenKeyboard.dll" />
+    <Content Include="Dll\ServiceLib.dll" />
     <Resource Include="Images\w512h5121380984608delete copy.png" />
     <None Include="Images\Msg.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

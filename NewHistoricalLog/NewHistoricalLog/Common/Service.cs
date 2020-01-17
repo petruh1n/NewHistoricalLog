@@ -201,7 +201,7 @@ namespace NewHistoricalLog
             return result;
         }
         #region Settings
-
+        const string SettingsAdress = @"\SemSettings\History\Config.xml";
         public static Dictionary<string, object> GetSettingsDictionary()
         {
             Dictionary<string, object> result = new Dictionary<string, object>();
@@ -256,22 +256,28 @@ namespace NewHistoricalLog
         {
             try
             {
-                var dict = GetSettingsDictionary();
-                XDocument xdoc = XDocument.Load(Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments) + "\\SEMHistory\\Config.xml");
-                foreach (XElement Element in xdoc.Element("ApplicationConfiguration").Element("Settings").Elements("Setting"))
+                if (File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments) + SettingsAdress))
                 {
-                    XElement SettingName = Element.Element("Name");
-                    XElement SettingValue = Element.Element("Value");
-                    if (SettingName != null && SettingValue != null)
+                    var dict = GetSettingsDictionary();
+                    XDocument xdoc = XDocument.Load(Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments) + SettingsAdress);
+                    foreach (XElement Element in xdoc.Element("ApplicationConfiguration").Element("Settings").Elements("Setting"))
                     {
-                        object temp = new object();
-                        if (dict.ContainsKey(SettingName.Value))
+                        XElement SettingName = Element.Element("Name");
+                        XElement SettingValue = Element.Element("Value");
+                        if (SettingName != null && SettingValue != null)
                         {
-                            dict[SettingName.Value] = SettingValue.Value;
+                            if (dict.ContainsKey(SettingName.Value))
+                            {
+                                dict[SettingName.Value] = SettingValue.Value;
+                            }
                         }
                     }
+                    ParseDictionary(dict);
                 }
-                ParseDictionary(dict);
+                else
+                {
+                    GenerateXML_Config();
+                }
             }
             catch (Exception ex)
             {
@@ -288,7 +294,7 @@ namespace NewHistoricalLog
                 //получили словарь настроек
                 var dict = GetSettingsDictionary();
                 //открыли документ
-                XDocument xdoc = XDocument.Load(Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments) + "\\SEMHistory\\Config.xml");
+                XDocument xdoc = XDocument.Load(Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments) + SettingsAdress);
                 foreach (var setting in dict)
                 {
                     bool flag = false;
@@ -300,7 +306,8 @@ namespace NewHistoricalLog
                         counter++;
                         if (setting.Key == SettingName.Value)
                         {
-                            Element.SetElementValue(SettingValue.Name, dict[SettingName.Value]);
+
+                            Element.SetElementValue(SettingValue.Name, dict[SettingName.Value] == null ? "" : dict[SettingName.Value]);
                             flag = true;
                             break;
                         }
@@ -311,11 +318,51 @@ namespace NewHistoricalLog
                     }
                 }
 
-                xdoc.Save(Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments) + "\\SEMHistory\\Config.xml");
+                xdoc.Save(Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments) + SettingsAdress);
             }
             catch (Exception ex)
             {
                 logger.Error(String.Format("Ошибка записи файла конфигурации: {0}", ex.Message));
+            }
+
+        }
+        /// <summary>
+        /// Сгенерировать новый XML файл Config.XML
+        /// </summary>
+        public static void GenerateXML_Config()
+        {
+            try
+            {
+                ReadKey();
+                #region Config.xml
+                if (!Directory.Exists(new FileInfo(Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments) + SettingsAdress).Directory.FullName))
+                    Directory.CreateDirectory(new FileInfo(Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments) + SettingsAdress).Directory.FullName);
+                XmlTextWriter textWritter = new XmlTextWriter(Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments) + SettingsAdress, Encoding.UTF8);
+                textWritter.WriteStartDocument();
+                textWritter.WriteStartElement("ApplicationConfiguration");
+                textWritter.WriteEndElement();
+                textWritter.Close();
+                //получили словарь настроек
+                var dict = GetSettingsDictionary();
+                XDocument xDoc = new XDocument();
+                var parentElement = new XElement("ApplicationConfiguration");
+                var settingsGroupElement = new XElement("Settings");
+                int counter = 0;
+                foreach (var setting in dict)
+                {
+                    settingsGroupElement.Add(new XElement("Setting", new XElement("ID", counter), new XElement("Name", setting.Key), new XElement("Value", setting.Value), new XElement("Description")));
+                    counter++;
+                }
+                counter = 0;
+
+                parentElement.Add(settingsGroupElement);
+                xDoc.Add(parentElement);
+                xDoc.Save(Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments) + SettingsAdress);
+                #endregion
+            }
+            catch (Exception ex)
+            {
+                logger.Error(String.Format("Ошибка генерации файла конфигурации: {0}", ex.Message));
             }
 
         }
@@ -338,44 +385,6 @@ namespace NewHistoricalLog
                 return false;
             }
         }
-
-        public static void GenerateXMLConfig()
-        {
-            try
-            {
-                ReadKey();
-                #region Config.xml
-                Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments) + "\\SEMHistory");
-                XmlTextWriter textWritter = new XmlTextWriter(Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments) + "\\SEMHistory\\Config.xml", Encoding.UTF8);
-                textWritter.WriteStartDocument();
-                textWritter.WriteStartElement("ApplicationConfiguration");
-                textWritter.WriteEndElement();
-                textWritter.Close();
-                //получили словарь настроек
-                var dict = GetSettingsDictionary();
-                XDocument xDoc = new XDocument();
-                var parentElement = new XElement("ApplicationConfiguration");
-                var settingsGroupElement = new XElement("Settings");
-                int counter = 0;
-                foreach (var setting in dict)
-                {
-                    settingsGroupElement.Add(new XElement("Setting", new XElement("ID", counter), new XElement("Name", setting.Key), new XElement("Value", setting.Value), new XElement("Description")));
-                    counter++;
-                }
-                counter = 0;
-
-                parentElement.Add(settingsGroupElement);
-                xDoc.Add(parentElement);
-                //xDoc.WriteTo(new XmlTextWriter(Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments) + "\\SEMTrends\\Config.xml", Encoding.UTF8));
-                xDoc.Save(Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments) + "\\SEMHistory\\Config.xml");
-                #endregion
-            }
-            catch (Exception ex)
-            {
-                logger.Error(String.Format("Ошибка генерации файла конфигурации: {0}", ex.Message));
-            }
-        }
-
         #endregion
     }   
 }
