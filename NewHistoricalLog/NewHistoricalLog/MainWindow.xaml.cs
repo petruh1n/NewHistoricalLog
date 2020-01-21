@@ -152,8 +152,7 @@ namespace NewHistoricalLog
         {
             try
             {
-                SqlConnection connection = new SqlConnection();
-                connection.ConnectionString = Service.SqlConnectionString;
+                SqlConnection connection = new SqlConnection() { ConnectionString = Service.SqlConnectionString };
                 connection.Open();
                 SqlCommand command = connection.CreateCommand();
                 command.CommandText = string.Format(@"SELECT Accounts.GroupID FROM Accounts INNER JOIN CurrentUser ON CAST(Accounts.Login AS VARCHAR) = CAST(CurrentUser.Login AS VARCHAR)
@@ -175,7 +174,7 @@ namespace NewHistoricalLog
 
         #region Обработчики событий контролов       
 
-        private void PrintClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
+        private void PrintClick(object sender, ItemClickEventArgs e)
         {
             var scheduler = TaskScheduler.FromCurrentSynchronizationContext();
             SelectColumnWindow wind = new SelectColumnWindow();
@@ -200,7 +199,7 @@ namespace NewHistoricalLog
                     DXMessageBox.Show("Принтер, установленный в системе по умолчанию, занят или недоступен!", "Принтер недоступен", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
             }
-        }    
+        }
 
         void PrintMethod()
         {
@@ -250,14 +249,14 @@ namespace NewHistoricalLog
             }
         }
 
-        private void ClearTextFilterClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
+        private void ClearTextFilterClick(object sender, ItemClickEventArgs e)
         {
             ClearFilters();
         }
 
-        private void RefreshClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
+        private void RefreshClick(object sender, ItemClickEventArgs e)
         {
-            if(Service.EndDate>Service.StartDate)
+            if (Service.EndDate > Service.StartDate)
             {
                 LoadMessagesThread = new Thread(LoadMessagesMethod) { IsBackground = true };
                 DXSplashScreen.Show<AwaitScreen>(WindowStartupLocation.CenterOwner, new SplashScreenOwner(this));
@@ -271,12 +270,11 @@ namespace NewHistoricalLog
             }
         }
 
-        private void SaveClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
+        private void SaveClick(object sender, ItemClickEventArgs e)
         {
             try
-            {               
-                SelectColumnWindow wind = new SelectColumnWindow();
-                wind.Owner = this;
+            {
+                SelectColumnWindow wind = new SelectColumnWindow() { Owner = this };
                 if (wind.ShowDialog() != false)
                 {
                     messageGrid.Columns["Date"].AllowPrinting = wind.Fields[0];
@@ -290,13 +288,13 @@ namespace NewHistoricalLog
                     DXSplashScreen.SetState("Сохранение журнала");
                     DXSplashScreen.Progress(0);
                     SaveMessagesThread = new Thread(SaveMethod) { IsBackground = true };
-                    SaveMessagesThread.ApartmentState = ApartmentState.STA;
+                    SaveMessagesThread.SetApartmentState(ApartmentState.STA);
                     SaveMessagesThread.Start();
-                }                    
+                }
             }
             catch (Exception ex)
             {
-                if(DXSplashScreen.IsActive)
+                if (DXSplashScreen.IsActive)
                     DXSplashScreen.Close();
                 Dispatcher.Invoke(() => DXMessageBox.Show("Файл сохранить не удалось. Для подробной информации см. лог приложения.", "Ошибка при сохранении файла!", MessageBoxButton.OK, MessageBoxImage.Error));
                 logger.Error(String.Format("Ошибка при сохранении файла: {0}", ex.Message));
@@ -421,17 +419,17 @@ namespace NewHistoricalLog
             }
         }
 
-        private void ExitClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
+        private void ExitClick(object sender, ItemClickEventArgs e)
         {
             Close();
         }
 
-        private void StartDateChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
+        private void StartDateChanged(object sender, EditValueChangedEventArgs e)
         {
             Service.StartDate = Convert.ToDateTime(startDate.EditValue);
         }
 
-        private void EndDateChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
+        private void EndDateChanged(object sender, EditValueChangedEventArgs e)
         {
             Service.EndDate = Convert.ToDateTime(endDate.EditValue);
         }
@@ -442,9 +440,9 @@ namespace NewHistoricalLog
             ChangeFilterCriteria();
 		}
 
-        private void FilterColumnChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
+        private void FilterColumnChanged(object sender, EditValueChangedEventArgs e)
         {
-            switch(filterBox.EditValue.ToString())
+            switch (filterBox.EditValue.ToString())
             {
                 case "Сообщение":
                     Service.FilterField = "Text";
@@ -460,7 +458,7 @@ namespace NewHistoricalLog
                     break;
             }
         }
-		private void RefreshButtonClick(object sender, RoutedEventArgs e)
+        private void RefreshButtonClick(object sender, RoutedEventArgs e)
 		{
             if (Service.EndDate > Service.StartDate)
             {
@@ -490,17 +488,17 @@ namespace NewHistoricalLog
             return child;
         }
 
-        private void StartSearchClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
+        private void StartSearchClick(object sender, ItemClickEventArgs e)
         {
             messageView.ShowSearchPanel(true);
-            if(messageView.SearchControl==null)
+            if (messageView.SearchControl == null)
             {
                 Dispatcher.BeginInvoke(new Action(() =>
                 {
                     GetVisualChild<TextBox>(messageView.SearchControl).PreviewMouseLeftButtonDown += MainWindow_PreviewMouseLeftButtonDown; ;
                 }), DispatcherPriority.Loaded);
             }
-            
+
         }
 
         private void MainWindow_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -517,7 +515,7 @@ namespace NewHistoricalLog
             }
         }
 
-        private void SaveToClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
+        private void SaveToClick(object sender, ItemClickEventArgs e)
         {
             ExpWindow wind = new ExpWindow();
             wind.Owner = this;
@@ -552,7 +550,7 @@ namespace NewHistoricalLog
                             DXSplashScreen.Close();
                         Dispatcher.Invoke(() => DXMessageBox.Show("Файл сохранить не удалось. Для подробной информации см. лог приложения.", "Ошибка при сохранении файла!", MessageBoxButton.OK, MessageBoxImage.Error));
                         logger.Error(String.Format("Ошибка при сохранении файла: {0}", ex.Message));
-                    } 
+                    }
                 }
             }
         }
@@ -645,7 +643,7 @@ namespace NewHistoricalLog
             
         }
 
-        private void AboutClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
+        private void AboutClick(object sender, ItemClickEventArgs e)
         {
             About wind = new About();
             wind.Owner = this;
@@ -660,7 +658,7 @@ namespace NewHistoricalLog
             }
         }
 
-        private void SendToDmz(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
+        private void SendToDmz(object sender, ItemClickEventArgs e)
         {
             try
             {
@@ -681,7 +679,7 @@ namespace NewHistoricalLog
                     DXSplashScreen.Progress(0);
                     SaveMessagesThread = new Thread(SendToDMZMethod) { IsBackground = true };
                     SaveMessagesThread.Start();
-                }                
+                }
             }
             catch (Exception ex)
             {
@@ -995,11 +993,11 @@ namespace NewHistoricalLog
                 logger.Error("Ошибка при формировании массива подсистем: {0}", ex.Message);
                 return new List<SystemsItems>();
             }
-        }       
+        }
 
-        private void BarCheckItem_CheckedChanged(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
+        private void BarCheckItem_CheckedChanged(object sender, ItemClickEventArgs e)
         {
-            if((sender as BarCheckItem).IsChecked.Value)
+            if ((sender as BarCheckItem).IsChecked.Value)
             {
                 filterTextRow.Height = new GridLength(40);
                 subSystemsColumn.Width = new GridLength(220);

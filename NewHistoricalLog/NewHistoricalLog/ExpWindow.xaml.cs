@@ -72,7 +72,7 @@ namespace NewHistoricalLog
 
         private void ThemedWindow_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == System.Windows.Input.Key.Escape)
+            if (e.Key == Key.Escape)
             {
                 Close();
             }

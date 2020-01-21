@@ -9,8 +9,6 @@ namespace NewHistoricalLog
 {
     class WINAPI
     {
-        const int SC_CLOSE = 0xF010;
-        const int MF_BYCOMMAND = 0;
         const int WM_NCLBUTTONDOWN = 0x00A1;
         const int WM_NCHITTEST = 0x0084;
         const int HTCAPTION = 2;
@@ -18,11 +16,11 @@ namespace NewHistoricalLog
         static extern int SendMessage(IntPtr hWnd,
         int Msg, IntPtr wParam, IntPtr lParam);
 
-        [DllImport("User32.dll")]
-        static extern IntPtr GetSystemMenu(IntPtr hWnd, bool bRevert);
+        //[DllImport("User32.dll")]
+        //static extern IntPtr GetSystemMenu(IntPtr hWnd, bool bRevert);
 
-        [DllImport("User32.dll")]
-        static extern bool RemoveMenu(IntPtr hMenu, int uPosition, int uFlags);
+        //[DllImport("User32.dll")]
+        //static extern bool RemoveMenu(IntPtr hMenu, int uPosition, int uFlags);
 
         internal static IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {

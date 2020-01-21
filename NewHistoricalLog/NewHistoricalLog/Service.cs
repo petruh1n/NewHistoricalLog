@@ -273,7 +273,6 @@ namespace NewHistoricalLog
                     XElement SettingValue = Element.Element("Value");
                     if (SettingName != null && SettingValue != null)
                     {
-                        object temp = new object();
                         if (dict.ContainsKey(SettingName.Value))
                         {
                             dict[SettingName.Value] = SettingValue.Value;
