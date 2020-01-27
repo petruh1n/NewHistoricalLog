@@ -165,32 +165,6 @@ namespace NewHistoricalLog
         {
             try
             {
-                //// Set management scope 
-                //ManagementScope scope = new ManagementScope("\\root\\cimv2");
-                //scope.Connect();
-
-                ////// Select Printers from WMI Object Collections 
-                //ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT * FROM Win32_Printer");
-                //string printerName = "";
-                //foreach (ManagementObject printer in searcher.Get())
-                //{
-                //    printerName = printer["Name"].ToString().ToLower();
-                //    if (printerName.ToUpper() == GetDefaultPrinterName().ToUpper())
-                //    {
-                //        int state = Int32.Parse(printer["ExtendedPrinterStatus"].ToString());
-
-                //        if ((state == 1) || //Other
-                //            (state == 2) || //Unknown
-                //            (state == 7) || //Offline
-                //            (state == 9) || //error
-                //            (state == 11) //Not Available
-                //            )
-                //        {
-                //            return true;
-                //        }
-                //    }
-                //}
-                //return false;
                 var server = new LocalPrintServer();
                 PrintQueue queue = server.DefaultPrintQueue;
                 return !(queue.IsBusy | queue.IsOffline);

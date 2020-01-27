@@ -82,13 +82,13 @@ namespace NewHistoricalLog
             return result;
         }
 	}
-	public enum MessageType
-	{
-		red=1,
-		yellow,
-		green,
-		gray
-	}
+	//public enum MessageType
+	//{
+	//	red=1,
+	//	yellow,
+	//	green,
+	//	gray
+	//}
 
     
 }
