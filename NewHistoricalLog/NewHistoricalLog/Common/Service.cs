@@ -221,6 +221,7 @@ namespace NewHistoricalLog
             result.Add("Заголовок печати и экспорта", PrintTitle);
             result.Add("Идентификатор группы администратора",AdminUserGroup);
             result.Add("Видимость колонок", GetStringFromBoolList(ColumnVisibilityList));
+            result.Add("Таблицы для фильтров", TabsForScan);
             return result;
         }
         public static void ParseDictionary(Dictionary<string, object> dictionary)
@@ -243,6 +244,7 @@ namespace NewHistoricalLog
                 PrintTitle = dictionary["Заголовок печати и экспорта"].ToString();
                 AdminUserGroup = Convert.ToInt32(dictionary["Идентификатор группы администратора"]);
                 ColumnVisibilityList = GetBoolListFromString(dictionary["Видимость колонок"].ToString());
+                TabsForScan = dictionary["Таблицы для фильтров"].ToString();
             }
             catch (Exception ex)
             {
