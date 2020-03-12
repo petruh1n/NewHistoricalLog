@@ -193,7 +193,7 @@ namespace NewHistoricalLog
         public static List<bool> GetBoolListFromString(string str)
         {
             List<bool> result = new List<bool>();
-            var sStr = str.Split(new char[] { ';' });
+            var sStr = str.Split(new char[] { ';' },StringSplitOptions.RemoveEmptyEntries);
             for(int i=0;i<sStr.Length;i++)
             {
                 result.Add(Convert.ToBoolean(sStr[i]));
