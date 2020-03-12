@@ -100,11 +100,12 @@ namespace NewHistoricalLog.Common
                 {
                     ObservableCollection<MessageClass> result = new ObservableCollection<MessageClass>();
                     SqlCommand command = connection.CreateCommand();
-                    command.CommandText = string.Format("SELECT DTime, Message, UserName, Place, Value, Priority, DTimeAck "+
+                    command.CommandText = string.Format("SELECT DTime, Message, UserName, Place, Value, Priority, DTimeAck, SysNum "+
                         "FROM dbo.PLCMessage WHERE DTime>=CAST ('{0}' as datetime2) AND DTime<=CAST ('{1}' as datetime2) ORDER BY ID", startTime, endTime);
                     SqlDataReader reader = await command.ExecuteReaderAsync();
                     while (await reader.ReadAsync())
                     {
+                        string place = reader["Place"] == null ? "" : reader["Place"].ToString();
                         result.Add(new MessageClass
                         {
                             Date = Convert.ToDateTime(reader["DTime"]),
@@ -113,7 +114,8 @@ namespace NewHistoricalLog.Common
                             Source = reader["Place"].ToString(),
                             MessageValue = reader["Value"].ToString(),
                             Kvited = reader["DTimeAck"].ToString(),
-                            Priority = (MessagePriorityEnum)Convert.ToInt32(reader["Priority"])
+                            Priority = (MessagePriorityEnum)Convert.ToInt32(reader["Priority"]),
+                            Code = place.ToUpper() == "ACCESS" ? reader["SysNum"].ToString() : ""
                         });
                     }
                     reader.Close();

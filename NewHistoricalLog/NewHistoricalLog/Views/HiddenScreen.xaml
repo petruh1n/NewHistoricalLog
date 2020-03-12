@@ -129,6 +129,7 @@
                     <dxe:TextEditSettings PrintTextWrapping="{Binding DataContext.WrapTextInGrid, RelativeSource={RelativeSource AncestorType=Window}}" TextWrapping="{Binding DataContext.WrapTextInGrid, RelativeSource={RelativeSource AncestorType=Window}}"/>
                 </dxg:GridColumn.EditSettings>
             </dxg:GridColumn>
+            <dxg:GridColumn FieldName="Code" IsSmart="True" Header="Код" Width="100"/>
             <dxg:GridColumn FieldName="Kvited" IsSmart="True" Header="Квитирование" PrintCellStyle="{StaticResource TextColumnPrintingStyle}" Width="150"                            
                             Visible="{Binding DataContext.ColumnVisibilities[1], RelativeSource={RelativeSource AncestorType=Window}}"/>
             <dxg:GridColumn FieldName="MessageValue" IsSmart="True" Header="Значение" PrintCellStyle="{StaticResource TextColumnPrintingStyle}" Width="100"                            

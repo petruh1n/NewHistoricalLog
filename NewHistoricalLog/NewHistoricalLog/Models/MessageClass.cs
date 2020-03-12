@@ -24,6 +24,7 @@ namespace NewHistoricalLog.Models
         private string messageValue;
         private string source;
         private string user;
+        private string code="";
 
         /// <summary>
         /// Идентификатор сообщений
@@ -119,6 +120,18 @@ namespace NewHistoricalLog.Models
             {
                 user = value;
                 OnPropertyChanged("User");
+            }
+        }
+        /// <summary>
+        /// Код сообщения Access
+        /// </summary>
+        public string Code
+        {
+            get { return code; }
+            set
+            {
+                code = value;
+                OnPropertyChanged("Code");
             }
         }
     }
