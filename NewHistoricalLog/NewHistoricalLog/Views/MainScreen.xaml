@@ -118,10 +118,18 @@
         <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Orientation="Horizontal">
             <TextBlock Margin="5" Text="Начальная дата выборки: " FontSize="16" VerticalAlignment="Center" Foreground="Black"/>
             <dxe:DateEdit Margin="5" FontSize="16" Width="180" EditValue="{Binding StartTime,UpdateSourceTrigger=LostFocus,Mode=TwoWay}" 
-                          MaskType="DateTime" Mask="G" MaskUseAsDisplayFormat="True" />
+                          MaskType="DateTime" Mask="G" MaskUseAsDisplayFormat="True" >
+                <dxe:DateEdit.StyleSettings>
+                    <dxe:DateEditPickerStyleSettings/>
+                </dxe:DateEdit.StyleSettings>
+            </dxe:DateEdit>
             <TextBlock Margin="5" Text="Конечная дата выборки: " FontSize="16" VerticalAlignment="Center" Foreground="Black"/>
             <dxe:DateEdit Margin="5" FontSize="16" Width="180" EditValue="{Binding EndTime,UpdateSourceTrigger=LostFocus,Mode=TwoWay}" 
-                          MaskType="DateTime" Mask="G" MaskUseAsDisplayFormat="True" />
+                          MaskType="DateTime" Mask="G" MaskUseAsDisplayFormat="True" >
+                <dxe:DateEdit.StyleSettings>
+                    <dxe:DateEditPickerStyleSettings/>
+                </dxe:DateEdit.StyleSettings>
+            </dxe:DateEdit>
         </StackPanel>
         <dx:SimpleButton Grid.Row="2" Grid.ColumnSpan="2" HorizontalAlignment="Right" Width="170" Content="Обновить" FontSize="16" Margin="5"
                          Command="{Binding LoadMessagesCommand}" />

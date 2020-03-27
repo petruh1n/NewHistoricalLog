@@ -2,6 +2,7 @@
 using System.Windows;
 using DevExpress.Xpf.Core;
 using System.Windows.Interop;
+using DevExpress.Xpf.Editors;
 
 namespace NewHistoricalLog.Views
 {
@@ -34,6 +35,14 @@ namespace NewHistoricalLog.Views
         {
             e.Result = e.ConditionalValue;
             e.Handled = true;
+        }
+    }
+    public class EditorLocalizerEx : EditorLocalizer
+    {
+        protected override void PopulateStringTable()
+        {
+            base.PopulateStringTable();
+            this.AddString(EditorStringId.LastPage, "Последняя страница");
         }
     }
 }
