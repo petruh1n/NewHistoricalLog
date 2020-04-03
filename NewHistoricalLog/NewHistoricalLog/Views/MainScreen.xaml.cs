@@ -11,6 +11,10 @@ namespace NewHistoricalLog.Views
     /// </summary>
     public partial class MainScreen : ThemedWindow
     {
+        static MainScreen()
+        {
+            EditorLocalizer.Active = new EditorLocalizerEx();
+        }
         public MainScreen()
         {
             InitializeComponent();
@@ -43,6 +47,16 @@ namespace NewHistoricalLog.Views
         {
             base.PopulateStringTable();
             this.AddString(EditorStringId.LastPage, "Последняя страница");
+            this.AddString(EditorStringId.NextPage, "Следующая страница");
+            this.AddString(EditorStringId.FirstPage, "Первая страница");
+            this.AddString(EditorStringId.PrevPage, "Предыдущая страница");
+            this.AddString(EditorStringId.LookUpSearch, "Поиск");
+            this.AddString(EditorStringId.LookUpClose, "Закрыть");
+            this.AddString(EditorStringId.Page, "Страница");
+            this.AddString(EditorStringId.Of, "из {0}");
+            this.AddString(EditorStringId.DatePickerMinutes, "мин");
+            this.AddString(EditorStringId.DatePickerHours, "час");
+            this.AddString(EditorStringId.DatePickerSeconds, "сек");
         }
     }
 }
