@@ -147,7 +147,7 @@
                             <dx:Format Background="White" Foreground="Black" TextDecorations="{x:Null}"/>
                         </dxg:FormatCondition>
                         <dxg:FormatCondition ApplyToRow="True" Expression="[Priority] = 'Low'" FieldName="Priority">
-                            <dx:Format Background="Green" Foreground="Black" TextDecorations="{x:Null}"/>
+                            <dx:Format Background="#00FF00" Foreground="Black" TextDecorations="{x:Null}"/>
                         </dxg:FormatCondition>
                         <dxg:FormatCondition ApplyToRow="True" Expression="[Priority] = 'Middle'" FieldName="Priority">
                             <dx:Format Background="Yellow" Foreground="Black" TextDecorations="{x:Null}"/>

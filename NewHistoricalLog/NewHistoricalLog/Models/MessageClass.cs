@@ -93,7 +93,7 @@ namespace NewHistoricalLog.Models
             get { return messageValue; }
             set
             {
-                messageValue = value;
+                messageValue = value=="NaN"?"":value;
                 OnPropertyChanged("MessageValue");
             }
         }

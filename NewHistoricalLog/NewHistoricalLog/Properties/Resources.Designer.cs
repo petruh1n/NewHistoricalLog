@@ -59,5 +59,15 @@ namespace NewHistoricalLog.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Icon, аналогичного (Значок).
+        /// </summary>
+        internal static System.Drawing.Icon Msg {
+            get {
+                object obj = ResourceManager.GetObject("Msg", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
     }
 }

@@ -275,19 +275,41 @@ namespace NewHistoricalLog.Models
 
         static MainModel()
         {
-            ni.Icon = new System.Drawing.Icon(Path.Combine(Directory.GetCurrentDirectory(), "Images\\Msg.ico"));
+            //ni.Icon = new System.Drawing.Icon(Path.Combine(Directory.GetCurrentDirectory(), "Images\\Msg.ico"));
+            ni.Icon = Properties.Resources.Msg;
             ni.Visible = false;
             ni.Text = "Журнал исторических сообщений";
             ni.DoubleClick +=
                 async delegate (object sender, EventArgs args)
                 {
                     await DbHelper.GetUserData();
-                    SubSystems = await DbHelper.GetSubSystemInfo();
+                    if(string.IsNullOrEmpty(Filter))
+                        SubSystems = await DbHelper.GetSubSystemInfo();
                     await GetMessagesAsync();
                     SingleInstanceApplication.Current.MainWindow.ShowActivated = true;
                     SingleInstanceApplication.Current.MainWindow.Show();
                     SingleInstanceApplication.Current.MainWindow.Topmost =true;
                 };
+            System.Windows.Forms.Timer fixControlTimer = new System.Windows.Forms.Timer();
+            fixControlTimer.Interval = 1000;
+            fixControlTimer.Tick += FixControlTimer_Tick;
+            fixControlTimer.Start();
+        }
+        private static void FixControlTimer_Tick(object sender, EventArgs e)
+        {
+            (sender as System.Windows.Forms.Timer).Stop();
+            try
+            {
+                if (Service.FollowFix && Proficy.iFixToolkit.Adapter2.Helper.FixIsFixRunning() == 0)
+                {
+                    Environment.Exit(0);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Ошибка определения состояния iFix: {0}", ex.Message);
+            }
+            (sender as System.Windows.Forms.Timer).Start();
         }
 
         /// <summary>
@@ -388,20 +410,15 @@ namespace NewHistoricalLog.Models
                         fString += string.Format(" AND [Priority] <> {0}", i+1);
                     }
                 }
-                foreach(var subSys in SubSystems)
+                var ssFstr = SubSystem.GetFilterString(SubSystems);
+                if (string.IsNullOrEmpty(fString))
                 {
-                    foreach(var dev in subSys.Devices)
-                    {
-                        if(dev.Selected && string.IsNullOrEmpty(fString))
-                        {
-                            fString = dev.DeviceFilter.Expresion;
-                        }
-                        else if(dev.Selected)
-                        {
-                            fString += string.Format(" OR {0}", dev.DeviceFilter.Expresion);
-                        }
-                    }
+                    fString = ssFstr;
                 }
+                else if(!string.IsNullOrEmpty(ssFstr))
+                {
+                    fString += string.Format(" AND {0}", ssFstr);
+                }                
                 if(!string.IsNullOrEmpty(TextFilterString) && string.IsNullOrEmpty(fString))
                 {
                     fString = string.Format("Contains ([{0}], '{1}')", GetFilterColumnName(FilterColumnName), TextFilterString);

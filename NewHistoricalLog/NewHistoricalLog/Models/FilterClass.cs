@@ -52,31 +52,31 @@ namespace NewHistoricalLog
         {
             Name = name;
             Selected = false;
-            expression = string.Format("(Contains([Text], '{0} ') Or Contains([Text], '{0}.'))", name);
+            expression = string.Format("(Contains([Text], '{0} ') OR Contains([Text], '{0}.'))", name);
         }
         /// <summary>
         /// Получить строку фильтрации по подсистемам
         /// </summary>
         /// <param name="collection"></param>
         /// <returns></returns>
-        public static string GetFilterString(IEnumerable<FilterClass> collection)
-        {
-            string result = "";
-            foreach(var fc in collection)
-            {
-                if(fc.Selected)
-                {
-                    if(string.IsNullOrEmpty(result))
-                    {
-                        result = fc.Expresion;
-                    }
-                    else
-                    {
-                        result += string.Format(" Or {0}", fc.Expresion);
-                    }
-                }
-            }
-            return result;
-        }
+        //public static string GetFilterString(IEnumerable<FilterClass> collection)
+        //{
+        //    string result = "";
+        //    foreach(var fc in collection)
+        //    {
+        //        if(fc.Selected)
+        //        {
+        //            if(string.IsNullOrEmpty(result))
+        //            {
+        //                result = fc.Expresion;
+        //            }
+        //            else
+        //            {
+        //                result += string.Format(" OR {0}", fc.Expresion);
+        //            }
+        //        }
+        //    }
+        //    return result;
+        //}
     }
 }

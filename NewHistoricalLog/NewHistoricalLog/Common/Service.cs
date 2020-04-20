@@ -180,6 +180,7 @@ namespace NewHistoricalLog
         /// Заоголовок для печати и экспорта
         /// </summary>
         public static string PrintTitle { get; set; } = "Заголовок печати и экспорта";
+        public static bool FollowFix { get; set; } = true;
         #endregion
         public static string GetStringFromBoolList(List<bool> list)
         {
@@ -222,6 +223,7 @@ namespace NewHistoricalLog
             result.Add("Идентификатор группы администратора",AdminUserGroup);
             result.Add("Видимость колонок", GetStringFromBoolList(ColumnVisibilityList));
             result.Add("Таблицы для фильтров", TabsForScan);
+            result.Add("Следить за работой iFix", FollowFix);
             return result;
         }
         public static void ParseDictionary(Dictionary<string, object> dictionary)
@@ -245,6 +247,7 @@ namespace NewHistoricalLog
                 AdminUserGroup = Convert.ToInt32(dictionary["Идентификатор группы администратора"]);
                 ColumnVisibilityList = GetBoolListFromString(dictionary["Видимость колонок"].ToString());
                 TabsForScan = dictionary["Таблицы для фильтров"].ToString();
+                FollowFix = Convert.ToBoolean(dictionary["Следить за работой iFix"]);
             }
             catch (Exception ex)
             {

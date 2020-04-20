@@ -57,5 +57,25 @@ namespace NewHistoricalLog.Models
                 OnPropertyChanged("Devices");
             }
         }
+
+        public static string GetFilterString(IEnumerable<SubSystem> collection)
+        {
+            string result = "";
+            foreach(var element in collection)
+            {
+                foreach(var device in element.Devices)
+                {
+                    if(device.Selected && string.IsNullOrEmpty(result))
+                    {
+                        result = device.DeviceFilter.Expresion;
+                    }
+                    else if(device.Selected)
+                    {
+                        result += string.Format(" OR {0}", device.DeviceFilter.Expresion);
+                    }
+                }
+            }
+            return string.IsNullOrEmpty(result)?"":string.Format("({0})",result);
+        }
     }
 }
