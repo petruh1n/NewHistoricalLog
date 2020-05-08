@@ -43,6 +43,7 @@ namespace NewHistoricalLog.Models
         static string filterColumnName = "Сообщение";
         static List<bool> exportColumns = Service.ColumnVisibilityList;
         static List<string> expAddresses = new List<string>();
+        static bool ingMode;
 
         /// <summary>
         /// Стартовая дата выборки
@@ -270,6 +271,18 @@ namespace NewHistoricalLog.Models
             {
                 expAddresses = value;
                 OnStaticPropertyChanged("ExpAddresses");
+            }
+        }
+        /// <summary>
+        /// Приложение в режиме инженера
+        /// </summary>
+        public static bool IngMode
+        {
+            get { return ingMode; }
+            set
+            {
+                ingMode = value;
+                OnStaticPropertyChanged("IngMode");
             }
         }
 

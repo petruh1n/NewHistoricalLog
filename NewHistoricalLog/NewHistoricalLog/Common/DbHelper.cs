@@ -146,6 +146,7 @@ namespace NewHistoricalLog.Common
                     while(await reader.ReadAsync())
                     {
                         MainModel.AdminMode = Convert.ToInt32(reader["GroupID"]) == Service.AdminUserGroup;
+                        MainModel.IngMode = Convert.ToInt32(reader["GroupId"]) <= Service.IngUserGroup;
                     }
                     reader.Close();
                     DisconnectFromDatabase(connection);

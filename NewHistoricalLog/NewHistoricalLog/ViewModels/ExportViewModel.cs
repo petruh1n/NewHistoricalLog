@@ -25,6 +25,7 @@ namespace NewHistoricalLog.ViewModels
         private string defaultDir = "";
         private bool isAdmin;
         private bool sendToStorage;
+        private bool isIng;
 
 
         public bool? DialogResult
@@ -169,6 +170,18 @@ namespace NewHistoricalLog.ViewModels
             }
         }
         /// <summary>
+        /// Флаг инженера
+        /// </summary>
+        public bool IsIng
+        {
+            get { return isIng; }
+            set
+            {
+                isIng = value;
+                RaisePropertyChanged("IsIng");
+            }
+        }
+        /// <summary>
         /// Флаг отправки на съемный носитель
         /// </summary>
         public bool SendToStorage
@@ -184,6 +197,7 @@ namespace NewHistoricalLog.ViewModels
         public ExportViewModel()
         {
             IsAdmin = Models.MainModel.AdminMode;
+            IsIng = Models.MainModel.IngMode;
             DefaultDir = Service.SavePath;
             Devices = GetDevices();
             PriorityVisible = Service.ColumnVisibilityList[0];

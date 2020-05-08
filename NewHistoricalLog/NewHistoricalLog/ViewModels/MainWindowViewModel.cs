@@ -35,6 +35,7 @@ namespace NewHistoricalLog.ViewModels
         private int progress;
         private int maxProgress;
         private string status;
+        private double mFontSize = 14;
 
         /// <summary>
         /// Коллекция сообщений
@@ -324,6 +325,18 @@ namespace NewHistoricalLog.ViewModels
                 RaisePropertyChanged("Status");
             }
         }
+        /// <summary>
+        /// Размер шрифта
+        /// </summary>
+        public double MainFontSize
+        {
+            get { return mFontSize; }
+            set
+            {
+                mFontSize = value;
+                RaisePropertyChanged("MainFontSize");
+            }
+        }
 
         public MainWindowViewModel()
         {
@@ -364,6 +377,7 @@ namespace NewHistoricalLog.ViewModels
             MaxProgress = MainModel.MaxProgress;
             Progress = MainModel.Progress;
             Status = MainModel.Status;
+            MainFontSize = Service.MainFontSize;
         }
 
 

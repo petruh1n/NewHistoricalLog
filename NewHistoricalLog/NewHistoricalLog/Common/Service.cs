@@ -29,6 +29,7 @@ namespace NewHistoricalLog
         static int countLines = 50;
         static List<bool> columnVisibilityList = new List<bool>() { true, true, true, true, true };
         static bool keyboardneeded=false;
+        static double mainFontSize=14;
 
         #region Global properties  
 
@@ -181,6 +182,23 @@ namespace NewHistoricalLog
         /// </summary>
         public static string PrintTitle { get; set; } = "Заголовок печати и экспорта";
         public static bool FollowFix { get; set; } = true;
+        /// <summary>
+        /// Идентификатор группы инженера
+        /// </summary>
+        public static int IngUserGroup { get; set; } = 2;
+        /// <summary>
+        /// Размер шрифта
+        /// </summary>        
+        public static double MainFontSize
+        {
+            get { return mainFontSize; }
+            set
+            {
+                mainFontSize = value;
+                OnStaticPropertyChanged("MainFontSize");
+            }
+        }
+
         #endregion
         public static string GetStringFromBoolList(List<bool> list)
         {
@@ -224,6 +242,8 @@ namespace NewHistoricalLog
             result.Add("Видимость колонок", GetStringFromBoolList(ColumnVisibilityList));
             result.Add("Таблицы для фильтров", TabsForScan);
             result.Add("Следить за работой iFix", FollowFix);
+            result.Add("Идентификатор группы инженера", IngUserGroup);
+            result.Add("Размер шрифта", MainFontSize);
             return result;
         }
         public static void ParseDictionary(Dictionary<string, object> dictionary)
@@ -248,6 +268,8 @@ namespace NewHistoricalLog
                 ColumnVisibilityList = GetBoolListFromString(dictionary["Видимость колонок"].ToString());
                 TabsForScan = dictionary["Таблицы для фильтров"].ToString();
                 FollowFix = Convert.ToBoolean(dictionary["Следить за работой iFix"]);
+                IngUserGroup = Convert.ToInt32(dictionary["Идентификатор группы инженера"]);
+                MainFontSize = Convert.ToDouble(dictionary["Размер шрифта"]);
             }
             catch (Exception ex)
             {

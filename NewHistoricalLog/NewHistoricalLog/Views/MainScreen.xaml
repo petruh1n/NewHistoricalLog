@@ -159,32 +159,67 @@
                 </dxg:TableView>
             </dxg:GridControl.View>
             <dxg:GridColumn FieldName="Id" IsSmart="True" Visible="False"/>
-            <dxg:GridColumn FieldName="Date" IsSmart="True" Header="Дата" Width="180">
-                <dxg:GridColumn.EditSettings>
-                    <dxe:TextEditSettings MaskUseAsDisplayFormat="True" MaskType="DateTime" Mask="dd.MM.yyyy HH:mm:ss.fff"/>
-                </dxg:GridColumn.EditSettings>
-            </dxg:GridColumn>
-            <dxg:GridColumn FieldName="Priority" IsSmart="True" Header="Приоритет" Width="150"
-                            Visible="{Binding DataContext.ColumnVisibilities[0], RelativeSource={RelativeSource AncestorType=Window}}">
+            <dxg:GridColumn FieldName="Date" IsSmart="True" Header="Дата" Width="180" HorizontalHeaderContentAlignment="Center">
                 <dxg:GridColumn.CellTemplate>
                     <DataTemplate>
-                        <dxe:TextEdit EditValue="{Binding RowData.Row.Priority, Converter={StaticResource enumDescriptionConverter}}" IsReadOnly="True" ShowBorder="False"/>
+                        <dxe:TextEdit EditValue="{Binding RowData.Row.Date,Mode=OneWay}" IsReadOnly="True" ShowBorder="False" Background="Transparent" 
+                                      FontSize="{Binding MainFontSize}" MaskUseAsDisplayFormat="True" MaskType="DateTime" Mask="dd.MM.yyyy HH:mm:ss.fff" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
                     </DataTemplate>
                 </dxg:GridColumn.CellTemplate>
             </dxg:GridColumn>
-            <dxg:GridColumn FieldName="Text" IsSmart="True" Header="Текст сообщения" Width="*" MinWidth="500">
-                <dxg:GridColumn.EditSettings>
-                    <dxe:TextEditSettings PrintTextWrapping="{Binding DataContext.WrapTextInGrid, RelativeSource={RelativeSource AncestorType=Window}}" TextWrapping="{Binding DataContext.WrapTextInGrid, RelativeSource={RelativeSource AncestorType=Window}}"/>
-                </dxg:GridColumn.EditSettings>
+            <dxg:GridColumn FieldName="Priority" IsSmart="True" Header="Приоритет" Width="150" HorizontalHeaderContentAlignment="Center"
+                            Visible="{Binding DataContext.ColumnVisibilities[0], RelativeSource={RelativeSource AncestorType=Window}}">
+                <dxg:GridColumn.CellTemplate>
+                    <DataTemplate>
+                        <dxe:TextEdit EditValue="{Binding RowData.Row.Priority, Converter={StaticResource enumDescriptionConverter}}" IsReadOnly="True" 
+                                      ShowBorder="False" FontSize="{Binding MainFontSize}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                    </DataTemplate>
+                </dxg:GridColumn.CellTemplate>
             </dxg:GridColumn>
-            <dxg:GridColumn FieldName="Kvited" IsSmart="True" Header="Квитирование" Width="150"
-                            Visible="{Binding DataContext.ColumnVisibilities[1], RelativeSource={RelativeSource AncestorType=Window}}"/>
-            <dxg:GridColumn FieldName="MessageValue" IsSmart="True" Header="Значение" Width="100"
-                            Visible="{Binding DataContext.ColumnVisibilities[2], RelativeSource={RelativeSource AncestorType=Window}}"/>
-            <dxg:GridColumn FieldName="Source" IsSmart="True" Header="Источник" Width="140"
-                            Visible="{Binding DataContext.ColumnVisibilities[3], RelativeSource={RelativeSource AncestorType=Window}}"/>
-            <dxg:GridColumn FieldName="User" IsSmart="True" Header="Пользователь" Width="150"
-                            Visible="{Binding DataContext.ColumnVisibilities[4], RelativeSource={RelativeSource AncestorType=Window}}"/>
+            <dxg:GridColumn FieldName="Text" IsSmart="True" Header="Текст сообщения" Width="*" MinWidth="500" HorizontalHeaderContentAlignment="Center">
+                <dxg:GridColumn.CellTemplate>
+                    <DataTemplate>
+                        <dxe:TextEdit EditValue="{Binding RowData.Row.Text,Mode=OneWay}" IsReadOnly="True" ShowBorder="False" Background="Transparent" 
+                                      FontSize="{Binding MainFontSize}" TextWrapping="{Binding DataContext.WrapTextInGrid, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                    </DataTemplate>
+                </dxg:GridColumn.CellTemplate>
+            </dxg:GridColumn>
+            <dxg:GridColumn FieldName="Kvited" IsSmart="True" Header="Квитирование" Width="150" HorizontalHeaderContentAlignment="Center"
+                            Visible="{Binding DataContext.ColumnVisibilities[1], RelativeSource={RelativeSource AncestorType=Window}}">
+                <dxg:GridColumn.CellTemplate>
+                    <DataTemplate>
+                        <dxe:TextEdit EditValue="{Binding RowData.Row.Kvited,Mode=OneWay}" IsReadOnly="True" ShowBorder="False" Background="Transparent" 
+                                      FontSize="{Binding MainFontSize}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                    </DataTemplate>
+                </dxg:GridColumn.CellTemplate>
+            </dxg:GridColumn>
+            <dxg:GridColumn FieldName="MessageValue" IsSmart="True" Header="Значение" Width="100" HorizontalHeaderContentAlignment="Center"
+                            Visible="{Binding DataContext.ColumnVisibilities[2], RelativeSource={RelativeSource AncestorType=Window}}">
+                <dxg:GridColumn.CellTemplate>
+                    <DataTemplate>
+                        <dxe:TextEdit EditValue="{Binding RowData.Row.MessageValue,Mode=OneWay}" IsReadOnly="True" ShowBorder="False" Background="Transparent" 
+                                      FontSize="{Binding MainFontSize}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                    </DataTemplate>
+                </dxg:GridColumn.CellTemplate>
+            </dxg:GridColumn>
+            <dxg:GridColumn FieldName="Source" IsSmart="True" Header="Источник" Width="140" HorizontalHeaderContentAlignment="Center"
+                            Visible="{Binding DataContext.ColumnVisibilities[3], RelativeSource={RelativeSource AncestorType=Window}}">
+                <dxg:GridColumn.CellTemplate>
+                    <DataTemplate>
+                        <dxe:TextEdit EditValue="{Binding RowData.Row.Source,Mode=OneWay}" IsReadOnly="True" ShowBorder="False" Background="Transparent" 
+                                      FontSize="{Binding MainFontSize}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
+                    </DataTemplate>
+                </dxg:GridColumn.CellTemplate>
+            </dxg:GridColumn>
+            <dxg:GridColumn FieldName="User" IsSmart="True" Header="Пользователь" Width="150" HorizontalHeaderContentAlignment="Center"
+                            Visible="{Binding DataContext.ColumnVisibilities[4], RelativeSource={RelativeSource AncestorType=Window}}">
+                <dxg:GridColumn.CellTemplate>
+                    <DataTemplate>
+                        <dxe:TextEdit EditValue="{Binding RowData.Row.User,Mode=OneWay}" IsReadOnly="True" ShowBorder="False" Background="Transparent" 
+                                      FontSize="{Binding MainFontSize}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                    </DataTemplate>
+                </dxg:GridColumn.CellTemplate>
+            </dxg:GridColumn>
         </dxg:GridControl>
 
         <dxlc:GroupBox Header="Фильтр по подсистемам"  Grid.Row="3" Margin="5" Foreground="Black"

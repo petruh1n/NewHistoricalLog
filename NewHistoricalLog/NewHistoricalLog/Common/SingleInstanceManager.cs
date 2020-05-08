@@ -77,6 +77,7 @@ namespace NewHistoricalLog
                 await Models.MainModel.GetMessagesAsync();
                 app.MainWindow.ShowActivated = true;
                 app.MainWindow.Topmost = true;
+                Models.MainModel.ChangeWindowPosition();
                 app.MainWindow.Show();
                 app.MainWindow.WindowState = WindowState.Normal;
 
