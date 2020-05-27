@@ -6,6 +6,7 @@
     xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+    xmlns:dxData="clr-namespace:DevExpress.Data;assembly=DevExpress.Xpf.Grid.v18.1.Core"
     xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
     xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm" 
     xmlns:model="clr-namespace:NewHistoricalLog.Models"
@@ -96,7 +97,7 @@
         </dxe:CheckEdit>
         <TextBlock Text="Текстовый фильтр" Grid.Row="1" Grid.ColumnSpan="2" Margin="260,5,135,5" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="16"
                    Foreground="Black" Visibility="{Binding FilterVisible, Converter={StaticResource BoolVisibleConverter}}"/>
-        <dxe:TextEdit x:Name="filterText" Grid.Row="1" Grid.ColumnSpan="2" Margin="410,5,315,5" FontSize="16" 
+        <dxe:TextEdit x:Name="filterText" Grid.Row="1" Grid.ColumnSpan="2" Margin="410,5,485,5" FontSize="16" 
                       EditValue="{Binding TextFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                       Visibility="{Binding FilterVisible, Converter={StaticResource BoolVisibleConverter}}">
             <i:Interaction.Triggers>
@@ -105,7 +106,7 @@
                 </i:EventTrigger>
             </i:Interaction.Triggers>
         </dxe:TextEdit>
-        <dxe:ComboBoxEdit x:Name="filterBox"   Margin="5,5,185,5" Width="120" Grid.Column="2" HorizontalAlignment="Right" IsTextEditable="False" 
+        <dxe:ComboBoxEdit x:Name="filterBox"   Margin="5,5,355,5" Width="120" Grid.Column="2" HorizontalAlignment="Right" IsTextEditable="False" 
                           Grid.Row="1" FontSize="16" Visibility="{Binding FilterVisible, Converter={StaticResource BoolVisibleConverter}}"
                           EditValue="{Binding FilterColumnName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" >
             <dxe:ComboBoxEditItem Content="Сообщение" FontSize="16"/>
@@ -113,7 +114,9 @@
             <dxe:ComboBoxEditItem Content="Пользователь" FontSize="16"/>
             <dxe:ComboBoxEditItem Content="Значение" FontSize="16"/>
         </dxe:ComboBoxEdit>
-        <dx:SimpleButton Grid.Row="1" Grid.ColumnSpan="2" Margin="5" Width="170" HorizontalAlignment="Right" Content="Применить фильтр" FontSize="16" 
+        <dxe:ComboBoxEdit Grid.Row="1" FontSize="16" Grid.ColumnSpan="2" Margin="5,5,175,5" ItemsSource="{Binding CountainList}" Visibility="{Binding FilterVisible, Converter={StaticResource BoolVisibleConverter}}"
+                          EditValue="{Binding ContainPhrase, UpdateSourceTrigger=PropertyChanged}" Width="170" HorizontalAlignment="Right" IsTextEditable="False"/>
+        <dx:SimpleButton Grid.Row="1" Grid.ColumnSpan="2" Margin="5" Width="165" HorizontalAlignment="Right" Content="Применить фильтр" FontSize="16" 
                          Visibility="{Binding FilterVisible, Converter={StaticResource BoolVisibleConverter}}" Command="{Binding LaunchTextFilterCommand}"/>
         <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Orientation="Horizontal">
             <TextBlock Margin="5" Text="Начальная дата выборки: " FontSize="16" VerticalAlignment="Center" Foreground="Black"/>
@@ -139,9 +142,26 @@
                 <dxg:TableView AllowPerPixelScrolling="True" SearchPanelAllowFilter="False" 
                                ShowGroupPanel="False" AllowEditing="False" AllowGrouping="False" ShowFilterPanelMode="Never" AllowPaging="True"
                                AllowDateTimeGroupIntervalMenu="False" IsRowCellMenuEnabled="False" IsGroupPanelMenuEnabled="False"
-                               IsColumnMenuEnabled="False" IsGroupRowMenuEnabled="False" IsGroupFooterMenuEnabled="False" IsTotalSummaryMenuEnabled="False" 
+                               IsColumnMenuEnabled="True" IsGroupRowMenuEnabled="False" IsGroupFooterMenuEnabled="False" IsTotalSummaryMenuEnabled="False" 
                                PageSize="{Binding PageSize}" CustomRowAppearance="TableView_CustomRowAppearance" NavigationStyle="Row" AllowColumnMoving="False" 
-                               AllowSorting="True" AllowColumnFiltering="False" AllowFilterEditor="False" >
+                               AllowSorting="False" AllowColumnFiltering="False" AllowFilterEditor="False" >
+                    <dxg:TableView.ColumnMenuCustomizations>
+                        <dxb:BarButtonItem Content="Сортировка по возрастанию" ItemClick="BarButtonItem_ItemClick" IsEnabled="True"/>
+                        <dxb:BarButtonItem Content="Сортировка по убыванию" ItemClick="BarButtonItem_ItemClick" IsEnabled="True"/>
+                        <dxb:BarButtonItem Content="Снять сортировку" ItemClick="BarButtonItem_ItemClick" IsEnabled="True"/>
+                        <dxb:BarButtonItem Content="Снять всю сортировку" ItemClick="BarButtonItem_ItemClick" IsEnabled="True"/>
+                        <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxg:DefaultColumnMenuItemNames.BestFitColumns}"/>
+                        <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxg:DefaultColumnMenuItemNames.ClearSorting}"/>
+                        <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxg:DefaultColumnMenuItemNames.SortAscending}"/>
+                        <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxg:DefaultColumnMenuItemNames.SortDescending}"/>
+                        <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxg:DefaultColumnMenuItemNames.SortBySummary}"/>
+                        <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxg:DefaultColumnMenuItemNames.ColumnChooser}"/>
+                        <!--<dxb:RemoveBarItemAndLinkAction ItemIndex="8"/>
+                        <dxb:RemoveBarItemAndLinkAction ItemIndex="9"/>
+                        <dxb:RemoveBarItemAndLinkAction ItemIndex="10"/>-->
+                        <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxg:DefaultColumnMenuItemNames.SearchPanel}"/>
+                        <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxg:DefaultColumnMenuItemNames.BestFit}"/>
+                    </dxg:TableView.ColumnMenuCustomizations>
                     <dxg:TableView.FormatConditions>
                         <dxg:FormatCondition ApplyToRow="True" Expression="[Priority] = 'Normal'" FieldName="Priority">
                             <dx:Format Background="White" Foreground="Black" TextDecorations="{x:Null}"/>
@@ -153,7 +173,7 @@
                             <dx:Format Background="Yellow" Foreground="Black" TextDecorations="{x:Null}"/>
                         </dxg:FormatCondition>
                         <dxg:FormatCondition ApplyToRow="True" Expression="[Priority] = 'High'" FieldName="Priority">
-                            <dx:Format Background="Red" Foreground="Black" TextDecorations="{x:Null}"/>
+                            <dx:Format Background="Red" Foreground="#FFFFFF" TextDecorations="{x:Null}"/>
                         </dxg:FormatCondition>
                     </dxg:TableView.FormatConditions>
                 </dxg:TableView>

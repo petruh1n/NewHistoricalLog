@@ -26,6 +26,7 @@ namespace NewHistoricalLog.ViewModels
         private bool isAdmin;
         private bool sendToStorage;
         private bool isIng;
+        private bool allowRemote;
 
 
         public bool? DialogResult
@@ -193,6 +194,16 @@ namespace NewHistoricalLog.ViewModels
                 RaisePropertyChanged("SendToStorage");
             }
         }
+       
+        public bool AllowRemote
+        {
+            get { return allowRemote; }
+            set
+            {
+                allowRemote = value;
+                RaisePropertyChanged("AllowRemote");
+            }
+        }
 
         public ExportViewModel()
         {
@@ -205,6 +216,7 @@ namespace NewHistoricalLog.ViewModels
             ValueVisible = Service.ColumnVisibilityList[2];
             SourceVisible = Service.ColumnVisibilityList[3];
             UserVisible = Service.ColumnVisibilityList[4];
+            AllowRemote = Service.AllowRemoteDevices;
         }
 
         public List<string> GetDevices()

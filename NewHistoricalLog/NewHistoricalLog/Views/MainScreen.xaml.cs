@@ -3,6 +3,7 @@ using System.Windows;
 using DevExpress.Xpf.Core;
 using System.Windows.Interop;
 using DevExpress.Xpf.Editors;
+using DevExpress.Xpf.Bars;
 
 namespace NewHistoricalLog.Views
 {
@@ -39,6 +40,29 @@ namespace NewHistoricalLog.Views
         {
             e.Result = e.ConditionalValue;
             e.Handled = true;
+        }
+
+        private void BarButtonItem_ItemClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
+        {
+            switch((sender as BarButtonItem).Content.ToString())
+            {
+                case "Сортировка по возрастанию":
+                    ((sender as BarButtonItem).DataContext as DevExpress.Xpf.Grid.GridColumnMenuInfo).Column.SortOrder = DevExpress.Data.ColumnSortOrder.Ascending;
+                    break;
+                case "Сортировка по убыванию":
+                    ((sender as BarButtonItem).DataContext as DevExpress.Xpf.Grid.GridColumnMenuInfo).Column.SortOrder = DevExpress.Data.ColumnSortOrder.Descending;
+                    break;
+                case "Снять сортировку":
+                    ((sender as BarButtonItem).DataContext as DevExpress.Xpf.Grid.GridColumnMenuInfo).Column.SortOrder = DevExpress.Data.ColumnSortOrder.None;
+                    break;
+                default:
+                    foreach(var column in gridControl.Columns)
+                    {
+                        column.SortOrder = DevExpress.Data.ColumnSortOrder.None;
+                    }                   
+                    break;
+            }
+            
         }
     }
     public class EditorLocalizerEx : EditorLocalizer

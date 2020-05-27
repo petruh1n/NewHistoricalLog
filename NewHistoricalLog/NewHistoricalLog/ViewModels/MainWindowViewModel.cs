@@ -338,13 +338,42 @@ namespace NewHistoricalLog.ViewModels
             }
         }
 
+        private List<string> containList = new List<string>() { "Содержит", "Не содержит" };
+        public List<string> CountainList
+        {
+            get { return containList; }
+            set
+            {
+                containList = value;
+                RaisePropertyChanged("CountainList");
+            }
+        }
+
+        private string containPhrase = "Содержит";
+        public string ContainPhrase
+        {
+            get { return containPhrase; }
+            set
+            {
+                containPhrase = value;
+                MainModel.Contains = ContainPhrase == "Содержит";
+                MainModel.ManageFilter();
+                RaisePropertyChanged("ContainPhrase");
+            }
+        }
+
+       
+
         public MainWindowViewModel()
         {
-            MainModel.StaticPropertyChanged += GlobalPropertyChanged;
-            Service.StaticPropertyChanged += GlobalPropertyChanged;
-            MainModel.Messages.CollectionChanged += Messages_CollectionChanged;
-            MainModel.SubSystems.CollectionChanged += SubSystems_CollectionChanged;
-            MainModel.StartApp();
+            if (!IsInDesignMode)
+            {
+                MainModel.StaticPropertyChanged += GlobalPropertyChanged;
+                Service.StaticPropertyChanged += GlobalPropertyChanged;
+                MainModel.Messages.CollectionChanged += Messages_CollectionChanged;
+                MainModel.SubSystems.CollectionChanged += SubSystems_CollectionChanged;
+                MainModel.StartApp();
+            }
         }
 
         private void SubSystems_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -378,6 +407,7 @@ namespace NewHistoricalLog.ViewModels
             Progress = MainModel.Progress;
             Status = MainModel.Status;
             MainFontSize = Service.MainFontSize;
+            
         }
 
 

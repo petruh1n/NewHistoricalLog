@@ -101,7 +101,7 @@ namespace NewHistoricalLog.Common
                     ObservableCollection<MessageClass> result = new ObservableCollection<MessageClass>();
                     SqlCommand command = connection.CreateCommand();
                     command.CommandText = string.Format("SELECT DTime, Message, UserName, Place, Value, Priority, DTimeAck "+
-                        "FROM dbo.PLCMessage WHERE DTime>=CAST ('{0}' as datetime2) AND DTime<=CAST ('{1}' as datetime2) ORDER BY ID", startTime, endTime);
+                        "FROM dbo.PLCMessage WHERE DTime>=CAST ('{0}' as datetime2) AND DTime<=CAST ('{1}' as datetime2) ORDER BY ID DESC", startTime, endTime);
                     SqlDataReader reader = await command.ExecuteReaderAsync();
                     while (await reader.ReadAsync())
                     {

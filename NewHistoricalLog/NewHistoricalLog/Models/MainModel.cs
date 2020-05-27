@@ -285,6 +285,7 @@ namespace NewHistoricalLog.Models
                 OnStaticPropertyChanged("IngMode");
             }
         }
+        public static bool Contains { get; set; } = true;
 
         static MainModel()
         {
@@ -434,11 +435,11 @@ namespace NewHistoricalLog.Models
                 }                
                 if(!string.IsNullOrEmpty(TextFilterString) && string.IsNullOrEmpty(fString))
                 {
-                    fString = string.Format("Contains ([{0}], '{1}')", GetFilterColumnName(FilterColumnName), TextFilterString);
+                    fString = string.Format("{2}Contains ([{0}], '{1}')", GetFilterColumnName(FilterColumnName), TextFilterString, Contains?"":"NOT ");
                 }
                 else if(!string.IsNullOrEmpty(TextFilterString))
                 {
-                    fString += string.Format(" AND Contains ([{0}], '{1}')", GetFilterColumnName(FilterColumnName), TextFilterString);
+                    fString += string.Format(" AND {2}Contains ([{0}], '{1}')", GetFilterColumnName(FilterColumnName), TextFilterString, Contains ? "" : "NOT ");
                 }
                 Filter = fString;
             }

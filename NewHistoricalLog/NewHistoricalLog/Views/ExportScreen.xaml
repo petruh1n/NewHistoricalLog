@@ -52,7 +52,7 @@
         <dxe:CheckEdit Grid.Row="1" Content="Отправить в директорию по умолчанию" Margin="5" EditValue="{Binding SendToDefaultDir}" Foreground="Black"/>
         <dxe:TextEdit Grid.Row="2" EditValue="{Binding DefaultDir}" Margin="5" IsEnabled="{Binding IsAdmin}" Foreground="Black"/>
         <dxe:CheckEdit Grid.Row="3" Content="Отправить на сервер ДМЗ" Margin="5" EditValue="{Binding SendToDmz}" Foreground="Black"/>
-        <dxe:CheckEdit x:Name="checkEdit" Grid.Row="4" Content="Отправить на съемный носитель" Margin="5" EditValue="{Binding SendToStorage}" Foreground="Black" IsEnabled="{Binding IsIng}"/>
+        <dxe:CheckEdit x:Name="checkEdit" Grid.Row="4" Content="Отправить на съемный носитель" Margin="5" EditValue="{Binding SendToStorage}" Foreground="Black" IsEnabled="{Binding IsIng}" Visibility="{Binding AllowRemote, Converter={StaticResource BoolVisibleConverter}}"/>
         <StackPanel Grid.Row="5" Orientation="Horizontal" 
                     Visibility="{Binding EditValue, ElementName=checkEdit, Converter={StaticResource BoolVisibleConverter}}" >
             <dxe:ComboBoxEdit Width="220" Margin="5" ItemsSource="{Binding Devices}" EditValue="{Binding Path}" Foreground="Black"/>

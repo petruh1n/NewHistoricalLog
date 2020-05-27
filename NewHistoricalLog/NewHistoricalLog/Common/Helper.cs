@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Markup;
 
 namespace NewHistoricalLog.Common
 {
@@ -57,6 +58,36 @@ namespace NewHistoricalLog.Common
             return string.Empty;
         }
     }
+    //public class StringToSortOrderConverter : MarkupExtension, IValueConverter
+    //{
+    //    public override object ProvideValue(IServiceProvider serviceProvider)
+    //    {
+    //        return this;
+    //    }
+
+    //    public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+    //    {
+    //        if (value == null )
+    //        {
+    //            return null;
+    //        }
+    //        else
+    //        {
+    //            if (value.ToString() == "Asc")
+    //                return DevExpress.Data.ColumnSortOrder.Ascending;
+    //            else if(value.ToString()=="Desc")
+    //                return DevExpress.Data.ColumnSortOrder.Descending;
+    //            else 
+    //                return DevExpress.Data.ColumnSortOrder.None;
+    //        }
+    //    }
+
+    //    public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
+    //}
+
     public static class DialogCloser
     {
         public static readonly DependencyProperty DialogResultProperty =

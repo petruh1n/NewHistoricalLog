@@ -198,6 +198,10 @@ namespace NewHistoricalLog
                 OnStaticPropertyChanged("MainFontSize");
             }
         }
+        /// <summary>
+        /// Разрешена запись на съемные носители
+        /// </summary>
+        public static bool AllowRemoteDevices { get; set; } = false;
 
         #endregion
         public static string GetStringFromBoolList(List<bool> list)
@@ -244,6 +248,7 @@ namespace NewHistoricalLog
             result.Add("Следить за работой iFix", FollowFix);
             result.Add("Идентификатор группы инженера", IngUserGroup);
             result.Add("Размер шрифта", MainFontSize);
+            result.Add("Разрешена запись на съемные носители", AllowRemoteDevices);
             return result;
         }
         public static void ParseDictionary(Dictionary<string, object> dictionary)
@@ -270,6 +275,7 @@ namespace NewHistoricalLog
                 FollowFix = Convert.ToBoolean(dictionary["Следить за работой iFix"]);
                 IngUserGroup = Convert.ToInt32(dictionary["Идентификатор группы инженера"]);
                 MainFontSize = Convert.ToDouble(dictionary["Размер шрифта"]);
+                AllowRemoteDevices = Convert.ToBoolean(dictionary["Разрешена запись на съемные носители"]);
             }
             catch (Exception ex)
             {
