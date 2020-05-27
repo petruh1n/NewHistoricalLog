@@ -75,6 +75,7 @@ namespace NewHistoricalLog
                 await Common.DbHelper.GetUserData();
                 Models.MainModel.SubSystems = await Common.DbHelper.GetSubSystemInfo();
                 await Models.MainModel.GetMessagesAsync();
+                Models.MainModel.ChangeWindowPosition();
                 app.MainWindow.ShowActivated = true;
                 app.MainWindow.Topmost = true;
                 app.MainWindow.Show();
