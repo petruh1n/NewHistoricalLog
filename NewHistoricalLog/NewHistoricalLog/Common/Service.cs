@@ -202,6 +202,7 @@ namespace NewHistoricalLog
         /// Разрешена запись на съемные носители
         /// </summary>
         public static bool AllowRemoteDevices { get; set; } = false;
+        public static bool AllowAdminAccessToWindows { get; set; } = false;
 
         #endregion
         public static string GetStringFromBoolList(List<bool> list)
@@ -249,6 +250,7 @@ namespace NewHistoricalLog
             result.Add("Идентификатор группы инженера", IngUserGroup);
             result.Add("Размер шрифта", MainFontSize);
             result.Add("Разрешена запись на съемные носители", AllowRemoteDevices);
+            result.Add("Администратору разрешен выход в Windows", AllowAdminAccessToWindows);
             return result;
         }
         public static void ParseDictionary(Dictionary<string, object> dictionary)
@@ -276,6 +278,7 @@ namespace NewHistoricalLog
                 IngUserGroup = Convert.ToInt32(dictionary["Идентификатор группы инженера"]);
                 MainFontSize = Convert.ToDouble(dictionary["Размер шрифта"]);
                 AllowRemoteDevices = Convert.ToBoolean(dictionary["Разрешена запись на съемные носители"]);
+                AllowAdminAccessToWindows = Convert.ToBoolean(dictionary["Администратору разрешен выход в Windows"]);
             }
             catch (Exception ex)
             {

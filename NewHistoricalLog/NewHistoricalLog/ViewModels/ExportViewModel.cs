@@ -205,6 +205,16 @@ namespace NewHistoricalLog.ViewModels
             }
         }
 
+        private bool allowWin;
+        public bool AllowAdminWindows
+        {
+            get { return allowWin; }
+            set
+            {
+                allowWin = value;
+                RaisePropertyChanged("AllowAdminWindows");
+            }
+        }
         public ExportViewModel()
         {
             IsAdmin = Models.MainModel.AdminMode;
@@ -217,6 +227,7 @@ namespace NewHistoricalLog.ViewModels
             SourceVisible = Service.ColumnVisibilityList[3];
             UserVisible = Service.ColumnVisibilityList[4];
             AllowRemote = Service.AllowRemoteDevices;
+            AllowAdminWindows = Service.AllowAdminAccessToWindows;
         }
 
         public List<string> GetDevices()

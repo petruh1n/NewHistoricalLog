@@ -9,6 +9,7 @@
     xmlns:dxData="clr-namespace:DevExpress.Data;assembly=DevExpress.Xpf.Grid.v18.1.Core"
     xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
     xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm" 
+    xmlns:dxei="http://schemas.devexpress.com/winfx/2008/xaml/editors/internal"
     xmlns:model="clr-namespace:NewHistoricalLog.Models"
     xmlns:common="clr-namespace:NewHistoricalLog.Common"
     xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
@@ -30,6 +31,46 @@
             <StackPanel>
                 <TextBlock Text="{Binding}"  FontSize="16"/>
             </StackPanel>
+        </DataTemplate>
+        <DataTemplate x:Key="gridCellTextTemplate">
+            <TextBlock Name="PART_Editor"  VerticalAlignment="Center"
+                                dxei:TextBlockService.EnableTextHighlighting="True"
+                                dxei:TextBlockService.HighlightedTextCriteria="Contains"
+                                Background="Transparent"
+                                Margin="2,0,2,0"
+                                FontSize="{Binding MainFontSize}"
+                                TextWrapping="{Binding DataContext.WrapTextInGrid, RelativeSource={RelativeSource AncestorType=Window}}"
+                                dxei:TextBlockService.HighlightText="{Binding View.SearchString}" Text="{Binding Value, Mode=OneWay}">
+                            <dxei:TextBlockService.HighlightTextAppearance>
+                                <dxe:HighligterAppearance HighlightedTextBackground="LightBlue" />
+                            </dxei:TextBlockService.HighlightTextAppearance>
+            </TextBlock>
+        </DataTemplate>
+        <DataTemplate x:Key="gridCellTextCenterTemplate">
+            <TextBlock Name="PART_Editor"  VerticalAlignment="Center" HorizontalAlignment="Center"
+                                dxei:TextBlockService.EnableTextHighlighting="True"
+                                dxei:TextBlockService.HighlightedTextCriteria="Contains"
+                                Background="Transparent"
+                                FontSize="{Binding MainFontSize}"
+                                TextWrapping="{Binding DataContext.WrapTextInGrid, RelativeSource={RelativeSource AncestorType=Window}}"
+                                dxei:TextBlockService.HighlightText="{Binding View.SearchString}" Text="{Binding Value, Mode=OneWay}">
+                            <dxei:TextBlockService.HighlightTextAppearance>
+                                <dxe:HighligterAppearance HighlightedTextBackground="LightBlue" />
+                            </dxei:TextBlockService.HighlightTextAppearance>
+            </TextBlock>
+        </DataTemplate>
+        <DataTemplate x:Key="gridCellPriorityTemplate">
+            <TextBlock Name="PART_Editor"  VerticalAlignment="Center" HorizontalAlignment="Center"
+                                dxei:TextBlockService.EnableTextHighlighting="True"
+                                dxei:TextBlockService.HighlightedTextCriteria="Contains"
+                                Background="Transparent"
+                                FontSize="{Binding MainFontSize}"
+                                TextWrapping="{Binding DataContext.WrapTextInGrid, RelativeSource={RelativeSource AncestorType=Window}}"
+                                dxei:TextBlockService.HighlightText="{Binding View.SearchString}" Text="{Binding Value, Mode=OneWay, Converter={StaticResource enumDescriptionConverter}}">
+                            <dxei:TextBlockService.HighlightTextAppearance>
+                                <dxe:HighligterAppearance HighlightedTextBackground="LightBlue" />
+                            </dxei:TextBlockService.HighlightTextAppearance>
+            </TextBlock>
         </DataTemplate>
     </dx:ThemedWindow.Resources>
     <dx:ThemedWindow.DataContext>
@@ -144,7 +185,7 @@
                                AllowDateTimeGroupIntervalMenu="False" IsRowCellMenuEnabled="False" IsGroupPanelMenuEnabled="False"
                                IsColumnMenuEnabled="True" IsGroupRowMenuEnabled="False" IsGroupFooterMenuEnabled="False" IsTotalSummaryMenuEnabled="False" 
                                PageSize="{Binding PageSize}" CustomRowAppearance="TableView_CustomRowAppearance" NavigationStyle="Row" AllowColumnMoving="False" 
-                               AllowSorting="False" AllowColumnFiltering="False" AllowFilterEditor="False" >
+                               AllowSorting="False" AllowColumnFiltering="False" AllowFilterEditor="False" SearchPanelHighlightResults="True" >
                     <dxg:TableView.ColumnMenuCustomizations>
                         <dxb:BarButtonItem Content="Сортировка по возрастанию" ItemClick="BarButtonItem_ItemClick" IsEnabled="True"/>
                         <dxb:BarButtonItem Content="Сортировка по убыванию" ItemClick="BarButtonItem_ItemClick" IsEnabled="True"/>
@@ -156,9 +197,6 @@
                         <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxg:DefaultColumnMenuItemNames.SortDescending}"/>
                         <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxg:DefaultColumnMenuItemNames.SortBySummary}"/>
                         <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxg:DefaultColumnMenuItemNames.ColumnChooser}"/>
-                        <!--<dxb:RemoveBarItemAndLinkAction ItemIndex="8"/>
-                        <dxb:RemoveBarItemAndLinkAction ItemIndex="9"/>
-                        <dxb:RemoveBarItemAndLinkAction ItemIndex="10"/>-->
                         <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxg:DefaultColumnMenuItemNames.SearchPanel}"/>
                         <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxg:DefaultColumnMenuItemNames.BestFit}"/>
                     </dxg:TableView.ColumnMenuCustomizations>
@@ -179,67 +217,20 @@
                 </dxg:TableView>
             </dxg:GridControl.View>
             <dxg:GridColumn FieldName="Id" IsSmart="True" Visible="False"/>
-            <dxg:GridColumn FieldName="Date" IsSmart="True" Header="Дата" Width="180" HorizontalHeaderContentAlignment="Center">
-                <dxg:GridColumn.CellTemplate>
-                    <DataTemplate>
-                        <dxe:TextEdit EditValue="{Binding RowData.Row.Date,Mode=OneWay}" IsReadOnly="True" ShowBorder="False" Background="Transparent" 
-                                      FontSize="{Binding MainFontSize}" MaskUseAsDisplayFormat="True" MaskType="DateTime" Mask="dd.MM.yyyy HH:mm:ss.fff" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
-                    </DataTemplate>
-                </dxg:GridColumn.CellTemplate>
-            </dxg:GridColumn>
+            <dxg:GridColumn FieldName="DateString" IsSmart="True" Header="Дата" Width="180" HorizontalHeaderContentAlignment="Center" CellTemplate="{StaticResource gridCellTextCenterTemplate}"/>
+            
             <dxg:GridColumn FieldName="Priority" IsSmart="True" Header="Приоритет" Width="150" HorizontalHeaderContentAlignment="Center"
-                            Visible="{Binding DataContext.ColumnVisibilities[0], RelativeSource={RelativeSource AncestorType=Window}}">
-                <dxg:GridColumn.CellTemplate>
-                    <DataTemplate>
-                        <dxe:TextEdit EditValue="{Binding RowData.Row.Priority, Converter={StaticResource enumDescriptionConverter}}" IsReadOnly="True" 
-                                      ShowBorder="False" FontSize="{Binding MainFontSize}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
-                    </DataTemplate>
-                </dxg:GridColumn.CellTemplate>
-            </dxg:GridColumn>
-            <dxg:GridColumn FieldName="Text" IsSmart="True" Header="Текст сообщения" Width="*" MinWidth="500" HorizontalHeaderContentAlignment="Center">
-                <dxg:GridColumn.CellTemplate>
-                    <DataTemplate>
-                        <dxe:TextEdit EditValue="{Binding RowData.Row.Text,Mode=OneWay}" IsReadOnly="True" ShowBorder="False" Background="Transparent" 
-                                      FontSize="{Binding MainFontSize}" TextWrapping="{Binding DataContext.WrapTextInGrid, RelativeSource={RelativeSource AncestorType=Window}}"/>
-                    </DataTemplate>
-                </dxg:GridColumn.CellTemplate>
-            </dxg:GridColumn>
+                            Visible="{Binding DataContext.ColumnVisibilities[0], RelativeSource={RelativeSource AncestorType=Window}}" CellTemplate="{StaticResource gridCellPriorityTemplate}"/>
+            <dxg:GridColumn FieldName="Text" IsSmart="True" Header="Текст сообщения" Width="*" MinWidth="500" HorizontalHeaderContentAlignment="Center" CellTemplate="{StaticResource gridCellTextTemplate}"/>
+
             <dxg:GridColumn FieldName="Kvited" IsSmart="True" Header="Квитирование" Width="150" HorizontalHeaderContentAlignment="Center"
-                            Visible="{Binding DataContext.ColumnVisibilities[1], RelativeSource={RelativeSource AncestorType=Window}}">
-                <dxg:GridColumn.CellTemplate>
-                    <DataTemplate>
-                        <dxe:TextEdit EditValue="{Binding RowData.Row.Kvited,Mode=OneWay}" IsReadOnly="True" ShowBorder="False" Background="Transparent" 
-                                      FontSize="{Binding MainFontSize}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
-                    </DataTemplate>
-                </dxg:GridColumn.CellTemplate>
-            </dxg:GridColumn>
+                            Visible="{Binding DataContext.ColumnVisibilities[1], RelativeSource={RelativeSource AncestorType=Window}}" CellTemplate="{StaticResource gridCellTextCenterTemplate}"/>
             <dxg:GridColumn FieldName="MessageValue" IsSmart="True" Header="Значение" Width="100" HorizontalHeaderContentAlignment="Center"
-                            Visible="{Binding DataContext.ColumnVisibilities[2], RelativeSource={RelativeSource AncestorType=Window}}">
-                <dxg:GridColumn.CellTemplate>
-                    <DataTemplate>
-                        <dxe:TextEdit EditValue="{Binding RowData.Row.MessageValue,Mode=OneWay}" IsReadOnly="True" ShowBorder="False" Background="Transparent" 
-                                      FontSize="{Binding MainFontSize}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
-                    </DataTemplate>
-                </dxg:GridColumn.CellTemplate>
-            </dxg:GridColumn>
+                            Visible="{Binding DataContext.ColumnVisibilities[2], RelativeSource={RelativeSource AncestorType=Window}}" CellTemplate="{StaticResource gridCellTextCenterTemplate}"/>
             <dxg:GridColumn FieldName="Source" IsSmart="True" Header="Источник" Width="140" HorizontalHeaderContentAlignment="Center"
-                            Visible="{Binding DataContext.ColumnVisibilities[3], RelativeSource={RelativeSource AncestorType=Window}}">
-                <dxg:GridColumn.CellTemplate>
-                    <DataTemplate>
-                        <dxe:TextEdit EditValue="{Binding RowData.Row.Source,Mode=OneWay}" IsReadOnly="True" ShowBorder="False" Background="Transparent" 
-                                      FontSize="{Binding MainFontSize}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
-                    </DataTemplate>
-                </dxg:GridColumn.CellTemplate>
-            </dxg:GridColumn>
+                            Visible="{Binding DataContext.ColumnVisibilities[3], RelativeSource={RelativeSource AncestorType=Window}}" CellTemplate="{StaticResource gridCellTextCenterTemplate}"/>
             <dxg:GridColumn FieldName="User" IsSmart="True" Header="Пользователь" Width="150" HorizontalHeaderContentAlignment="Center"
-                            Visible="{Binding DataContext.ColumnVisibilities[4], RelativeSource={RelativeSource AncestorType=Window}}">
-                <dxg:GridColumn.CellTemplate>
-                    <DataTemplate>
-                        <dxe:TextEdit EditValue="{Binding RowData.Row.User,Mode=OneWay}" IsReadOnly="True" ShowBorder="False" Background="Transparent" 
-                                      FontSize="{Binding MainFontSize}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
-                    </DataTemplate>
-                </dxg:GridColumn.CellTemplate>
-            </dxg:GridColumn>
+                            Visible="{Binding DataContext.ColumnVisibilities[4], RelativeSource={RelativeSource AncestorType=Window}}" CellTemplate="{StaticResource gridCellTextCenterTemplate}"/>
         </dxg:GridControl>
 
         <dxlc:GroupBox Header="Фильтр по подсистемам"  Grid.Row="3" Margin="5" Foreground="Black"

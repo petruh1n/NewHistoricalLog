@@ -59,7 +59,12 @@ namespace NewHistoricalLog.Models
             {
                 date = value;
                 OnPropertyChanged("Date");
+                OnPropertyChanged("DateString");
             }
+        }
+        public string DateString
+        {
+            get { return Date.ToString("dd.MM.yyyy HH:mm:ss.fff"); }           
         }
         /// <summary>
         /// Отметка квитирования
