@@ -114,7 +114,18 @@
             <dxb:BarButtonItem Content="Очистить фильтр" Command="{Binding ClearFilterCommand}" ContentTemplate="{StaticResource BarItemTextTemplate}"
                                LargeGlyph="{dx:DXImage Image=IgnoreMasterFilter_32x32.png}" Glyph="{dx:DXImage Image=IgnoreMasterFilter_16x16.png}"
                                BarItemDisplayMode="ContentAndGlyph"  />
-
+            <dxb:BarEditItem Content="Текущий источник" Alignment="Far" ContentTemplate="{StaticResource BarItemTextTemplate}" 
+                             IsEnabled="{DXBinding '!NeedProgressBar'}" EditValue="{Binding CurrentSource, UpdateSourceTrigger=PropertyChanged}">
+                <!--<dxb:BarEditItem.EditSettings>
+                    <dxe:ComboBoxEditSettings ItemsSource="{Binding Sources}" DisplayMember="Name" IsTextEditable="False" />
+                </dxb:BarEditItem.EditSettings>-->
+                <dxb:BarEditItem.EditTemplate>
+                    <DataTemplate>
+                        <dxe:ComboBoxEdit ItemsSource="{Binding DataContext.Sources, RelativeSource={RelativeSource AncestorType=Window}}" DisplayMember="Name" IsTextEditable="False" Width="220" FontSize="16" 
+                                          EditValue="{Binding DataContext.CurrentSource, RelativeSource={RelativeSource AncestorType=Window}, UpdateSourceTrigger=PropertyChanged}"/>
+                    </DataTemplate>
+                </dxb:BarEditItem.EditTemplate>
+            </dxb:BarEditItem>
         </dxb:MainMenuControl>
         <dxe:CheckEdit Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="5" Grid.Row="1" VerticalAlignment="Center" Width="50"
                        EditValue="{Binding White, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 

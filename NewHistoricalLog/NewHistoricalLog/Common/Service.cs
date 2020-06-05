@@ -203,6 +203,7 @@ namespace NewHistoricalLog
         /// </summary>
         public static bool AllowRemoteDevices { get; set; } = false;
         public static bool AllowAdminAccessToWindows { get; set; } = false;
+        public static string SourceFilePath { get; set; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments), "SemSettings", "History", "Sources.xml");
 
         #endregion
         public static string GetStringFromBoolList(List<bool> list)

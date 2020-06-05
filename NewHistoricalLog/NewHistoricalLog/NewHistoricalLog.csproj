@@ -140,6 +140,7 @@
     <Compile Include="Common\Helper.cs" />
     <Compile Include="Models\Device.cs" />
     <Compile Include="Models\FilterClass.cs" />
+    <Compile Include="Models\MessageSource.cs" />
     <Compile Include="Views\InfoWindow.xaml.cs">
       <DependentUpon>InfoWindow.xaml</DependentUpon>
     </Compile>

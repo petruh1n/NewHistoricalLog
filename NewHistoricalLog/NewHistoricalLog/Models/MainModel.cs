@@ -44,6 +44,8 @@ namespace NewHistoricalLog.Models
         static List<bool> exportColumns = Service.ColumnVisibilityList;
         static List<string> expAddresses = new List<string>();
         static bool ingMode;
+        static ObservableCollection<MessageSource> sources = new ObservableCollection<MessageSource>();
+        static MessageSource currentSource;
 
         /// <summary>
         /// Стартовая дата выборки
@@ -286,6 +288,41 @@ namespace NewHistoricalLog.Models
             }
         }
         public static bool Contains { get; set; } = true;
+        /// <summary>
+        /// Коллекция источников сообщений
+        /// </summary>
+        public static ObservableCollection<MessageSource> Sources
+        {
+            get { return sources; }
+            set
+            {
+                sources = value;
+                OnStaticPropertyChanged("Sources");
+            }
+        }
+        /// <summary>
+        /// Активный источник сообщений
+        /// </summary>
+        public static MessageSource CurrectSource
+        {
+            get { return currentSource; }
+            set 
+            {
+                if (currentSource!=value)
+                {
+                    currentSource = value;
+                    OnStaticPropertyChanged("CurrectSource");
+                    UpdateData();   
+                }
+            }
+        }
+
+        static async void UpdateData()
+        {
+            await DbHelper.GetUserData(CurrectSource);
+            SubSystems = await DbHelper.GetSubSystemInfo(CurrectSource);
+            await GetMessagesAsync();
+        }
 
         static MainModel()
         {
@@ -296,9 +333,9 @@ namespace NewHistoricalLog.Models
             ni.DoubleClick +=
                 async delegate (object sender, EventArgs args)
                 {
-                    await DbHelper.GetUserData();
+                    await DbHelper.GetUserData(CurrectSource);
                     if(string.IsNullOrEmpty(Filter))
-                        SubSystems = await DbHelper.GetSubSystemInfo();
+                        SubSystems = await DbHelper.GetSubSystemInfo(CurrectSource);
                     await GetMessagesAsync();
                     SingleInstanceApplication.Current.MainWindow.ShowActivated = true;
                     SingleInstanceApplication.Current.MainWindow.Show();
@@ -334,9 +371,11 @@ namespace NewHistoricalLog.Models
             Service.ReadSettings();
             ReadArgs(Environment.GetCommandLineArgs());
             ChangeWindowPosition();
-            await DbHelper.GetUserData();
-            SubSystems = await DbHelper.GetSubSystemInfo();
-            await GetMessagesAsync();
+            Sources = await Task.Run(() => MessageSource.GetSources(Service.SourceFilePath));
+            CurrectSource = Sources[0];
+            //await DbHelper.GetUserData(CurrectSource);
+            //SubSystems = await DbHelper.GetSubSystemInfo(CurrectSource);
+            //await GetMessagesAsync();
             SingleInstanceApplication.Current.MainWindow.Close();
         }
         /// <summary>
@@ -348,7 +387,7 @@ namespace NewHistoricalLog.Models
             Status = string.Format("Получение сообщений за период с {0} по {1}", StartTime, EndTime);
             NeedProgressBar = true;
             Indeterminant = true;
-            Messages = await DbHelper.GetMessages(StartTime, EndTime);
+            Messages = await DbHelper.GetMessages(StartTime, EndTime, CurrectSource);
             Indeterminant = false;
             NeedProgressBar = false;
         } 

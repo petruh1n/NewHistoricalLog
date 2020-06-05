@@ -16,48 +16,48 @@ namespace NewHistoricalLog.Common
         /// <summary>
         /// Строка подключения к серверу БД
         /// </summary>
-        public static string ConnectionString
-        {
-            get
-            {
-                return string.Format("Data Source={0}; Integrated Security=False; Initial Catalog={1}; User={2}; Password={3}; Connection Timeout=3;",
-                Service.Server,
-                Service.Database,
-                Service.User,
-                Service.Password);
-            }
-        }
+        //public static string ConnectionString
+        //{
+        //    get
+        //    {
+        //        return string.Format("Data Source={0}; Integrated Security=False; Initial Catalog={1}; User={2}; Password={3}; Connection Timeout=3;",
+        //        Service.Server,
+        //        Service.Database,
+        //        Service.User,
+        //        Service.Password);
+        //    }
+        //}
         /// <summary>
         /// Подключиться к БД
         /// </summary>
         /// <param name="SqlConnection"></param>
         /// <returns></returns>
-        public static SqlConnection ConnectToDatabase()
-        {
-            try
-            {
-                var SqlConnection = new SqlConnection();
-                SqlConnection.ConnectionString = ConnectionString;
-                SqlConnection.Open();
-                return SqlConnection;
-            }
-            catch (Exception ex)
-            {
-                logger.Error("Ошибка подключения к БД: {0}", ex.Message);
-                return null;
-            }
-        }
+        //public static SqlConnection ConnectToDatabase(MessageSource src)
+        //{
+        //    try
+        //    {
+        //        var SqlConnection = new SqlConnection();
+        //        SqlConnection.ConnectionString = ConnectionString;
+        //        SqlConnection.Open();
+        //        return SqlConnection;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        logger.Error("Ошибка подключения к БД: {0}", ex.Message);
+        //        return null;
+        //    }
+        //}
         /// <summary>
         /// Подключиться к БД асинхронно
         /// </summary>
         /// <param name="SqlConnection"></param>
         /// <returns></returns>
-        public async static Task<SqlConnection> ConnectToDatabaseAsync()
+        public async static Task<SqlConnection> ConnectToDatabaseAsync(MessageSource src)
         {
             try
             {
                 var SqlConnection = new SqlConnection();
-                SqlConnection.ConnectionString = ConnectionString;
+                SqlConnection.ConnectionString = src.ConnectionString;
                 await SqlConnection.OpenAsync();
                 return SqlConnection;
             }
@@ -91,11 +91,11 @@ namespace NewHistoricalLog.Common
         /// <param name="startTime">Начало промежутка</param>
         /// <param name="endTime">Конец промежутка</param>
         /// <returns></returns>
-        public async static Task<ObservableCollection<MessageClass>> GetMessages(DateTime startTime, DateTime endTime)
+        public async static Task<ObservableCollection<MessageClass>> GetMessages(DateTime startTime, DateTime endTime, MessageSource src)
         {
             try
             {
-                var connection = await ConnectToDatabaseAsync();
+                var connection = await ConnectToDatabaseAsync(src);
                 if(connection!=null)
                 {
                     ObservableCollection<MessageClass> result = new ObservableCollection<MessageClass>();
@@ -132,11 +132,11 @@ namespace NewHistoricalLog.Common
         /// Проверить группу пользователя на администратора
         /// </summary>
         /// <returns></returns>
-        public async static Task GetUserData()
+        public async static Task GetUserData(MessageSource src)
         {
             try
             {
-                var connection = await ConnectToDatabaseAsync();
+                var connection = await ConnectToDatabaseAsync(src);
                 if (connection != null)
                 {
                     SqlCommand command = connection.CreateCommand();
@@ -161,7 +161,7 @@ namespace NewHistoricalLog.Common
         /// Получить данные по подсистемам
         /// </summary>
         /// <returns></returns>
-        public async static Task<ObservableCollection<SubSystem>> GetSubSystemInfo()
+        public async static Task<ObservableCollection<SubSystem>> GetSubSystemInfo(MessageSource src)
         {
             try
             {
@@ -181,7 +181,7 @@ namespace NewHistoricalLog.Common
                 }
                 if(ss.Count>0)
                 {
-                    var connection = await ConnectToDatabaseAsync();
+                    var connection = await ConnectToDatabaseAsync(src);
                     if (connection != null)
                     {
                         foreach(var s in ss)

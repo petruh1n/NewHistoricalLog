@@ -362,6 +362,28 @@ namespace NewHistoricalLog.ViewModels
             }
         }
 
+        private ObservableCollection<MessageSource> sources = new ObservableCollection<MessageSource>();
+        public ObservableCollection<MessageSource> Sources
+        {
+            get { return sources; }
+            set
+            {
+                sources = value;
+                RaisePropertyChanged("Sources");
+            }
+        }
+        private MessageSource currentSource;
+        public MessageSource CurrentSource
+        {
+            get { return currentSource; }
+            set
+            {
+                currentSource = value;
+                MainModel.CurrectSource = currentSource;
+                RaisePropertyChanged("CurrentSource");
+            }
+        }
+
        
 
         public MainWindowViewModel()
@@ -407,7 +429,8 @@ namespace NewHistoricalLog.ViewModels
             Progress = MainModel.Progress;
             Status = MainModel.Status;
             MainFontSize = Service.MainFontSize;
-            
+            Sources = MainModel.Sources;
+            CurrentSource = MainModel.CurrectSource;
         }
 
 

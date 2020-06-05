@@ -72,8 +72,8 @@ namespace NewHistoricalLog
 				base.OnStartupNextInstance(eventArgs);
                 Service.ReadSettings();
                 Models.MainModel.ReadArgs(eventArgs.CommandLine.ToArray());
-                await Common.DbHelper.GetUserData();
-                Models.MainModel.SubSystems = await Common.DbHelper.GetSubSystemInfo();
+                await Common.DbHelper.GetUserData(Models.MainModel.CurrectSource);
+                Models.MainModel.SubSystems = await Common.DbHelper.GetSubSystemInfo(Models.MainModel.CurrectSource);
                 await Models.MainModel.GetMessagesAsync();
                 app.MainWindow.ShowActivated = true;
                 app.MainWindow.Topmost = true;
