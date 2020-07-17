@@ -191,7 +191,7 @@
         <dxg:GridControl x:Name="gridControl" AutoGenerateColumns="None" Grid.Column="1" EnableSmartColumnsGeneration="True" FontSize="16"
                          Margin="5" Grid.Row="3" ItemsSource="{Binding Messages}" FilterCriteria="{Binding Filter}" AllowMRUFilterList="False" AllowColumnMRUFilterList="False">
             <dxg:GridControl.View>
-                <dxg:TableView AllowPerPixelScrolling="True" SearchPanelAllowFilter="False" 
+                <dxg:TableView AllowPerPixelScrolling="True" SearchPanelAllowFilter="False" ShowSearchPanelNavigationButtons="True"
                                ShowGroupPanel="False" AllowEditing="False" AllowGrouping="False" ShowFilterPanelMode="Never" AllowPaging="True"
                                AllowDateTimeGroupIntervalMenu="False" IsRowCellMenuEnabled="False" IsGroupPanelMenuEnabled="False"
                                IsColumnMenuEnabled="True" IsGroupRowMenuEnabled="False" IsGroupFooterMenuEnabled="False" IsTotalSummaryMenuEnabled="False" 

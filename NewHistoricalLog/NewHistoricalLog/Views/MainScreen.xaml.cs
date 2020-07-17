@@ -81,6 +81,8 @@ namespace NewHistoricalLog.Views
             this.AddString(EditorStringId.DatePickerMinutes, "мин");
             this.AddString(EditorStringId.DatePickerHours, "час");
             this.AddString(EditorStringId.DatePickerSeconds, "сек");
+            this.AddString(EditorStringId.LookUpPrevious, "Пред.");
+            this.AddString(EditorStringId.LookUpNext, "След.");
         }
     }
 }
